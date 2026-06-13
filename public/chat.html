@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Captain Adel — ask the GACAR</title>
+  <meta name="description" content="Ask Captain Adel about the GACAR regulations and get answers with the exact section cited. Independent and educational.">
+  <meta name="theme-color" content="#0A0E12">
+  <link rel="icon" href="assets/img/captain/avatar.png" type="image/png">
+  <link rel="canonical" href="https://captadel.com/chat.html">
+  <link rel="stylesheet" href="assets/css/adel.css">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">Skip to content</a>
+
+  <div class="disclaimer-strip">
+    <div class="container">
+      <span><strong>Independent educational reference.</strong> Not affiliated with GACA —
+      always verify against the official source,
+      <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.</span>
+    </div>
+  </div>
+
+  <header class="site-nav">
+    <div class="container nav-inner">
+      <a class="lockup" href="/" aria-label="Captain Adel — home">
+        <img src="assets/img/captain/avatar.png" alt="" width="40" height="40">
+        <span>
+          <span class="wordmark"><span class="wm-capt">Captain</span> <span class="wm-adel">Adel</span></span>
+          <span class="lockup-sub">Saudi civil aviation</span>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="chat.html" aria-current="page">Ask</a>
+        <a href="console.html">Console</a>
+        <a href="https://gaca.gov.sa" target="_blank" rel="noopener">GACA ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="chat-main">
+    <div class="container">
+      <section class="chat">
+        <header class="chat-header">
+          <div class="chat-id">
+            <img class="chat-avatar" src="assets/img/captain/avatar.png" alt="Captain Adel" width="44" height="44">
+            <div>
+              <span class="chat-name">Captain Adel</span>
+              <span class="chat-status"><span class="on-duty"></span> GACA ATPL · CFII · on duty</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="chat-log" id="chat-log" role="log" aria-live="polite" aria-label="Conversation with Captain Adel">
+          <div class="chat-welcome" id="chat-welcome">
+            <img class="welcome-avatar" src="assets/img/captain/avatar.png" alt="" width="96" height="96">
+            <h1>Captain Adel — on the line.</h1>
+            <p>GACA-licensed ATPL and flight instructor. Ask me about the GACAR regulations,
+            Saudi airspace, licensing, or operations — I answer with the section citation.</p>
+            <div class="chat-suggest" id="chat-suggest">
+              <button type="button" data-q="What are the VFR weather minima in controlled airspace?">VFR weather minima</button>
+              <button type="button" data-q="What's required for a GACAR commercial pilot licence?">CPL requirements</button>
+              <button type="button" data-q="What are the fuel reserve requirements for a Part 121 flight?">Part 121 fuel reserves</button>
+              <button type="button" data-q="What does GACAR Part 91 say about carry-on baggage?">Carry-on baggage rules</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <form class="chat-form" id="chat-form">
+            <label class="visually-hidden" for="chat-text">Ask Captain Adel</label>
+            <textarea id="chat-text" rows="1" placeholder="Ask Captain Adel about the GACAR…" autocomplete="off"></textarea>
+            <button class="chat-send" type="submit" aria-label="Send">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </form>
+          <p class="chat-disclaimer">Captain Adel is an educational AI and can be wrong.
+          Always verify against the official GACA source — not for operational use.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="assets/js/chat.js" defer></script>
+</body>
+</html>

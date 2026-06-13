@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GACAR.console — Captain Adel</title>
+  <meta name="description" content="A citation-first console for the GACAR. Ask Captain Adel and read the governing section beside every answer. Independent and educational.">
+  <meta name="theme-color" content="#0A0E12">
+  <link rel="icon" href="assets/img/captain/avatar.png" type="image/png">
+  <link rel="canonical" href="https://captadel.com/console.html">
+  <link rel="stylesheet" href="assets/css/adel.css">
+  <link rel="stylesheet" href="assets/css/console.css">
+</head>
+<body class="console-page">
+  <a class="visually-hidden" href="#main">Skip to content</a>
+
+  <div class="disclaimer-strip">
+    <div class="container">
+      <span><strong>Independent educational reference.</strong> Not affiliated with GACA —
+      always verify against the official source,
+      <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.</span>
+    </div>
+  </div>
+
+  <header class="site-nav">
+    <div class="container nav-inner">
+      <a class="lockup" href="/" aria-label="Captain Adel — home">
+        <img src="assets/img/captain/avatar.png" alt="" width="40" height="40">
+        <span>
+          <span class="wordmark"><span class="wm-capt">Captain</span> <span class="wm-adel">Adel</span></span>
+          <span class="lockup-sub">GACAR.console</span>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="chat.html">Ask</a>
+        <a href="console.html" aria-current="page">Console</a>
+        <a href="https://gaca.gov.sa" target="_blank" rel="noopener">GACA ↗</a>
+        <span class="lang-seg" role="group" aria-label="Language">
+          <button id="lang-en" type="button" aria-pressed="true">EN</button>
+          <button id="lang-ar" type="button" aria-pressed="false" lang="ar">ع</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="console-main">
+    <div class="container">
+
+      <form class="qbar" id="qbar" autocomplete="off">
+        <span class="qbar-caret" aria-hidden="true">›</span>
+        <label class="visually-hidden" for="q">Ask the GACAR</label>
+        <input id="q" type="text"
+          data-en-ph="ask a question — or jump to a section like  91.155"
+          data-ar-ph="اسأل سؤالاً — أو انتقل إلى مادة مثل  91.155"
+          placeholder="ask a question — or jump to a section like  91.155"
+          spellcheck="false">
+        <kbd class="qbar-kbd">⌘K</kbd>
+        <button class="qbar-send" type="submit" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </form>
+      <p class="qbar-hint"
+         data-en="Press <b>⌘K</b> / <b>/</b> to focus. Use <b>↑ ↓</b> to walk citations — the Source pane snaps to each."
+         data-ar="اضغط <b>⌘K</b> / <b>/</b> للتركيز. استخدم <b>↑ ↓</b> للتنقّل بين الاستشهادات — تنتقل لوحة المصدر إلى كلٍّ منها.">
+        Press <b>⌘K</b> / <b>/</b> to focus. Use <b>↑ ↓</b> to walk citations — the Source pane snaps to each.
+      </p>
+
+      <div class="console-grid">
+        <section class="results" id="results" role="log" aria-live="polite" aria-label="Console answers from Captain Adel">
+          <div class="console-welcome" id="console-welcome">
+            <img class="welcome-avatar" src="assets/img/captain/avatar.png" alt="" width="72" height="72">
+            <h1 data-en="Citation-first. Ask the GACAR." data-ar="الاستشهاد أولاً. اسأل اللوائح.">Citation-first. Ask the GACAR.</h1>
+            <p data-en="Every answer leads with how grounded it is and the exact section it rests on — read the governing text in the pane beside it."
+               data-ar="كل إجابة تبدأ بمدى استنادها إلى المصدر والمادة التي تقوم عليها — اقرأ النص الحاكم في اللوحة المجاورة.">
+              Every answer leads with how grounded it is and the exact section it rests on — read the governing text in the pane beside it.</p>
+            <div class="suggest" id="suggest">
+              <button type="button" data-q="What are the VFR weather minima in controlled airspace?">VFR weather minima</button>
+              <button type="button" data-q="What's required for a GACAR commercial pilot licence?">CPL requirements</button>
+              <button type="button" data-q="What are the fuel reserve requirements for a Part 121 flight?">Part 121 fuel reserves</button>
+              <button type="button" data-q="91.155">Jump to §91.155</button>
+            </div>
+          </div>
+        </section>
+
+        <aside class="source-rail" aria-label="Cited source">
+          <div class="console-source" id="source">
+            <div class="source-top">
+              <span class="source-t" data-en="Source" data-ar="المصدر">Source</span>
+              <span class="source-cite" id="src-cite">—</span>
+            </div>
+            <div class="source-body" id="src-body">
+              <p class="source-hint" data-en="The cited GACAR section appears here. Click a § in an answer to snap to it."
+                 data-ar="تظهر هنا مادة اللوائح المُستشهَد بها. انقر على § في إجابة للانتقال إليها.">
+                The cited GACAR section appears here. Click a § in an answer to snap to it.</p>
+            </div>
+            <div class="source-foot" id="src-foot" hidden>
+              <a id="src-open" href="#" target="_blank" rel="noopener"
+                 data-en="Open the full section ↗" data-ar="افتح المادة كاملة ↗">Open the full section ↗</a>
+              <span class="source-ver" id="src-ver"></span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <p class="console-foot-disclaimer">
+    <span data-en="Captain Adel is an educational AI and can be wrong. Always verify against the official GACA source — not for operational use."
+          data-ar="كابتن عادل ذكاء اصطناعي تعليمي وقد يخطئ. تحقّق دائماً من مصدر الهيئة الرسمي — ليس للاستخدام التشغيلي.">
+      Captain Adel is an educational AI and can be wrong. Always verify against the official GACA source — not for operational use.</span>
+  </p>
+
+  <script src="assets/js/console.js" defer></script>
+</body>
+</html>

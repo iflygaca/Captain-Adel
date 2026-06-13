@@ -1,0 +1,35 @@
+{
+  "name": "captain-adel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Captain Adel — independent AI flight instructor for Saudi civil aviation. Standalone RAG service and the brain Fly GACA plugs into.",
+  "main": "src/server.js",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test:unit": "node --test test/*.test.js",
+    "eval": "node evals/run.js",
+    "eval:dry": "node evals/run.js --dry",
+    "eval:allam": "node evals/run.js --provider allam",
+    "eval:jais": "node evals/run.js --provider jais",
+    "eval:fanar": "node evals/run.js --provider fanar",
+    "eval:qwen": "node evals/run.js --provider qwen",
+    "eval:commandr": "node evals/run.js --provider commandr",
+    "eval:parity": "node evals/parity.js",
+    "eval:parity:jais": "node evals/parity.js --provider jais",
+    "eval:parity:fanar": "node evals/parity.js --provider fanar",
+    "eval:parity:qwen": "node evals/parity.js --provider qwen",
+    "eval:parity:commandr": "node evals/parity.js --provider commandr",
+    "provider:smoke": "node evals/provider-smoke.js",
+    "allam:smoke": "node evals/allam-smoke.js",
+    "jais:smoke": "node evals/jais-smoke.js",
+    "build:embeddings": "node scripts/build-embeddings.js",
+    "smoke": "node -e \"require('./src/server'); console.log('server module loads OK')\""
+  },
+  "dependencies": {
+    "@google/genai": "^1.0.0",
+    "express": "^4.21.0"
+  }
+}

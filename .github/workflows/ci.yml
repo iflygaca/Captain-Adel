@@ -1,0 +1,57 @@
+name: captain-adel ci
+
+on:
+  push:
+    paths:
+      - 'captadel/**'
+  pull_request:
+    paths:
+      - 'captadel/**'
+  workflow_dispatch:
+  schedule:
+    # Weekly live-eval — catches server-side model drift even when no code
+    # changed (Mondays 06:17 UTC). Schedule events ignore the paths filter.
+    - cron: '17 6 * * 1'
+
+# When this subtree is promoted to its own FlyGACA/captadel repo, drop the
+# `paths:` filters and the `working-directory` below (the repo root becomes
+# captadel/).
+defaults:
+  run:
+    working-directory: captadel
+
+jobs:
+  # Always-green structure check: the server module loads and cases.json is
+  # valid. No key, no model calls — safe on every push/PR and on forks.
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npm run smoke
+      # Unit tests for the deterministic brain: guards, routing, rate limiter and
+      # the BM25 retriever (runs against the bundled corpus — no API key needed).
+      - run: npm run test:unit
+      - run: npm run eval:dry
+
+  # Live model eval against the real brain. Needs a PAID Gemini key — the free
+  # tier's 5 RPM is too slow for the suite (EVAL_DELAY_MS paces the calls). Runs
+  # only on the weekly schedule and on manual dispatch, and only when the
+  # GEMINI_API_KEY secret is set, so routine pushes and forks stay green.
+  live-eval:
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - name: Live eval (only when GEMINI_API_KEY is set)
+        if: ${{ env.GEMINI_API_KEY != '' }}
+        run: npm run eval

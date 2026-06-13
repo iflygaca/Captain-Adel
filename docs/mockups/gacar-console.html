@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GACAR.console — answer + refusal cards (design concept)</title>
+<!--
+  Captain Adel · "GACAR.console" direction — static design concept.
+  Non-deployed mockup. Vanilla HTML/CSS/JS, no framework, no network.
+  It renders against the v1 response contract in ../data-contract.md, i.e. it
+  only shows what that contract can actually return.
+
+  Design rules this concept obeys (from the design-team critique):
+    • Provenance leads — the citation header sits ABOVE the answer.
+    • Grounding is a THREE-state, server-authoritative signal, never "a cite is present":
+        grounded (sage green) · partial (amber) · refusal (amber, distinct).
+      Teal (#4A9CB8) stays the LINK/FOCUS color only — it never means "verified".
+    • Refusals are first-class console verdicts with a named class + a "where to verify"
+      block + a one-line plain-language gloss (warmth grafted from The Reference Desk).
+    • Every cite token is <bdi dir="ltr" lang="en"> so §91.155(a)(2) never scrambles in RTL.
+    • The verify-against-GACA stamp is per-card and non-dismissible.
+    • Safety-critical handoffs are routed OUT of the cold terminal into an urgent card.
+    • Lockstep: focus a cite (click / ↑ ↓ / Tab) → the Source pane snaps to that passage.
+    • EN ⇄ العربية toggle flips dir and proves bidi cite rendering + RTL parity.
+-->
+<style>
+  :root{
+    /* Falcon palette — carried from captadel/public/assets/css/adel.css */
+    --night:#0A0E12; --panel:#11161C; --panel-2:#161C24; --panel-3:#1A222C;
+    --line:#232C36; --line-2:#2C3743;
+    --ink:#E7ECF1; --ink-dim:#9AA7B4; --ink-faint:#6B7886;
+    --gold:#C8A04A; --gold-soft:#E0C079;
+    /* teal = links / focus ONLY (never "verified") */
+    --teal:#4A9CB8; --teal-bright:#5FB3CE;
+    /* grounding signals — green vs amber polarity */
+    --sage:#8FC9A8; --sage-bright:#62D39B; --sage-bg:rgba(98,211,155,.10);
+    --amber:#E0B341; --amber-bg:rgba(224,179,65,.10);
+    --flag:#E08A4A; --flag-bg:rgba(224,138,74,.12);   /* refusal / hold */
+    --urgent:#E0594A; --urgent-bg:rgba(224,89,74,.12); /* safety handoff */
+    --radius:12px;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    /* Arabic should load Cairo in production; system Arabic stack here. */
+    --sans:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,"Noto Sans Arabic",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; font-family:var(--sans); color:var(--ink); line-height:1.55;
+    background:radial-gradient(1100px 560px at 50% -12%,#121A22 0%,var(--night) 62%);
+    min-height:100vh;
+  }
+  a{color:var(--teal-bright);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 18px}
+
+  /* ---- top bar ---- */
+  .top{position:sticky;top:0;z-index:30;background:rgba(10,14,18,.82);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .top .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:14px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:.2px}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--sage-bright);
+    box-shadow:0 0 9px var(--sage-bright)}
+  .brand .mono{font-family:var(--mono);color:var(--ink-dim);font-weight:600;font-size:13px}
+  .brand b{color:var(--gold)}
+  .top-actions{display:flex;align-items:center;gap:8px}
+  .seg{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;overflow:hidden}
+  .seg button{background:transparent;border:0;color:var(--ink-dim);font:inherit;font-size:13px;
+    font-weight:700;padding:6px 12px;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--panel-3);color:var(--ink)}
+  .seg button+button{border-inline-start:1px solid var(--line-2)}
+
+  /* ---- console query bar ---- */
+  .console{margin:18px 0 14px}
+  .qbar{display:flex;align-items:center;gap:10px;background:var(--panel);
+    border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.02) inset}
+  .qbar:focus-within{border-color:var(--teal);box-shadow:0 0 0 3px rgba(74,156,184,.18)}
+  .qbar .caret{font-family:var(--mono);color:var(--sage-bright);font-weight:700}
+  .qbar input{flex:1;background:transparent;border:0;outline:0;color:var(--ink);
+    font-family:var(--mono);font-size:15px}
+  .qbar input::placeholder{color:var(--ink-faint)}
+  .kbd{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);border:1px solid var(--line-2);
+    border-radius:6px;padding:2px 7px;background:var(--panel-2)}
+  .hint{margin:8px 2px 0;font-size:12.5px;color:var(--ink-faint)}
+  .hint b{color:var(--ink-dim);font-weight:700}
+
+  /* ---- split layout ---- */
+  .split{display:grid;grid-template-columns:1.32fr .9fr;gap:18px;align-items:start;padding-bottom:64px}
+  .stack{display:flex;flex-direction:column;gap:16px}
+
+  /* ---- result card ---- */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden}
+  .card.active{border-color:var(--line-2)}
+  .card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:11px 15px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+  .badge{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:800;
+    letter-spacing:.5px;text-transform:uppercase}
+  .badge .seg-meter{display:inline-flex;gap:3px}
+  .badge .seg-meter i{width:13px;height:6px;border-radius:2px;background:var(--line-2);display:block}
+  .badge .lbl{display:inline-flex;align-items:center;gap:6px}
+  .badge .dot{width:8px;height:8px;border-radius:50%}
+  /* grounded */
+  .card[data-kind="grounded"] .badge{color:var(--sage-bright)}
+  .card[data-kind="grounded"] .badge .dot{background:var(--sage-bright);box-shadow:0 0 8px var(--sage-bright)}
+  .card[data-kind="grounded"] .seg-meter i{background:var(--sage-bright)}
+  /* partial */
+  .card[data-kind="partial"] .badge{color:var(--amber)}
+  .card[data-kind="partial"] .badge .dot{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+  .card[data-kind="partial"] .seg-meter i:nth-child(1){background:var(--amber)}
+  .card[data-kind="partial"] .seg-meter i:nth-child(2){background:linear-gradient(90deg,var(--amber) 55%,var(--line-2) 55%)}
+  /* refusal */
+  .card[data-kind="refusal"] .badge{color:var(--flag)}
+  .card[data-kind="refusal"] .badge .dot{background:var(--flag);box-shadow:0 0 8px var(--flag)}
+  .card[data-kind="refusal"] .seg-meter i{background:var(--line-2)}
+  .card[data-kind="refusal"]{border-color:rgba(224,138,74,.32)}
+  .card[data-kind="refusal"] .card-top{background:var(--flag-bg)}
+  /* urgent handoff */
+  .card[data-kind="handoff"]{border-color:rgba(224,89,74,.4)}
+  .card[data-kind="handoff"] .card-top{background:var(--urgent-bg)}
+  .card[data-kind="handoff"] .badge{color:var(--urgent)}
+  .card[data-kind="handoff"] .badge .dot{background:var(--urgent);box-shadow:0 0 10px var(--urgent)}
+
+  .classtag{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);
+    border:1px solid var(--line-2);border-radius:6px;padding:2px 8px;white-space:nowrap}
+
+  .card-body{padding:15px 16px 4px}
+  .qecho{font-family:var(--mono);font-size:12.5px;color:var(--ink-faint);margin:0 0 10px}
+  .qecho::before{content:"› ";color:var(--sage-bright)}
+  .short{font-size:16.5px;margin:0 0 10px;line-height:1.5}
+  .detail{margin:0 0 12px;color:var(--ink);font-size:14.5px}
+  .detail ul{margin:6px 0 0;padding-inline-start:20px}
+  .detail li{margin:4px 0}
+
+  /* inline cite token — focusable, drives the source pane */
+  .cite{font-family:var(--mono);font-size:.86em;font-weight:700;color:var(--gold-soft);
+    background:rgba(200,160,74,.10);border:1px solid rgba(200,160,74,.28);border-radius:6px;
+    padding:1px 6px;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s}
+  .cite:hover{background:rgba(200,160,74,.18)}
+  .cite:focus-visible,.cite.snapped{outline:none;border-color:var(--teal);
+    box-shadow:0 0 0 2px rgba(74,156,184,.35);background:rgba(74,156,184,.12);color:var(--teal-bright)}
+
+  /* verbatim "regulation reads" block */
+  .verbatim{margin:4px 0 12px;border-inline-start:3px solid var(--gold);border-radius:0 8px 8px 0;
+    background:#0d141b;padding:11px 14px}
+  .verbatim .vh{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-faint);
+    margin:0 0 6px}
+  .verbatim p{margin:0;font-family:var(--mono);font-size:13px;color:var(--ink);line-height:1.6}
+
+  /* plain-language gloss (warmth graft) */
+  .gloss{margin:2px 0 12px;padding:10px 13px;border-radius:8px;background:var(--panel-3);
+    border:1px solid var(--line);color:var(--ink-dim);font-size:13.5px}
+  .gloss b{color:var(--ink)}
+
+  /* "where to verify" action block */
+  .verify{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px}
+  .vbtn{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;
+    color:var(--ink);background:var(--panel-2);border:1px solid var(--line-2);border-radius:8px;
+    padding:7px 12px;cursor:pointer}
+  .vbtn:hover{border-color:var(--teal);color:var(--teal-bright);text-decoration:none}
+  .vbtn .ext{color:var(--ink-faint);font-size:11px}
+
+  /* per-card stamp — non-dismissible */
+  .stamp{display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+    padding:9px 16px;border-top:1px solid var(--line);background:var(--panel-2);
+    font-size:11.5px;color:var(--ink-dim)}
+  .stamp .seal{font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--ink);font-size:11px}
+  .stamp .asof{margin-inline-start:auto;font-family:var(--mono);color:var(--ink-faint);font-size:11px}
+
+  /* ---- source pane (right) ---- */
+  .sourcewrap{position:sticky;top:78px}
+  .source{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .source-top{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:11px 14px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+  .source-top .t{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-faint);font-weight:700}
+  .source-top .cite-now{font-family:var(--mono);font-size:13px;color:var(--gold-soft);font-weight:700}
+  .source-body{padding:14px 15px;max-height:60vh;overflow:auto}
+  .source-body .secline{font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin:0 0 9px}
+  .source-body .passage{font-size:14px;line-height:1.7;color:var(--ink);margin:0}
+  .source-body .passage mark{background:rgba(98,211,155,.18);color:var(--ink);
+    border-radius:3px;padding:0 2px;box-shadow:inset 0 -1px 0 var(--sage)}
+  .source-foot{padding:10px 15px;border-top:1px solid var(--line);display:flex;
+    align-items:center;justify-content:space-between;gap:10px;font-size:12px}
+  .source-foot .ver{font-family:var(--mono);color:var(--ink-faint);font-size:11px}
+  /* empty (refusal) state */
+  .source.empty .source-body{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;min-height:200px;color:var(--ink-faint)}
+  .source.empty .nogrnd{font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+    color:var(--flag);font-size:12px;margin-bottom:8px}
+  .source.empty .passage{color:var(--ink-faint);font-size:13.5px;max-width:34ch}
+
+  .legend{margin:18px 0 6px;display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--ink-faint)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .legend i{width:11px;height:11px;border-radius:3px;display:block}
+
+  @media (max-width:880px){
+    .split{grid-template-columns:1fr}
+    .sourcewrap{position:static}
+    /* On phones the lockstep becomes a bottom sheet that keeps answer+proof co-visible.
+       Concept: the source pane re-flows under each card; in the real build it is a
+       drag-up sheet pinned to the focused cite. */
+  }
+  [dir="rtl"] .qecho::before{content:"‹ "}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <span class="dot" aria-hidden="true"></span>
+      <span>Captain&nbsp;<b>Adel</b></span>
+      <span class="mono">GACAR.console</span>
+    </div>
+    <div class="top-actions">
+      <div class="seg" role="group" aria-label="Language">
+        <button id="lang-en" aria-pressed="true">EN</button>
+        <button id="lang-ar" aria-pressed="false" lang="ar">ع</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="console">
+    <div class="qbar" id="qbar">
+      <span class="caret" aria-hidden="true">›</span>
+      <input id="q" type="text"
+        data-en-ph="ask a question — or jump to a section like  91.155"
+        data-ar-ph="اسأل سؤالاً — أو انتقل إلى مادة مثل  91.155"
+        placeholder="ask a question — or jump to a section like  91.155"
+        autocomplete="off" spellcheck="false">
+      <span class="kbd">⌘K</span>
+    </div>
+    <p class="hint" data-en="Type a bare section (e.g. &lt;b&gt;91.155&lt;/b&gt;) to read the text with no model call. Use &lt;b&gt;↑ ↓&lt;/b&gt; to walk citations — the Source pane snaps to each."
+       data-ar="اكتب رقم مادة (مثل &lt;b&gt;91.155&lt;/b&gt;) لقراءة النص دون استدعاء النموذج. استخدم &lt;b&gt;↑ ↓&lt;/b&gt; للتنقّل بين الاستشهادات — تنتقل لوحة المصدر إلى كلٍّ منها.">
+      Type a bare section (e.g. <b>91.155</b>) to read the text with no model call. Use <b>↑ ↓</b> to walk citations — the Source pane snaps to each.
+    </p>
+  </section>
+
+  <div class="split">
+
+    <!-- LEFT: result cards -->
+    <div class="stack" id="stack">
+
+      <!-- ============ GROUNDED answer card ============ -->
+      <article class="card active" data-kind="grounded" tabindex="-1">
+        <div class="card-top">
+          <span class="badge" role="status">
+            <span class="seg-meter" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="lbl"><span class="dot"></span>
+              <span data-en="Grounded" data-ar="موثَّق بالمصدر">Grounded</span></span>
+          </span>
+          <span class="classtag" data-en="all claims supported" data-ar="كل العبارات مدعومة">all claims supported</span>
+        </div>
+        <div class="card-body">
+          <p class="qecho">VFR weather minima in controlled airspace, below 10,000 ft</p>
+          <p class="short">
+            <span data-en="In controlled airspace below 10,000&nbsp;ft MSL, VFR requires &lt;b&gt;3&nbsp;SM&lt;/b&gt; flight visibility and cloud clearance of &lt;b&gt;500&nbsp;ft below, 1,000&nbsp;ft above, 2,000&nbsp;ft horizontal&lt;/b&gt;."
+                  data-ar="في المجال الجوي المُراقب دون 10,000&nbsp;قدم، يتطلّب الطيران البصري رؤية &lt;b&gt;3&nbsp;أميال برية&lt;/b&gt; وابتعاداً عن السحب بمقدار &lt;b&gt;500&nbsp;قدم أسفل، 1,000&nbsp;قدم أعلى، 2,000&nbsp;قدم أفقياً&lt;/b&gt;.">
+              In controlled airspace below 10,000&nbsp;ft MSL, VFR requires <b>3&nbsp;SM</b> flight visibility and cloud clearance of <b>500&nbsp;ft below, 1,000&nbsp;ft above, 2,000&nbsp;ft horizontal</b>.
+            </span>
+          </p>
+          <div class="detail">
+            <span data-en="This is the controlled-airspace case; uncontrolled and higher-altitude classes differ."
+                  data-ar="هذه حالة المجال المُراقب؛ تختلف القيم في المجال غير المُراقب والارتفاعات الأعلى.">
+              This is the controlled-airspace case; uncontrolled and higher-altitude classes differ.</span>
+            <ul>
+              <li><span data-en="Flight visibility &amp; distance-from-cloud are set in"
+                        data-ar="تُحدَّد الرؤية والابتعاد عن السحب في">Flight visibility &amp; distance-from-cloud are set in</span>
+                <button class="cite" type="button"
+                  data-section="91.155(a)"
+                  data-cite="GACAR Part 91, §91.155(a)"
+                  data-passage="Except as provided in §91.157, no person may operate an aircraft under VFR when the flight visibility is less, or at a distance from clouds that is less, than that prescribed for the corresponding altitude and class of airspace. In controlled airspace below 10,000 ft MSL: 3 statute miles flight visibility; 500 ft below, 1,000 ft above, and 2,000 ft horizontal from cloud."
+                  data-mark="3 statute miles flight visibility; 500 ft below, 1,000 ft above, and 2,000 ft horizontal">
+                  <bdi dir="ltr" lang="en">§91.155(a)</bdi></button>.
+              </li>
+              <li><span data-en="Special VFR and the &lt;3&nbsp;SM exceptions are carved out in"
+                        data-ar="استثناءات الطيران البصري الخاص تُذكر في">Special VFR and the &lt;3&nbsp;SM exceptions are carved out in</span>
+                <button class="cite" type="button"
+                  data-section="91.157"
+                  data-cite="GACAR Part 91, §91.157"
+                  data-passage="Special VFR weather minimums. When authorized by ATC, a person may operate an aircraft under special VFR within the lateral boundaries of controlled airspace below 10,000 ft MSL at or below 1 statute mile flight visibility and clear of clouds, provided the operation is conducted clear of clouds and, between sunset and sunrise, the aircraft and pilot are appropriately equipped and rated."
+                  data-mark="1 statute mile flight visibility and clear of clouds">
+                  <bdi dir="ltr" lang="en">§91.157</bdi></button>.
+              </li>
+            </ul>
+          </div>
+          <div class="verbatim">
+            <p class="vh" data-en="Regulation reads — §91.155(a)" data-ar="نص المادة — §91.155(a)">Regulation reads — <bdi dir="ltr" lang="en">§91.155(a)</bdi></p>
+            <p>“…no person may operate an aircraft under VFR when the flight visibility is less, or at a distance from clouds that is less, than that prescribed… <b>3 statute miles; 500 ft below, 1,000 ft above, 2,000 ft horizontal</b>.”</p>
+          </div>
+        </div>
+        <div class="stamp">
+          <span class="seal" data-en="Unofficial · educational" data-ar="غير رسمي · تعليمي">Unofficial · educational</span>
+          <span data-en="Verify against the official source —" data-ar="تحقّق من المصدر الرسمي —">Verify against the official source —</span>
+          <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>
+          <span class="asof" data-en="corpus AIRAC 2505 · §91.155" data-ar="المرجع AIRAC 2505 · §91.155">corpus AIRAC 2505 · §91.155</span>
+        </div>
+      </article>
+
+      <!-- ============ REFUSAL card (1.1 unverifiable operational limit) ============ -->
+      <article class="card" data-kind="refusal" data-empty-source="1" tabindex="-1">
+        <div class="card-top">
+          <span class="badge" role="status">
+            <span class="seg-meter" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="lbl"><span class="dot"></span>
+              <span data-en="Hold — not grounded" data-ar="توقّف — غير موثَّق">Hold — not grounded</span></span>
+          </span>
+          <span class="classtag">refusal · <bdi dir="ltr" lang="en">unverifiable-limit · §1.1</bdi></span>
+        </div>
+        <div class="card-body">
+          <p class="qecho">max crosswind for a student pilot on a solo flight?</p>
+          <p class="short">
+            <span data-en="I can't verify that figure. There is no single GACAR number for a student's solo crosswind limit — it's set by your instructor's endorsement and the AFM, not by a regulation."
+                  data-ar="لا أستطيع التحقق من هذا الرقم. لا توجد قيمة واحدة في اللوائح لحد الرياح المتقاطعة في الطيران المنفرد للطالب — يحدّدها اعتماد مُدرّبك ودليل الطائرة، لا اللائحة.">
+              I can't verify that figure. There is no single GACAR number for a student's solo crosswind limit — it's set by your instructor's endorsement and the AFM, not by a regulation.</span>
+          </p>
+          <div class="gloss">
+            <b data-en="Why this is a hold, not a dodge:" data-ar="لماذا هذا توقّف وليس تهرّباً:">Why this is a hold, not a dodge:</b>
+            <span data-en="a wrong limit is more dangerous than no limit. Student solo currency lives in Part 61; the actual crosswind ceiling is the lower of your AFM demonstrated value and your instructor's limitation."
+                  data-ar="القيمة الخاطئة أخطر من غيابها. أهلية الطيران المنفرد للطالب في الجزء 61؛ والحد الفعلي للرياح المتقاطعة هو الأدنى بين قيمة دليل الطائرة وتقييد مُدرّبك.">
+              a wrong limit is more dangerous than no limit. Student solo currency lives in Part 61; the actual crosswind ceiling is the lower of your AFM demonstrated value and your instructor's limitation.</span>
+          </div>
+          <div class="verify">
+            <button class="vbtn" type="button">📖 <span data-en="Open Part 61 in the Library" data-ar="افتح الجزء 61 في المكتبة">Open Part 61 in the Library</span> <span class="ext">↗</span></button>
+            <a class="vbtn" href="https://gaca.gov.sa" target="_blank" rel="noopener">🏛 <span data-en="Check GACA" data-ar="راجع الهيئة">Check GACA</span> <span class="ext">↗</span></a>
+          </div>
+        </div>
+        <div class="stamp">
+          <span class="seal" data-en="Unofficial · educational" data-ar="غير رسمي · تعليمي">Unofficial · educational</span>
+          <span data-en="No grounded figure was returned — verify directly." data-ar="لم تُرجَع قيمة موثّقة — تحقّق مباشرة.">No grounded figure was returned — verify directly.</span>
+          <span class="asof">refusalClass=1.1</span>
+        </div>
+      </article>
+
+      <!-- ============ PARTIAL card (some claims unsupported) ============ -->
+      <article class="card" data-kind="partial" tabindex="-1">
+        <div class="card-top">
+          <span class="badge" role="status">
+            <span class="seg-meter" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="lbl"><span class="dot"></span>
+              <span data-en="Partially grounded" data-ar="موثَّق جزئياً">Partially grounded</span></span>
+          </span>
+          <span class="classtag" data-en="1 of 2 claims unverified" data-ar="عبارة من اثنتين غير مؤكدة">1 of 2 claims unverified</span>
+        </div>
+        <div class="card-body">
+          <p class="qecho">how much fuel reserve for a Part 121 domestic flight?</p>
+          <p class="short">
+            <span data-en="Domestic Part 121 requires fuel to the destination &lt;b&gt;plus 45 minutes&lt;/b&gt; at normal cruise — that part is grounded in"
+                  data-ar="تتطلّب رحلة الجزء 121 الداخلية وقوداً حتى الوجهة &lt;b&gt;زائد 45 دقيقة&lt;/b&gt; بسرعة الطيران العادية — وهذا الجزء موثّق في">
+              Domestic Part 121 requires fuel to the destination <b>plus 45 minutes</b> at normal cruise — that part is grounded in</span>
+            <button class="cite" type="button"
+              data-section="121.639"
+              data-cite="GACAR Part 121, §121.639"
+              data-passage="No person may dispatch or release an airplane for operation under domestic rules unless it has enough fuel to fly to the airport to which it is dispatched; thereafter, to fly to and land at the most distant alternate airport specified; and thereafter, to fly for 45 minutes at normal cruising fuel consumption."
+              data-mark="to fly for 45 minutes at normal cruising fuel consumption">
+              <bdi dir="ltr" lang="en">§121.639</bdi></button>.
+            <span data-en="The alternate-airport trigger I gave you, though, I could not confirm against the cited text — treat it as unverified."
+                  data-ar="أما شرط مطار البديل الذي ذكرته فلم أستطع تأكيده مقابل النص المُستشهَد — اعتبره غير مؤكد.">
+              The alternate-airport trigger I gave you, though, I could not confirm against the cited text — treat it as unverified.</span>
+          </p>
+          <div class="gloss">
+            <b data-en="Amber, not green:" data-ar="كهرماني لا أخضر:">Amber, not green:</b>
+            <span data-en="the badge is amber because the faithfulness check returned “partial” — one claim is supported by the cited section, one is not. Read the section before relying on the second."
+                  data-ar="الشارة كهرمانية لأن فحص المطابقة أعاد «جزئي» — عبارة مدعومة بالمادة المُستشهَدة وأخرى لا. اقرأ المادة قبل الاعتماد على الثانية.">
+              the badge is amber because the faithfulness check returned “partial” — one claim is supported by the cited section, one is not. Read the section before relying on the second.</span>
+          </div>
+        </div>
+        <div class="stamp">
+          <span class="seal" data-en="Unofficial · educational" data-ar="غير رسمي · تعليمي">Unofficial · educational</span>
+          <span data-en="Verify against the official source —" data-ar="تحقّق من المصدر الرسمي —">Verify against the official source —</span>
+          <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>
+          <span class="asof">grounding 0.50 · 1/2</span>
+        </div>
+      </article>
+
+      <!-- ============ SAFETY HANDOFF card (3.1) — routed OUT of the cold terminal ============ -->
+      <article class="card" data-kind="handoff" data-empty-source="1" tabindex="-1">
+        <div class="card-top">
+          <span class="badge" role="status">
+            <span class="lbl"><span class="dot"></span>
+              <span data-en="Safety handoff" data-ar="إحالة سلامة">Safety handoff</span></span>
+          </span>
+          <span class="classtag">handoff · <bdi dir="ltr" lang="en">emergency · §3.1</bdi></span>
+        </div>
+        <div class="card-body">
+          <p class="qecho">my engine just failed, talk me through it</p>
+          <p class="short" style="font-size:18px;line-height:1.45">
+            <b data-en="Fly the aircraft. Declare to ATC. Run your QRH/ECAM for your type."
+               data-ar="حلّق بالطائرة أولاً. أبلِغ المراقبة الجوية. نفّذ قائمة الطوارئ الخاصة بطرازك.">Fly the aircraft. Declare to ATC. Run your QRH/ECAM for your type.</b>
+          </p>
+          <div class="gloss">
+            <span data-en="I'm a study tool, not your checklist — I won't stand in for the type QRH in a live emergency. The console steps aside on purpose here."
+                  data-ar="أنا أداة دراسة لا قائمتك المرجعية — لن أحلّ محل قائمة طوارئ الطراز في حالة حقيقية. تتنحّى الواجهة عمداً هنا.">
+              I'm a study tool, not your checklist — I won't stand in for the type QRH in a live emergency. The console steps aside on purpose here.</span>
+          </div>
+        </div>
+        <div class="stamp">
+          <span class="seal" data-en="Not for operational use" data-ar="ليس للاستخدام التشغيلي">Not for operational use</span>
+          <span class="asof">refusalClass=3.1</span>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- RIGHT: source pane (lockstep) -->
+    <div class="sourcewrap">
+      <div class="source" id="source">
+        <div class="source-top">
+          <span class="t" data-en="Source" data-ar="المصدر">Source</span>
+          <span class="cite-now" id="src-cite"><bdi dir="ltr" lang="en">§91.155(a)</bdi></span>
+        </div>
+        <div class="source-body" id="src-body">
+          <p class="secline" id="src-sec">GACAR Part 91 — General Operating &amp; Flight Rules · §91.155(a)</p>
+          <p class="passage" id="src-passage"></p>
+        </div>
+        <div class="source-foot">
+          <a id="src-open" href="#" target="_blank" rel="noopener"
+             data-en="Open the full section ↗" data-ar="افتح المادة كاملة ↗">Open the full section ↗</a>
+          <span class="ver" id="src-ver">corpus AIRAC 2505</span>
+        </div>
+      </div>
+
+      <div class="legend" aria-hidden="true">
+        <span><i style="background:var(--sage-bright)"></i> <span data-en="Grounded" data-ar="موثَّق">Grounded</span></span>
+        <span><i style="background:var(--amber)"></i> <span data-en="Partial" data-ar="جزئي">Partial</span></span>
+        <span><i style="background:var(--flag)"></i> <span data-en="Refusal / hold" data-ar="توقّف">Refusal / hold</span></span>
+        <span><i style="background:var(--urgent)"></i> <span data-en="Safety handoff" data-ar="إحالة سلامة">Safety handoff</span></span>
+        <span><i style="background:var(--teal)"></i> <span data-en="Link / focus (never “verified”)" data-ar="رابط / تركيز (ليس «موثّقاً»)">Link / focus (never “verified”)</span></span>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+  /* ---------- lockstep: focus a cite → snap the Source pane ---------- */
+  const source  = $('#source');
+  const srcCite = $('#src-cite');
+  const srcSec  = $('#src-sec');
+  const srcPass = $('#src-passage');
+  const srcOpen = $('#src-open');
+  const cites   = $$('.cite');
+
+  function escapeHtml(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+  function snap(cite){
+    cites.forEach(c => c.classList.remove('snapped'));
+    cite.classList.add('snapped');
+    source.classList.remove('empty');
+    const section = cite.dataset.section || '';
+    const passage = cite.dataset.passage || '';
+    const mark    = cite.dataset.mark || '';
+    srcCite.innerHTML = '<bdi dir="ltr" lang="en">§' + escapeHtml(section) + '</bdi>';
+    srcSec.textContent = (cite.dataset.cite || '').replace('GACAR ', 'GACAR ');
+    let html = escapeHtml(passage);
+    if (mark) html = html.replace(escapeHtml(mark), '<mark>' + escapeHtml(mark) + '</mark>');
+    srcPass.innerHTML = html;
+    srcOpen.href = 'library.html#' + section;   // deep-link shape: sectionAnchor
+  }
+
+  function emptySource(reason){
+    source.classList.add('empty');
+    cites.forEach(c => c.classList.remove('snapped'));
+    const ar = document.documentElement.lang === 'ar';
+    srcCite.textContent = ar ? '—' : '—';
+    source.querySelector('.source-body').innerHTML =
+      '<div class="nogrnd">' + (ar ? 'لا مصدر موثّق' : 'no grounded source') + '</div>' +
+      '<p class="passage">' + (ar
+        ? 'لم تُرجِع الاستعادة نصاً يدعم هذه الإجابة. هذا غياب مقصود — تحقّق مباشرة في المادة.'
+        : 'Retrieval returned no text that supports this answer. The absence is intentional — verify the section directly.') + '</p>';
+  }
+  // restore the source body shell when leaving an empty state
+  const SRC_SHELL = source.querySelector('.source-body').innerHTML;
+
+  cites.forEach((c, i) => {
+    c.addEventListener('click', () => snap(c));
+    c.addEventListener('focus', () => snap(c));
+  });
+
+  // ↑ ↓ walk the citations globally (the keyboard "lockstep")
+  let idx = -1;
+  document.addEventListener('keydown', (e) => {
+    if (e.target.matches('input,textarea')) return;
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    if (!cites.length) return;
+    e.preventDefault();
+    idx = (e.key === 'ArrowDown') ? (idx + 1) % cites.length
+                                  : (idx - 1 + cites.length) % cites.length;
+    cites[idx].focus();
+  });
+
+  // a card with no grounded source shows the empty Source state when activated
+  $$('.card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      $$('.card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      if (card.dataset.emptySource === '1') emptySource();
+      else if (card.querySelector('.cite')) {
+        if (source.classList.contains('empty')) {
+          source.querySelector('.source-body').innerHTML = SRC_SHELL;
+          rebind();
+        }
+        snap(card.querySelector('.cite'));
+      }
+    });
+  });
+  function rebind(){ /* src-body shell is static refs; re-query */
+    // no-op: shell uses ids that persist; nothing dynamic to rebind here
+  }
+
+  /* ---------- ⌘K / "/" focuses the query bar ---------- */
+  const q = $('#q');
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); q.focus(); }
+    if (e.key === '/' && !e.target.matches('input,textarea')) { e.preventDefault(); q.focus(); }
+  });
+
+  /* ---------- EN ⇄ العربية : flip dir, swap copy, prove bidi ---------- */
+  const enBtn = $('#lang-en'), arBtn = $('#lang-ar');
+  function setLang(lang){
+    const ar = lang === 'ar';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = ar ? 'rtl' : 'ltr';
+    enBtn.setAttribute('aria-pressed', String(!ar));
+    arBtn.setAttribute('aria-pressed', String(ar));
+    $$('[data-en]').forEach(el => { el.innerHTML = ar ? el.dataset.ar : el.dataset.en; });
+    q.placeholder = ar ? q.dataset.arPh : q.dataset.enPh;
+  }
+  enBtn.addEventListener('click', () => setLang('en'));
+  arBtn.addEventListener('click', () => setLang('ar'));
+
+  /* ---------- init ---------- */
+  if (cites[0]) snap(cites[0]);
+})();
+</script>
+</body>
+</html>

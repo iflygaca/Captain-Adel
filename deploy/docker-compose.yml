@@ -1,0 +1,43 @@
+# Local / dev wiring: Captain Adel + an ALLaM vLLM sidecar.
+#
+# Production should run ALLaM on a managed GPU endpoint in a KSA region (see
+# allam-vllm.md), not as a sidecar. The `allam` service here needs an NVIDIA GPU
+# and the container toolkit; remove it (and set MODEL_PROVIDER=gemini) to run
+# Gemini-only on CPU.
+#
+#   GEMINI_API_KEY=...  docker compose -f deploy/docker-compose.yml up --build
+
+services:
+  adel:
+    build: ..
+    ports:
+      - "8787:8787"
+    environment:
+      PORT: "8787"
+      MODEL_PROVIDER: "auto"
+      GEMINI_API_KEY: "${GEMINI_API_KEY}"
+      CAPTAIN_ADEL_MODEL: "gemini-2.5-flash"
+      ALLAM_BASE_URL: "http://allam:8000/v1"
+      ALLAM_MODEL: "humain-ai/ALLaM-7B-Instruct-preview"
+      ADEL_API_KEY: "${ADEL_API_KEY:-}"
+    depends_on:
+      - allam
+
+  allam:
+    image: vllm/vllm-openai:latest
+    command:
+      - "--model"
+      - "humain-ai/ALLaM-7B-Instruct-preview"
+      - "--max-model-len"
+      - "4096"
+    ports:
+      - "8000:8000"
+    environment:
+      HUGGING_FACE_HUB_TOKEN: "${HUGGING_FACE_HUB_TOKEN:-}"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

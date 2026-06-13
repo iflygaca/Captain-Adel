@@ -1,2 +1,3 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# bm25.js embeds Arabic combining marks (the normalizeArabic fold table), which
+# trips gits binary-diff heuristic. Force it to diff as text so reviews work.
+src/brain/bm25.js text diff

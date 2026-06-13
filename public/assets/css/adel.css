@@ -1,0 +1,240 @@
+/* Captain Adel — standalone site styles. Self-contained, no framework.
+   Brand: night #0A0E12, gold #C8A04A, with a cool instrument-glow accent. */
+
+:root {
+  --night: #0A0E12;
+  --panel: #11161C;
+  --panel-2: #161C24;
+  --line: #232C36;
+  --ink: #E7ECF1;
+  --ink-dim: #9AA7B4;
+  --gold: #C8A04A;
+  --gold-soft: #E0C079;
+  --accent: #4A9CB8;            /* teal — links / focus ONLY, never "verified" */
+  /* grounding signals — green vs amber polarity */
+  --sage: #62D39B;
+  --amber: #E0B341;
+  --flag: #E08A4A;              /* refusal / hold */
+  --glow: 0 0 24px rgba(74, 156, 184, 0.18);
+  --radius: 14px;
+  --maxw: 1080px;
+  --font: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: radial-gradient(1200px 600px at 50% -10%, #121A22 0%, var(--night) 60%);
+  color: var(--ink);
+  line-height: 1.55;
+  min-height: 100vh;
+}
+a { color: var(--gold-soft); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* disclaimer strip */
+.disclaimer-strip {
+  background: #0c1116; border-bottom: 1px solid var(--line);
+  font-size: 12.5px; color: var(--ink-dim);
+}
+.disclaimer-strip .container { padding-top: 8px; padding-bottom: 8px; }
+.disclaimer-strip strong { color: var(--ink); }
+
+/* header */
+.site-nav { border-bottom: 1px solid var(--line); background: rgba(10,14,18,0.7); backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 10; }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.lockup { display: flex; align-items: center; gap: 12px; color: var(--ink); }
+.lockup:hover { text-decoration: none; }
+.lockup img { border-radius: 50%; box-shadow: var(--glow); }
+.wordmark { font-weight: 800; letter-spacing: 0.2px; font-size: 18px; }
+.wm-capt { color: var(--ink); }
+.wm-adel { color: var(--gold); }
+.lockup-sub { display: block; font-size: 11px; color: var(--ink-dim); font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; }
+.nav-links { display: flex; gap: 20px; }
+.nav-links a { color: var(--ink-dim); font-weight: 600; font-size: 14px; }
+.nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--ink); text-decoration: none; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px; font-weight: 700; border: 1px solid transparent; cursor: pointer; font-size: 14px; }
+.btn-primary { background: linear-gradient(180deg, var(--gold-soft), var(--gold)); color: #1a1206; }
+.btn-primary:hover { text-decoration: none; filter: brightness(1.05); }
+.btn-ghost { background: transparent; border-color: var(--line); color: var(--ink); }
+
+/* hero */
+.hero { padding: 72px 0 56px; }
+.hero-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; align-items: center; }
+.hero h1 { font-size: clamp(30px, 5vw, 48px); line-height: 1.08; margin: 0 0 16px; letter-spacing: -0.5px; }
+.hero h1 .g { color: var(--gold); }
+.hero p.lede { font-size: 18px; color: var(--ink-dim); margin: 0 0 28px; max-width: 38ch; }
+.hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+.hero-art { text-align: center; }
+.hero-art img { width: min(320px, 80%); border-radius: 24px; box-shadow: var(--glow); }
+.cred { display: inline-flex; gap: 8px; align-items: center; margin-top: 16px; font-size: 13px; color: var(--gold-soft); font-weight: 700; }
+.cred .dot { width: 8px; height: 8px; border-radius: 50%; background: #36c275; box-shadow: 0 0 10px #36c275; }
+
+/* feature cards */
+.features { padding: 24px 0 72px; }
+.features h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-dim); margin: 0 0 20px; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+.card h3 { margin: 0 0 8px; font-size: 17px; }
+.card p { margin: 0; color: var(--ink-dim); font-size: 14.5px; }
+
+/* chat */
+.chat-main { padding: 28px 0 56px; }
+.chat { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; height: min(76vh, 760px); }
+.chat-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--line); background: var(--panel-2); }
+.chat-id { display: flex; align-items: center; gap: 12px; }
+.chat-avatar { border-radius: 50%; box-shadow: var(--glow); }
+.chat-name { font-weight: 800; display: block; }
+.chat-status { font-size: 12px; color: var(--ink-dim); display: inline-flex; align-items: center; gap: 7px; }
+.on-duty { width: 8px; height: 8px; border-radius: 50%; background: #36c275; box-shadow: 0 0 8px #36c275; }
+
+.chat-log { flex: 1; overflow-y: auto; padding: 22px 18px; display: flex; flex-direction: column; gap: 16px; }
+.chat-welcome { text-align: center; margin: auto 0; padding: 16px; }
+.welcome-avatar { border-radius: 50%; box-shadow: var(--glow); margin-bottom: 12px; }
+.chat-welcome h1 { font-size: 22px; margin: 6px 0 8px; }
+.chat-welcome p { color: var(--ink-dim); max-width: 52ch; margin: 0 auto 18px; }
+
+.chat-suggest { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.chat-suggest button {
+  background: var(--panel-2); border: 1px solid var(--line); color: var(--ink);
+  padding: 9px 14px; border-radius: 999px; cursor: pointer; font-size: 13px; font-weight: 600;
+}
+.chat-suggest button:hover { border-color: var(--gold); color: var(--gold-soft); }
+
+.msg { display: flex; gap: 10px; max-width: 86%; }
+.msg.user { align-self: flex-end; }
+.msg.adel { align-self: flex-start; }
+.msg-avatar { border-radius: 50%; flex-shrink: 0; align-self: flex-start; }
+.msg-bubble { background: var(--panel-2); border: 1px solid var(--line); padding: 12px 15px; border-radius: 14px; font-size: 15px; }
+.msg.user .msg-bubble { background: #1c2733; border-color: #2a3a49; }
+.msg-bubble p { margin: 0 0 8px; }
+.msg-bubble p:last-child { margin-bottom: 0; }
+.msg-bubble strong { color: var(--gold-soft); }
+.msg-bubble ul { margin: 6px 0; padding-left: 20px; }
+.msg-sources { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); display: flex; flex-direction: column; gap: 5px; }
+.src-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--ink-dim); }
+.msg-sources a { font-size: 13px; }
+
+.msg.typing .msg-bubble { display: inline-flex; gap: 5px; }
+.msg.typing span:not(.msg-avatar) { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-dim); animation: blink 1.2s infinite both; }
+.msg.typing span:nth-child(3) { animation-delay: .2s; }
+.msg.typing span:nth-child(4) { animation-delay: .4s; }
+@keyframes blink { 0%, 80%, 100% { opacity: .2; } 40% { opacity: 1; } }
+
+.chat-followups { align-self: flex-start; }
+.cf-label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--ink-dim); display: block; margin-bottom: 8px; }
+
+.chat-input { border-top: 1px solid var(--line); padding: 14px 16px; background: var(--panel-2); }
+.chat-form { display: flex; gap: 10px; align-items: flex-end; }
+.chat-form textarea {
+  flex: 1; resize: none; background: var(--night); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 12px; padding: 12px 14px; font: inherit; font-size: 15px; max-height: 160px;
+}
+.chat-form textarea:focus { outline: none; border-color: var(--accent); box-shadow: var(--glow); }
+.chat-send {
+  background: linear-gradient(180deg, var(--gold-soft), var(--gold)); color: #1a1206;
+  border: none; border-radius: 12px; width: 46px; height: 46px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.chat-send:disabled { opacity: .5; cursor: default; }
+.chat-send svg { width: 20px; height: 20px; }
+.chat-disclaimer { font-size: 12px; color: var(--ink-dim); margin: 10px 2px 0; }
+
+/* footer */
+.site-footer { border-top: 1px solid var(--line); padding: 32px 0; color: var(--ink-dim); font-size: 13.5px; }
+.footer-bottom { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; margin-top: 14px; }
+.footer-disclaimer { max-width: 75ch; }
+.footer-disclaimer strong { color: var(--ink); }
+
+@media (max-width: 760px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-art { order: -1; }
+  .cards { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+}
+
+/* ============================================================================
+   Grounding contract — three-state badge, § cites, source lockstep, refusal.
+   Driven by the /v1/chat response (kind · refusalClass · grounding · sources).
+   ==========================================================================*/
+
+/* provenance leads — the badge sits at the very top of the answer bubble */
+.grounding-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase;
+  margin: 0 0 9px; padding: 4px 10px 4px 8px; border-radius: 999px;
+  border: 1px solid var(--line-2, #2C3743); background: var(--night);
+}
+.grounding-badge .gb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-dim); }
+.grounding-badge .gb-class {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink-dim);
+  border-inline-start: 1px solid var(--line); padding-inline-start: 8px; margin-inline-start: 2px;
+}
+.grounding-badge[data-state="grounded"] { color: var(--sage); border-color: rgba(98,211,155,.4); }
+.grounding-badge[data-state="grounded"] .gb-dot { background: var(--sage); box-shadow: 0 0 8px var(--sage); }
+.grounding-badge[data-state="partial"]  { color: var(--amber); border-color: rgba(224,179,65,.4); }
+.grounding-badge[data-state="partial"]  .gb-dot { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+.grounding-badge[data-state="refusal"]  { color: var(--flag); border-color: rgba(224,138,74,.45); }
+.grounding-badge[data-state="refusal"]  .gb-dot { background: var(--flag); box-shadow: 0 0 8px var(--flag); }
+
+/* the answer bubble tints with the verdict (subtle) */
+.msg-bubble[data-kind="refusal"] { border-color: rgba(224,138,74,.32); background: rgba(224,138,74,.06); }
+.msg-bubble[data-kind="partial"] { border-color: rgba(224,179,65,.22); }
+
+/* inline § cite token — focusable, drives the source lockstep */
+.cite {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .86em; font-weight: 700; color: var(--gold-soft);
+  background: rgba(200,160,74,.10); border: 1px solid rgba(200,160,74,.28);
+  border-radius: 6px; padding: 0 5px; cursor: pointer; white-space: nowrap;
+  transition: background .12s, border-color .12s;
+}
+.cite:hover { background: rgba(200,160,74,.18); }
+.cite:focus-visible, .cite.snapped {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(74,156,184,.35); background: rgba(74,156,184,.12); color: var(--accent);
+}
+
+/* sources — each row reveals its verbatim passage inline (the lockstep) */
+.msg-sources .src-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; margin-top: 6px; }
+.src-toggle {
+  display: inline-flex; align-items: baseline; gap: 6px; background: transparent; border: 0;
+  color: var(--gold-soft); font: inherit; font-size: 13px; cursor: pointer; padding: 0; text-align: start;
+}
+.src-toggle[disabled] { cursor: default; color: var(--ink-dim); }
+.src-caret { color: var(--ink-dim); font-size: 11px; }
+.src-toggle:not([disabled]):hover .src-cite { text-decoration: underline; }
+.src-open { font-size: 12px; color: var(--ink-dim); }
+.src-row.flash { background: rgba(98,211,155,.08); border-radius: 8px; }
+.src-verbatim {
+  flex-basis: 100%; margin: 6px 0 2px; padding: 10px 12px; border-radius: 8px;
+  background: #0d141b; border-inline-start: 3px solid var(--gold);
+}
+.src-verbatim p {
+  margin: 0; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px; line-height: 1.6; color: var(--ink);
+}
+.src-verbatim .src-ver { display: block; margin-top: 6px; font-size: 11px; color: var(--ink-faint, #6B7886); }
+
+/* refusal — "where to verify" action buttons */
+.verify-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+.verify-actions .vbtn {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700;
+  color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px;
+  padding: 6px 11px;
+}
+.verify-actions .vbtn:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+
+/* per-answer stamp — non-dismissible, low-key so it doesn't become banner-blind */
+.msg-stamp { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line);
+  font-size: 11.5px; color: var(--ink-dim); }
+.msg-stamp.refusal { color: var(--flag); border-top-color: rgba(224,138,74,.3); font-weight: 600; }
+.msg-stamp .stamp-ver { color: var(--ink-faint, #6B7886); }
