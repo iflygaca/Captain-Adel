@@ -2,23 +2,12 @@ name: captain-adel ci
 
 on:
   push:
-    paths:
-      - 'captadel/**'
   pull_request:
-    paths:
-      - 'captadel/**'
   workflow_dispatch:
   schedule:
     # Weekly live-eval — catches server-side model drift even when no code
     # changed (Mondays 06:17 UTC). Schedule events ignore the paths filter.
     - cron: '17 6 * * 1'
-
-# When this subtree is promoted to its own FlyGACA/captadel repo, drop the
-# `paths:` filters and the `working-directory` below (the repo root becomes
-# captadel/).
-defaults:
-  run:
-    working-directory: captadel
 
 jobs:
   # Always-green structure check: the server module loads and cases.json is
