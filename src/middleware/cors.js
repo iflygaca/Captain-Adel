@@ -28,7 +28,8 @@ function corsMiddleware(req, res, next) {
     res.set('Access-Control-Allow-Origin', origin);
     res.set('Vary', 'Origin');
     res.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, X-Adel-Session, X-Adel-Api-Key');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Adel-Session, X-Adel-Api-Key');
+    res.set('Access-Control-Expose-Headers', 'X-Adel-Quota-Remaining, Retry-After');
     res.set('Access-Control-Max-Age', '3600');
   }
   if (req.method === 'OPTIONS') {

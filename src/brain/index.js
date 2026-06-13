@@ -10,7 +10,7 @@
 
 'use strict';
 
-const { answer } = require('./answer');
+const { answer, answerStream } = require('./answer');
 const bm25 = require('./bm25');
 const guards = require('./guards');
 const ratelimit = require('./ratelimit');
@@ -20,4 +20,4 @@ function warmUp() {
   bm25.warmUp();
 }
 
-module.exports = { answer, warmUp, bm25, guards, ratelimit, pickProvider };
+module.exports = { answer, answerStream, warmUp, bm25, guards, ratelimit, pickProvider };

@@ -1,0 +1,54 @@
+evals: ALLaM parity gate + endpoint smoke ping
+
+Adds the gate that decides whether MODEL_PROVIDER=auto is safe to flip
+on (route Arabic-dominant questions to ALLaM in production). Until now
+the gate was a manual diff between two `node evals/run.js` invocations;
+now it is a single script with an exit code CI can enforce.
+
+What's new:
+
+- evals/lib.js  — shared loadCases/score/hasArabic/isArabicCase. The
+  parity verdict and a solo run.js report can never drift apart because
+  both count PASS/FAIL from the exact same code.
+
+- evals/allam-smoke.js  — one-turn POST against the configured ALLaM
+  endpoint. Fails in ~2s on a bad URL / wrong auth / wrong model name,
+  with a diagnostic, instead of failing after 20 case turns. Run this
+  before parity.js or `eval:allam`.
+
+- evals/parity.js  — runs every case through Gemini AND ALLaM, prints a
+  side-by-side table, computes per-category and Arabic-subset roll-ups,
+  emits a verdict + exit code. The gate is two conditions, both must
+  hold:
+
+    (1) Arabic subset: ALLaM passes >= Gemini passes
+        (this is the actual question the auto router decides)
+    (2) Overall:       ALLaM doesn't regress by more than --tol cases
+        (ALLaM is the cross-provider fallback for English too)
+
+  Exit 0  -> safe to set MODEL_PROVIDER=auto.
+  Exit 1  -> keep MODEL_PROVIDER=gemini; ALLaM stays available as
+             manual provider:"allam" override and as the fallback.
+
+- evals/run.js  — refactored to use lib.js. Behaviour identical
+  (--dry still validates the 20 cases; CI's eval:dry step is unchanged).
+
+- package.json scripts:
+    allam:smoke   -> node evals/allam-smoke.js
+    eval:allam    -> node evals/run.js --provider allam
+    eval:parity   -> node evals/parity.js
+
+- evals/README.md — documents the gate, its two conditions, the
+  recommended smoke->parity workflow.
+
+Offline checks (all pass):
+  npm run smoke          (server module loads)
+  npm run eval:dry       (20 cases valid)
+  node --check evals/{lib,allam-smoke,parity,run}.js
+  pickProvider routes correctly across {gemini,allam,auto} x {EN,AR} x
+    {ALLAM_BASE_URL set, unset}
+  retrieve() returns 4 GACAR citations for the VFR weather question
+
+Live runs (require secrets, intentionally not run in this commit):
+  ALLAM_BASE_URL=... npm run allam:smoke
+  GEMINI_API_KEY=... ALLAM_BASE_URL=... npm run eval:parity

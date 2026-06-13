@@ -26,6 +26,17 @@ const embeddings = require('./embeddings');
 const REF_RE = /\bpart\s+(\d+)\b[^0-9]{0,12}§?\s*(\d+\.\d+(?:\.\d+)?(?:\([^)]*\))?)/i;
 const MAX_PASSAGE_CHARS = 1200;
 
+/* Parent-child expansion: the top hits are widened from their 1200-char chunk
+ * to the FULL section they belong to (the "parent"), so the model reads whole
+ * rules instead of mid-sentence slices. Default on; ADEL_PARENT_CHILD=off
+ * reverts to the historical chunk-only behaviour. Read at call time so evals
+ * and tests can flip it without a module reload. */
+const PARENT_EXPAND_TOP = 3;     // expand this many leading hits
+const MAX_PARENT_CHARS = 4000;   // cap for an expanded section
+function parentChildEnabled() {
+  return String(process.env.ADEL_PARENT_CHILD || 'on').toLowerCase() !== 'off';
+}
+
 function pushSource(sources, seen, citation, url, text, version) {
   if (!citation && !url) return;
   let anchor = String(url || '');
@@ -39,13 +50,25 @@ function pushSource(sources, seen, citation, url, text, version) {
 /* Package an ordered list of hits into the { context, sources } the model and
  * UI consume. Shared by both retrieval paths so their output shape is identical. */
 function buildResult(hits) {
+  const expand = parentChildEnabled();
   const sources = [];
   const seen = new Set();
   const blocks = [];
   let i = 1;
   for (const h of hits) {
     pushSource(sources, seen, h.citation, h.page_url, h.text, h.version);
-    const text = String(h.text || '').slice(0, MAX_PASSAGE_CHARS);
+    let text = String(h.text || '');
+    if (expand && i <= PARENT_EXPAND_TOP) {
+      // Top hits get their whole section (direct lookupCitation() hits arrive
+      // already concatenated and carry no chunk_index — just lift their cap).
+      if (Number.isInteger(h.chunk_index)) {
+        const full = bm25.sectionTextAt(h.chunk_index);
+        if (full.length > text.length) text = full;
+      }
+      text = text.slice(0, MAX_PARENT_CHARS);
+    } else {
+      text = text.slice(0, MAX_PASSAGE_CHARS);
+    }
     blocks.push(`[${i}] ${h.citation || '(uncited passage)'}\n${text}`);
     i++;
   }

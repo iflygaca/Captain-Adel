@@ -56,11 +56,11 @@ function pad(s, n) { s = String(s); return s.length >= n ? s : s + ' '.repeat(n 
 
 async function runOne(brain, provider, c) {
   try {
-    const out = await brain.answer(c.question, [], {
+    const out = await brain.answer(c.question, c.history || [], {
       apiKey: process.env.GEMINI_API_KEY, // ALLaM ignores this; needed only if Gemini is invoked
       provider,
     });
-    const checks = score(c.expect, out.answer, out.sources || []);
+    const checks = score(c.expect, out.answer, out.sources || [], { kind: out.kind });
     return { passed: checks.every((x) => x.ok), checks, err: null };
   } catch (e) {
     const err = String((e && e.message) || e);

@@ -18,11 +18,18 @@ const has = (haystack, needle) =>
   String(haystack).toLowerCase().includes(String(needle).toLowerCase());
 const hasArabic = (s) => /[؀-ۿ]/.test(String(s));
 
-/* ----- score one answer against one case's `expect` block ----------------- */
-function score(expect, answer, sources) {
+/* ----- score one answer against one case's `expect` block -----------------
+ * `extra` is optional and backward-compatible: when the runner passes the
+ * decorated output's kind, a case may assert expect.kind ('grounded' |
+ * 'partial' | 'refusal' | 'na'). Old cases and old callers are unaffected. */
+function score(expect, answer, sources, extra) {
   const checks = [];
   const add = (name, ok, note) => checks.push({ name, ok, note: note || '' });
   const text = String(answer || '');
+
+  if (expect.kind && extra && extra.kind !== undefined) {
+    add('kind', extra.kind === expect.kind, 'expected ' + expect.kind + ', got ' + extra.kind);
+  }
 
   if (expect.citesPart) {
     const ok = expect.citesPart.some((p) =>
@@ -58,6 +65,16 @@ function loadCases() {
     if (!c.id || !c.question || !c.expect) {
       console.error('  invalid case:', JSON.stringify(c).slice(0, 120));
       bad++;
+      continue;
+    }
+    // Optional multi-turn context: history = [{ role: 'user'|'model', text }].
+    if (c.history !== undefined) {
+      const ok = Array.isArray(c.history) && c.history.every((h) =>
+        h && (h.role === 'user' || h.role === 'model') && typeof h.text === 'string');
+      if (!ok) {
+        console.error('  invalid history in case:', c.id);
+        bad++;
+      }
     }
   }
   if (bad) throw new Error(bad + ' invalid case(s) in cases.json');

@@ -106,11 +106,12 @@ async function main() {
     const c = run[i];
     let checks, faithResult = null, err = null;
     try {
-      const out = await brain.answer(c.question, [], {
+      const out = await brain.answer(c.question, c.history || [], {
         apiKey: process.env.GEMINI_API_KEY,
         provider: provider || undefined,
+        mode: c.mode === 'exam' ? 'exam' : undefined,
       });
-      checks = score(c.expect, out.answer, out.sources || []);
+      checks = score(c.expect, out.answer, out.sources || [], { kind: out.kind });
       if (faith) {
         faithResult = await faith.scoreAnswer(
           { answer: out.answer, sources: out.sources || [] },

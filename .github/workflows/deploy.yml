@@ -1,0 +1,86 @@
+name: Deploy (captadel)
+
+# Inert mirror of the monorepo's .github/workflows/deploy-captadel.yml, staged
+# for when this subtree is promoted to its own FlyGACA/captadel repo
+# (office/RUNBOOK-captadel-extraction.md). GitHub only runs workflows under the
+# repository root's .github/workflows, so this file does NOT run while captadel/
+# is a subtree — the active deploy lives at the monorepo root.
+#
+# When promoted: this file becomes the active deploy. Drop the `paths:` filter
+# and the `working-directory: captadel` default below (the repo root becomes
+# captadel/), exactly as captadel CI's ci.yml documents.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'captadel/**'
+  workflow_dispatch:
+    inputs:
+      region:
+        description: 'Cloud Run region (me-central2 default; me-central1 fallback)'
+        default: 'me-central2'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-captadel
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: captadel
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npm run smoke
+      - run: npm run test:unit
+      - run: npm run eval:dry
+
+  deploy:
+    needs: test
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
+    runs-on: ubuntu-latest
+    env:
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+      REGION: ${{ github.event.inputs.region || vars.CAPTADEL_REGION || 'me-central2' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Skip when GCP_SA_KEY is not configured
+        if: ${{ env.GCP_SA_KEY == '' }}
+        run: |
+          echo "::warning::Deploy skipped — GCP_SA_KEY secret not configured"
+          echo "⚠️ Deploy skipped — GCP_SA_KEY secret not configured" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Authenticate to Google Cloud
+        if: ${{ env.GCP_SA_KEY != '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud
+        if: ${{ env.GCP_SA_KEY != '' }}
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ vars.CAPTADEL_PROJECT_ID }}
+
+      - name: Deploy to Cloud Run (deploy.sh is the source of truth)
+        if: ${{ env.GCP_SA_KEY != '' }}
+        run: ./deploy/deploy.sh
+
+      - name: Health check
+        if: ${{ env.GCP_SA_KEY != '' }}
+        run: |
+          URL="$(gcloud run services describe captadel --region "$REGION" --format='value(status.url)')"
+          echo "Service URL: $URL"
+          curl -fsS "$URL/health" | grep '"status":"ok"'
+          echo "✅ Deployed and healthy: $URL" >> "$GITHUB_STEP_SUMMARY"

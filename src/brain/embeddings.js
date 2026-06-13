@@ -101,7 +101,11 @@ function denseIndex() {
   try {
     if (!fs.existsSync(DENSE_PATH)) { _dense = null; return _dense; }
     const raw = JSON.parse(zlib.gunzipSync(fs.readFileSync(DENSE_PATH)));
-    _dense = Array.isArray(raw) ? raw : (raw.vectors || null);
+    const vectors = Array.isArray(raw) ? raw : (raw.vectors || null);
+    // Hold the vectors as Float32Array, not parsed-JSON number arrays: at
+    // 47k chunks × 1024 dims (BGE-M3) that halves resident memory to ~190 MB
+    // and speeds up cosine(). Size hybrid deployments at ≥1 GiB (deploy.sh).
+    _dense = vectors ? vectors.map((v) => Float32Array.from(v)) : null;
   } catch (err) {
     _dense = null;
   }

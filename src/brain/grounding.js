@@ -29,6 +29,12 @@
 
 const MAX_VERBATIM = 600;
 
+// How many sources the UI shows. Retrieval may hand us more (topK), and grounding
+// derivation below reads ALL of them for accuracy, but a wall of cites buries the
+// answer — so the response surfaces only the top few, in retrieval order. Tunable
+// via ADEL_MAX_SOURCES; 0 or unset keeps the default.
+const MAX_SOURCES = Math.max(1, parseInt(process.env.ADEL_MAX_SOURCES, 10) || 3);
+
 /* ----------------------------------------------------------------------------
  * Source shaping — the single place the source object shape is defined.
  * Inputs are already in hand at every call site (the BM25 hit), so this only
@@ -293,8 +299,19 @@ async function decorate(raw, opts = {}) {
     kind,
     refusalClass: kind === 'refusal' ? refusalClass : null,
     grounding: { state, score, mode, claims, resolved, unresolved },
-    sources,
-    meta: { provider: opts._provider || null, model: opts.model || null },
+    // Grounding above weighed every source; the UI gets a tight, deduplicated top set.
+    sources: sources.slice(0, MAX_SOURCES),
+    meta: {
+      provider: opts._provider || null,
+      model: opts.model || null,
+      // Set by answer.js when rewrite.js changed the retrieval query (multi-
+      // turn follow-up resolution / AR->EN glossary) — for eval debugging.
+      rewrittenQuery: opts._rewrittenQuery || null,
+      // Worked compute-tool calls (crosswind, fuel, W&B, recency, density
+      // altitude) from the agentic provider — the UI renders the steps and a
+      // deep link to the matching Fly GACA calculator.
+      toolCalls: Array.isArray(raw.toolCalls) && raw.toolCalls.length ? raw.toolCalls : null,
+    },
   };
 }
 
@@ -379,6 +396,15 @@ async function selftest() {
   ok('decorate: refusalClass null when grounded', out.refusalClass === null);
   ok('decorate: source widened', out.sources[0].verbatim != null);
   ok('decorate: meta', out.meta.model === 'gemini-2.5-flash');
+
+  // source cap: derivation reads all sources, but the UI gets at most MAX_SOURCES.
+  const manySrc = ['91.155', '91.157', '91.159', '91.161', '91.163'].map((sec) =>
+    makeSource(`GACAR Part 91, §${sec}`, `library.html#${sec}`, 'passage for ' + sec));
+  const capped = await decorate(
+    { answer: 'VFR minima vary by airspace and altitude (§91.155).', sources: manySrc }, {});
+  ok('decorate: sources capped to default 3', capped.sources.length === 3, String(capped.sources.length));
+  ok('decorate: cap keeps retrieval order', capped.sources[0].section === '91.155', capped.sources[0].section);
+  ok('decorate: cap does not blunt grounding', capped.kind === 'grounded', capped.kind);
 
   // phase-2 trailer: declared refusal wins and is stripped from the visible answer
   const dRef = await decorate({ answer: "That's an AFM/POH figure for your airframe.\n<<adel kind=refusal class=2.2>>", sources: [] }, {});

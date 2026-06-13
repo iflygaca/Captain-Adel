@@ -1,0 +1,144 @@
+/* ============================================================================
+ * Captain Adel — animated character states (companion to adel-character.js).
+ *
+ * Everything keys off  svg.adel-figure[data-state="…"]. Transform-only motion
+ * in the SVG's own coordinate space, so it is RTL-safe (no left/right offsets)
+ * and cheap to composite. prefers-reduced-motion collapses every state to the
+ * static pose.
+ *
+ * Byte-identical copies live in captadel/public/assets/css/ (canonical) and
+ * Fly GACA's assets/css/ — kept in lockstep by tests/unit/adel-ui-parity.test.js.
+ * ==========================================================================*/
+
+.adel-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.adel-figure * { transform-box: fill-box; }
+
+/* ---- idle: slow bob + periodic blink ------------------------------------ */
+
+.adel-figure .adel-head {
+  transform-origin: 50% 90%;
+  animation: adel-bob 5.2s ease-in-out infinite;
+}
+@keyframes adel-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(2.5px) rotate(-0.6deg); }
+}
+
+/* Eyelids sit above the eyes, retracted; the blink drops them briefly.
+   Two slightly different periods so the blink never looks metronomic. */
+.adel-figure .adel-lid {
+  transform: translateY(-14px);
+  animation: adel-blink 4.6s linear infinite;
+}
+.adel-figure .adel-eye-r .adel-lid { animation-duration: 4.6s; animation-delay: 0.05s; }
+@keyframes adel-blink {
+  0%, 92%, 100% { transform: translateY(-14px); }
+  94%, 97%      { transform: translateY(-3px); }
+}
+
+/* Mouth: calm smile by default, the open-mouth ellipse hidden. */
+.adel-figure .adel-mouth-open { opacity: 0; }
+
+/* Salute arm hidden unless saluting. */
+.adel-figure .adel-arm {
+  opacity: 0;
+  transform: rotate(38deg) translateY(26px);
+  transform-origin: 88% 95%;
+  transition: transform 0.28s ease, opacity 0.2s ease;
+}
+
+/* Brows rest position. */
+.adel-figure .adel-brow-l,
+.adel-figure .adel-brow-r {
+  transition: transform 0.25s ease;
+}
+
+/* Pupils rest position. */
+.adel-figure .adel-pupil { transition: transform 0.25s ease; }
+
+/* ---- listening: brows up, attentive ------------------------------------- */
+
+.adel-figure[data-state="listening"] .adel-brow-l,
+.adel-figure[data-state="listening"] .adel-brow-r { transform: translateY(-3.5px); }
+.adel-figure[data-state="listening"] .adel-head { animation-duration: 3.4s; }
+
+/* ---- thinking: eyes up-left, slight head tilt, wings shimmer ------------- */
+
+.adel-figure[data-state="thinking"] .adel-pupil { transform: translate(-2.4px, -2.2px); }
+.adel-figure[data-state="thinking"] .adel-brow-l { transform: translateY(-2px) rotate(-6deg); }
+.adel-figure[data-state="thinking"] .adel-brow-r { transform: translateY(-3.5px) rotate(4deg); }
+.adel-figure[data-state="thinking"] .adel-head {
+  animation: adel-ponder 2.2s ease-in-out infinite;
+}
+@keyframes adel-ponder {
+  0%, 100% { transform: rotate(-1.4deg); }
+  50%      { transform: rotate(0.6deg) translateY(1.5px); }
+}
+.adel-figure[data-state="thinking"] .adel-wings {
+  animation: adel-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes adel-shimmer {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+
+/* ---- talking: mouth loop while tokens stream ----------------------------- */
+
+.adel-figure[data-state="talking"] .adel-mouth { opacity: 0; }
+.adel-figure[data-state="talking"] .adel-mouth-open {
+  opacity: 1;
+  transform-origin: 50% 50%;
+  animation: adel-talk 0.34s ease-in-out infinite;
+}
+@keyframes adel-talk {
+  0%, 100% { transform: scaleY(0.35); }
+  50%      { transform: scaleY(1); }
+}
+.adel-figure[data-state="talking"] .adel-head { animation-duration: 2.6s; }
+
+/* ---- grounded: a confident nod ------------------------------------------- */
+
+.adel-figure[data-state="grounded"] .adel-head {
+  animation: adel-nod 0.8s ease-in-out 2;
+}
+@keyframes adel-nod {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  40%      { transform: rotate(2deg) translateY(4px); }
+}
+
+/* ---- salute: the in-character refusal ("Hold, Captain") ------------------- */
+
+.adel-figure[data-state="salute"] .adel-arm {
+  opacity: 1;
+  transform: rotate(0deg) translateY(0);
+}
+.adel-figure[data-state="salute"] .adel-head {
+  animation: none;
+  transform: rotate(-1deg);
+}
+.adel-figure[data-state="salute"] .adel-mouth { d: path('M116 138 h24'); }
+
+/* ---- error: furrowed brows, mouth flat ----------------------------------- */
+
+.adel-figure[data-state="error"] .adel-brow-l { transform: translateY(2.5px) rotate(8deg); }
+.adel-figure[data-state="error"] .adel-brow-r { transform: translateY(2.5px) rotate(-8deg); }
+.adel-figure[data-state="error"] .adel-mouth { d: path('M116 140 q12 -6 24 0'); }
+.adel-figure[data-state="error"] .adel-head { animation: none; }
+
+/* ---- reduced motion: collapse everything to the static pose --------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .adel-figure .adel-head,
+  .adel-figure .adel-lid,
+  .adel-figure .adel-mouth-open,
+  .adel-figure .adel-wings { animation: none !important; }
+  .adel-figure .adel-arm { transition: none; }
+  .adel-figure[data-state="talking"] .adel-mouth { opacity: 1; }
+  .adel-figure[data-state="talking"] .adel-mouth-open { opacity: 0; }
+}

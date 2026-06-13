@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// ============================================================================
+// Captain Adel (captadel.com) — Firestore security rules.
+//
+// The browser NEVER opens a Firestore connection: a pilot's plan and remaining
+// quota are served by the Captain Adel service via GET /v1/me (Admin SDK), and
+// entitlements are written only by the Stripe webhook (Admin SDK). The Admin SDK
+// bypasses these rules, so the safest possible policy is to deny every direct
+// client read and write. There is nothing here a client is meant to reach.
+//
+// Collections written server-side: users/{uid} (profile + entitlement),
+// adelQuota/{period__key} (usage counters, TTL-purged on expireAt).
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

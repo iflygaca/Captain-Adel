@@ -1,408 +1,227 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Captain Adel — AI Flight Instructor for Saudi Civil Aviation</title>
-  <meta name="description" content="Captain Adel is an independent AI flight instructor for Saudi civil aviation. Ask about the GACARs, get answers with the exact section cited. He refuses to guess. Bilingual EN/AR.">
+  <title>كابتن عادل — مرشد الطيران المدني السعودي بالذكاء الاصطناعي</title>
+  <meta name="description" content="كابتن عادل مرشد طيران مستقل بالذكاء الاصطناعي للطيران المدني السعودي. اسأل عن لوائح GACAR واحصل على إجابة مع الاستشهاد بالقسم الدقيق. أداة تعليمية — تحقّق دائماً من الهيئة. · Captain Adel is an independent AI flight instructor for Saudi civil aviation.">
   <meta name="theme-color" content="#0A0E12">
-
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Captain Adel">
-  <meta property="og:title" content="Captain Adel — AI Flight Instructor for Saudi Civil Aviation">
-  <meta property="og:description" content="The whole of Saudi aviation regulation, one captain on the answer. GACARs cited. Refuses to guess. Bilingual.">
-  <meta property="og:url" content="https://captadel.com/">
-  <meta property="og:image" content="https://captadel.com/assets/img/captain/avatar.png">
-  <meta name="twitter:card" content="summary_large_image">
-
   <link rel="icon" href="assets/img/captain/avatar.png" type="image/png">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Captain Adel · كابتن عادل">
+  <meta property="og:title" content="كابتن عادل — مرشد الطيران المدني السعودي">
+  <meta property="og:description" content="اسأل عن لوائح GACAR واحصل على إجابة مع الاستشهاد بالقسم الدقيق. مستقل وتعليمي.">
+  <meta property="og:url" content="https://captadel.com/">
   <link rel="canonical" href="https://captadel.com/">
-  <link rel="alternate" hreflang="en" href="https://captadel.com/">
-  <link rel="alternate" hreflang="ar" href="https://captadel.com/?lang=ar">
 
-  <link rel="preconnect" href="https://gaca.gov.sa">
   <link rel="stylesheet" href="assets/css/adel.css">
-  <link rel="stylesheet" href="assets/css/landing.css">
+  <script src="assets/js/i18n.js" defer></script>
 </head>
-<body class="landing-page">
-  <!-- Subtle runway-stripes background -->
-  <div class="runway-bg" aria-hidden="true"></div>
-
-  <!-- Disclaimer strip (GACA independence) -->
+<body>
   <div class="disclaimer-strip">
     <div class="container">
-      <span>
-        <strong>Independent educational reference.</strong>
-        Not affiliated with GACA — always verify against the official source,
-        <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.
-      </span>
+      <span data-i18n-html
+        data-en='<strong>Independent educational reference.</strong> Not affiliated with GACA — always verify against the official source, <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.'>
+        <strong>مرجع تعليمي مستقل.</strong> غير تابع للهيئة العامة للطيران المدني —
+        تحقّق دائماً من المصدر الرسمي،
+        <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.</span>
     </div>
   </div>
 
-  <!-- Sticky nav -->
   <header class="site-nav">
     <div class="container nav-inner">
-      <a class="lockup" href="/" aria-label="Captain Adel — home">
+      <a class="lockup" href="/" aria-label="كابتن عادل — الرئيسية">
         <img src="assets/img/captain/avatar.png" alt="" width="40" height="40">
         <span>
-          <span class="wordmark"><span class="wm-capt">Captain</span> <span class="wm-adel">Adel</span></span>
-          <span class="lockup-sub">Saudi civil aviation</span>
+          <span class="wordmark" data-i18n-html
+            data-en='<span class="wm-capt">Captain</span> <span class="wm-adel">Adel</span>'><span class="wm-capt">كابتن</span> <span class="wm-adel">عادل</span></span>
+          <span class="lockup-sub" data-en="Saudi civil aviation">الطيران المدني السعودي</span>
         </span>
       </a>
-      <nav class="nav-links" aria-label="Primary">
-        <a href="#capabilities">Capabilities</a>
-        <a href="#how">How it works</a>
-        <a href="#proof">Proof</a>
-        <a href="chat.html">Try it</a>
-        <a href="console.html">Console</a>
-        <a href="https://gaca.gov.sa" target="_blank" rel="noopener">GACA ↗</a>
+      <nav class="nav-links" aria-label="رئيسية">
+        <a href="#what" data-en="What he does">ماذا يقدّم</a>
+        <a href="#how" data-en="How it works">كيف يعمل</a>
+        <a href="#pricing" data-en="Pricing">الأسعار</a>
+        <a href="exam.html" data-en="Mock exam">الاختبار التجريبي</a>
+        <a href="https://gaca.gov.sa" target="_blank" rel="noopener" data-en="GACA ↗">الهيئة ↗</a>
       </nav>
-      <a class="btn btn-primary nav-cta" href="chat.html">
-        Ask Captain Adel
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-        </svg>
-      </a>
+      <div class="nav-actions">
+        <button type="button" class="lang-toggle" lang="en">EN</button>
+        <a class="btn btn-ghost" href="account.html" data-en="Account">حسابي</a>
+        <a class="btn btn-primary" href="chat.html" data-en="Ask Captain Adel">اسأل كابتن عادل</a>
+      </div>
     </div>
   </header>
 
   <main id="main">
-
-    <!-- ============ HERO ============ -->
     <section class="hero">
       <div class="container hero-grid">
-        <div class="hero-text">
-          <div class="hero-eyebrow">
-            <span class="pulse-dot" aria-hidden="true"></span>
-            <span>On duty · 47,361 GACAR chunks indexed</span>
-          </div>
-          <h1>
-            The whole of Saudi aviation regulation,
-            <span class="g">one captain on the answer.</span>
-          </h1>
-          <p class="lede">
-            Captain Adel is an independent AI flight instructor. Ask about the GACARs,
-            airspace, licensing or operations — he answers with the exact section cited,
-            and <strong>refuses to guess</strong> when he can't ground it.
-          </p>
+        <div>
+          <h1 data-i18n-html
+            data-en='The whole of Saudi aviation regulation, <span class="g">one captain on the answer.</span>'>لوائح الطيران السعودي بأكملها،
+            <span class="g">وقائدٌ واحد على الإجابة.</span></h1>
+          <p class="lede" data-en="Captain Adel is an independent AI flight instructor for Saudi civil aviation. Ask about the GACARs, airspace, licensing or operations — he answers with the exact section cited, and refuses rather than guess.">كابتن عادل مرشد طيران مستقل بالذكاء الاصطناعي
+            للطيران المدني السعودي. اسأله عن لوائح GACAR أو المجال الجوي أو الرخص أو
+            العمليات — يجيبك مع الاستشهاد بالقسم الدقيق، ويرفض بدل أن يخمّن.</p>
           <div class="hero-cta">
-            <a class="btn btn-primary btn-lg" href="chat.html">
-              Ask Captain Adel
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </a>
-            <a class="btn btn-ghost btn-lg" href="console.html">
-              Open the citation console
-            </a>
+            <a class="btn btn-primary" href="chat.html" data-en="Ask Captain Adel">اسأل كابتن عادل</a>
+            <a class="btn btn-ghost" href="#how" data-en="How it works">كيف يعمل</a>
           </div>
-          <div class="hero-meta">
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-              </svg>
-              <span><strong>Cited</strong> — every claim carries GACAR §X.YYY</span>
-            </div>
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
-              <span><strong>Refuses</strong> — no fabrication, no guesswork</span>
-            </div>
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-              </svg>
-              <span><strong>Bilingual</strong> — English &amp; العربية</span>
-            </div>
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              </svg>
-              <span><strong>Independent</strong> — not GACA, not an airline</span>
-            </div>
-          </div>
+          <span class="cred"><span class="dot"></span> <span data-en="GACA ATPL · CFII · MEL · bilingual EN / العربية">رخصة GACA ATPL · CFII · MEL · ثنائي اللغة العربية / EN</span></span>
         </div>
         <div class="hero-art">
-          <div class="avatar-wrap">
-            <div class="avatar-halo" aria-hidden="true"></div>
-            <img class="avatar-img" src="assets/img/captain/avatar.png" alt="Captain Adel — AI flight instructor" width="380" height="380">
-            <div class="rank-badge" aria-label="Captain rank">
-              <span class="rank-stripe"></span>
-              <span class="rank-stripe"></span>
-              <span class="rank-stripe"></span>
-              <span class="rank-stripe"></span>
+          <img src="assets/img/captain/avatar.png" alt="كابتن عادل">
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase">
+      <div class="container">
+        <h2 data-en="How he answers">كيف يجاوب</h2>
+        <div class="demo-card">
+          <div class="demo-q">
+            <span class="demo-who" data-en="You">أنت</span>
+            <p data-en="What's the basic VFR day visibility minimum in uncontrolled airspace?">وش أقل رؤية مطلوبة للطيران البصري نهاراً في مجال غير مراقب؟</p>
+          </div>
+          <div class="demo-a">
+            <img class="demo-avatar" src="assets/img/captain/avatar.png" alt="" width="40" height="40">
+            <div class="demo-bubble">
+              <span class="demo-badge" data-en="Grounded">موثَّق بالمصدر</span>
+              <p data-i18n-html
+                data-en='The minimum is set in <span class="cite"><bdi dir="ltr">§91.155</bdi></span> — read it and don&#39;t go below it.'>الحدّ مذكور في
+                <span class="cite"><bdi dir="ltr">§91.155</bdi></span> — اقرأه ولا تنزل تحته.</p>
+              <p class="demo-brief" data-i18n-html
+                data-en='<strong>Captain&#39;s Briefing:</strong> don&#39;t trust your eyes alone — pull the METAR before you go and confirm the visibility is above the limit, especially in our dust season.'><strong>توجيه الكابتن:</strong>
+                لا تعتمد على عينك بس — قبل ما تطير افتح الـMETAR وتأكّد الرؤية فوق الحدّ،
+                خصوصاً وقت الغبار عندنا.</p>
+              <div class="demo-src" data-en="Source: GACAR Part 91, §91.155 · verify at gaca.gov.sa">المصدر: GACAR Part 91, §91.155 · تحقّق على gaca.gov.sa</div>
             </div>
+          </div>
+          <span class="demo-note" data-en="Illustrative preview — Captain Adel always cites the live regulation and reminds you to verify.">مثال توضيحي — كابتن عادل يستشهد دائماً باللائحة الحيّة ويذكّرك بالتحقّق.</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="what" class="features">
+      <div class="container">
+        <h2 data-en="What he does">ماذا يقدّم</h2>
+        <div class="cards">
+          <div class="card">
+            <h3 data-en="Cited answers">إجابات موثّقة بالمصدر</h3>
+            <p data-en="Every regulatory claim carries a &quot;GACAR Part X, §X.YYY&quot; citation, with links to the source passage. No citation, no claim.">كل معلومة تنظيمية تحمل استشهاداً بصيغة
+            «GACAR Part X, §X.YYY» مع رابط للنصّ المصدر. لا استشهاد، لا ادّعاء.</p>
+          </div>
+          <div class="card">
+            <h3 data-en="Refuses rather than guess">يرفض بدل أن يخمّن</h3>
+            <p data-en="For minima, distances, weights and currency periods, a wrong number is worse than no number. If he can't ground it, he says so and points you to the Part.">في الحدود الدنيا والمسافات والأوزان وفترات الحداثة،
+            الرقم الخاطئ أسوأ من لا رقم. إن لم يستطع توثيقه، يقولها ويدلّك على الجزء.</p>
+          </div>
+          <div class="card">
+            <h3 data-en="Bilingual">ثنائي اللغة</h3>
+            <p data-en="Answers in the language you ask — English or العربية — keeping technical terms in the language of the regulation.">يجيب بلغة سؤالك — العربية أو الإنجليزية — مع إبقاء
+            المصطلحات الفنية بلغة اللائحة.</p>
+          </div>
+          <div class="card" style="border-color:var(--gold);background:rgba(200,160,74,.04)">
+            <h3 data-en="Timed mock exam">اختبار تجريبي مؤقّت</h3>
+            <p data-en="25 GACAR questions · 30-minute timer · 75% pass mark — drawn from the regulation library, every answer cited back to the section.">25 سؤالاً من لوائح GACAR · مؤقّت 30 دقيقة · حد النجاح 75% —
+            مأخوذة من مكتبة اللوائح، وكل إجابة مستشهَدة بالقسم.</p>
+            <a class="btn btn-primary" href="exam.html" style="margin-top:14px;font-size:13px" data-en="Start exam">ابدأ الاختبار</a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ============ CAPABILITIES ============ -->
-    <section id="capabilities" class="section">
+    <section id="how" class="features" style="padding-top:0;">
       <div class="container">
-        <header class="section-head">
-          <span class="section-kicker">What he does</span>
-          <h2>Built for the GACA-licensed pilot, not the chatbot crowd.</h2>
-          <p class="section-lede">
-            Captain Adel is grounded in the official GACA Aviation Regulations
-            (GACARs), the topical books, the AIP-KSA, and ICAO standards adopted by KSA.
-            He answers in the language you wrote in — and he never invents a section number.
-          </p>
-        </header>
-
-        <div class="cap-grid">
-          <article class="cap-card">
-            <div class="cap-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/>
-              </svg>
-            </div>
-            <h3>Cited answers</h3>
-            <p>Every regulatory claim carries a <code>GACAR Part X, §X.YYY</code> citation,
-            with a verbatim passage revealed inline. No citation, no claim.</p>
-            <a class="cap-link" href="chat.html?q=What+are+the+VFR+weather+minima+in+controlled+airspace%3F">Try: VFR minima →</a>
-          </article>
-
-          <article class="cap-card">
-            <div class="cap-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
-              </svg>
-            </div>
-            <h3>Refuses rather than guess</h3>
-            <p>For minima, distances, weights and currency periods, a wrong number is
-            worse than no number. If he can't ground it, he says so and points you to
-            the Part.</p>
-            <a class="cap-link" href="chat.html?q=What+is+the+minimum+altitude+over+a+congested+area%3F">Try: congestion altitude →</a>
-          </article>
-
-          <article class="cap-card">
-            <div class="cap-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 8l6 6 4-4 4 4"/><path d="M3 21h18"/><path d="M3 10h4l2-2h6l2 2h4"/>
-              </svg>
-            </div>
-            <h3>Citation console</h3>
-            <p>For deep study: a single-column reading pane where the cited GACAR section
-            appears next to the answer. <kbd>⌘K</kbd> to focus, <kbd>↑</kbd>/<kbd>↓</kbd> to walk cites.</p>
-            <a class="cap-link" href="console.html">Open console →</a>
-          </article>
-
-          <article class="cap-card">
-            <div class="cap-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-              </svg>
-            </div>
-            <h3>Bilingual EN / العربية</h3>
-            <p>Answers in the language you ask. Mirrors Arabic–English code-switching when
-            present. Technical terms stay in the language of the regulation.</p>
-            <a class="cap-link" href="chat.html?q=%D9%85%D8%A7+%D9%87%D9%8A+%D8%AD%D8%AF%D9%88%D8%AF+%D8%A7%D9%84%D8%B7%D9%82%D8%B3+%D9%84%D9%84%D8%B7%D9%8A%D8%B1%D8%A7%D9%86+%D8%A7%D9%84%D8%A8%D8%B5%D8%B1%D9%8A%D8%9F">جرّب بالعربية →</a>
-          </article>
-
-          <article class="cap-card">
-            <div class="cap-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
-              </svg>
-            </div>
-            <h3>Grounded in the GACARs</h3>
-            <p>A lexical search over the GACA Aviation Regulations and topical books
-            retrieves the relevant passages before Captain Adel answers — never from
-            memory.</p>
-            <a class="cap-link" href="chat.html?q=What+is+GACAR+Part+91+about%3F">Try: explain Part 91 →</a>
-          </article>
-
-          <article class="cap-card">
-            <div class="cap-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>
-              </svg>
-            </div>
-            <h3>Educational, not operational</h3>
-            <p>Captain Adel is a study and reference tool. GACA is always the authority.
-            Every answer ends with a verify-against-the-official-source line.</p>
-            <a class="cap-link" href="https://gaca.gov.sa" target="_blank" rel="noopener">Open gaca.gov.sa ↗</a>
-          </article>
+        <h2 data-en="How it works">كيف يعمل</h2>
+        <div class="cards">
+          <div class="card">
+            <h3 data-en="Grounded in the GACARs">مبنيّ على لوائح GACAR</h3>
+            <p data-en="A lexical and semantic search over the GACA Aviation Regulations and topical books retrieves the relevant passages before Captain Adel answers — never from memory.">بحثٌ لفظي ودلالي في لوائح الطيران (GACARs) والكتب
+            الموضوعية يسترجع النصوص ذات الصلة قبل أن يجيب كابتن عادل — لا من الذاكرة أبداً.</p>
+          </div>
+          <div class="card">
+            <h3 data-en="Saudi-first models">نماذج سعودية أولاً</h3>
+            <p data-en="English runs on a fast frontier model; Arabic runs on ALLaM, the Saudi (HUMAIN) Arabic model, self-hosted in-Kingdom.">الإنجليزية على نموذجٍ متقدّمٍ سريع؛ والعربية على
+            ALLaM، النموذج العربي السعودي (HUMAIN)، مُستضاف داخل المملكة.</p>
+          </div>
+          <div class="card">
+            <h3 data-en="Educational, not operational">تعليمي، لا تشغيلي</h3>
+            <p data-en="Captain Adel is a study and reference tool. GACA is always the authority; verify against the official publication before you rely on anything.">كابتن عادل أداة دراسة ومرجع. الهيئة هي المرجع
+            دائماً؛ تحقّق من النشرة الرسمية قبل أن تعتمد على أي شيء.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- ============ HOW IT WORKS ============ -->
-    <section id="how" class="section section-alt">
+    <section id="pricing" class="pricing">
       <div class="container">
-        <header class="section-head">
-          <span class="section-kicker">How it works</span>
-          <h2>Retrieval, then read. Citation, then trust.</h2>
-        </header>
+        <h2 data-en="Simple pricing">أسعار بسيطة</h2>
+        <p class="pricing-lede" data-en="Start free. Go Pro when you want the captain on every question. Cancel anytime.">ابدأ مجاناً. ارتقِ إلى برو عندما تريد الكابتن على كل سؤال. ألغِ في أي وقت.</p>
 
-        <ol class="steps">
-          <li class="step">
-            <span class="step-num">01</span>
-            <h3>You ask</h3>
-            <p>Plain English, plain Arabic, or a mix. "What are the VFR weather minima in
-            controlled airspace?" works as well as "<span lang="ar">ما هي حدود الطقس للطيران البصري؟</span>".</p>
-          </li>
-          <li class="step">
-            <span class="step-num">02</span>
-            <h3>Retrieval</h3>
-            <p>A lexical (BM25) search runs over the indexed GACAR corpus — currently
-            <strong>47,361 chunks</strong> across GACAR Parts 1 through 199, the topical
-            handbooks, and AIP excerpts.</p>
-          </li>
-          <li class="step">
-            <span class="step-num">03</span>
-            <h3>Read</h3>
-            <p>The model is handed the retrieved passages under a strict
-            <em>cite-or-refuse</em> contract. For critical limits (minima, distances, weights)
-            it quotes the regulation verbatim.</p>
-          </li>
-          <li class="step">
-            <span class="step-num">04</span>
-            <h3>Verify</h3>
-            <p>Every answer ends with a three-state grounding badge (<span class="legend grounded">Grounded</span>
-            / <span class="legend partial">Partial</span> / <span class="legend refusal">Hold</span>)
-            and a <em>Verify against the official source</em> line.</p>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- ============ PROOF / EXAMPLE ============ -->
-    <section id="proof" class="section">
-      <div class="container">
-        <header class="section-head">
-          <span class="section-kicker">See it in action</span>
-          <h2>An example, end to end.</h2>
-          <p class="section-lede">A real question, a real retrieval, a cited answer — and a
-          refusal class when the regulation isn't in the corpus.</p>
-        </header>
-
-        <div class="example">
-          <div class="ex-q">
-            <span class="ex-label">Q</span>
-            <p>What are the VFR weather minima in controlled airspace?</p>
-          </div>
-          <div class="ex-a">
-            <div class="ex-meta">
-              <span class="grounding-badge" data-state="grounded" role="status">
-                <span class="gb-dot" aria-hidden="true"></span>
-                <span class="gb-label">Grounded</span>
-                <span class="gb-class">91.155</span>
-              </span>
-            </div>
-            <p><strong>Short answer:</strong> In controlled airspace below 10,000 ft MSL, the
-            GACAR basic VFR weather minima are <strong>1,000 ft ceiling</strong> and
-            <strong>3 sm visibility</strong> (Class B, C, D, E).</p>
-            <p><strong>Detail:</strong></p>
-            <ul>
-              <li><strong>Airspace class B:</strong> 3 sm visibility; clear of clouds.</li>
-              <li><strong>Class C, D, E (below 10,000 ft MSL):</strong> 3 sm visibility, 500 ft below
-              clouds, 1,000 ft above, 2,000 ft horizontal.</li>
-              <li><strong>Class E (at or above 10,000 ft MSL):</strong> 5 sm visibility, 1,000 ft
-              below, 1,000 ft above, 1 sm horizontal.</li>
+        <div class="price-cards">
+          <div class="price-card">
+            <span class="price-tier" data-en="Free">مجاني</span>
+            <div class="price-amount"><span class="price-num" data-en="SAR 0">0 ريال</span></div>
+            <span class="price-note" data-en="forever">للأبد</span>
+            <ul class="price-feats">
+              <li data-en="5 cited questions a day">٥ أسئلة موثّقة يومياً</li>
+              <li data-en="Every answer cites the exact section">كل إجابة تستشهد بالقسم الدقيق</li>
+              <li data-en="Bilingual — العربية / English">ثنائي اللغة — العربية / الإنجليزية</li>
+              <li data-en="Timed mock exam included">الاختبار التجريبي المؤقّت مشمول</li>
             </ul>
-            <p class="ex-cite"><strong>Cite:</strong> GACAR Part 91, §91.155 — Basic VFR weather
-            minimums.</p>
-            <p class="ex-cite"><strong>See also:</strong> §91.167 (Special VFR) ·
-            §91.169 (VFR flight plan).</p>
+            <a class="btn btn-ghost price-cta" href="chat.html" data-en="Start free">ابدأ مجاناً</a>
+          </div>
 
-            <div class="ex-sources">
-              <span class="src-label">Source (verbatim)</span>
-              <div class="src-verbatim">
-                <p>§ 91.155 — Basic VFR weather minimums. Except as provided in §91.167 of
-                this part, the following weather minimums apply to VFR flight operations:
-                (a) Airspace class B — visibility 3 sm, clear of clouds. (b) Airspace class
-                C, D, or E (below 10,000 ft MSL) — visibility 3 sm; 500 ft below clouds;
-                1,000 ft above clouds; 2,000 ft horizontal from clouds…</p>
-                <span class="src-ver">GACAR § 91.155 · corpus v104</span>
-              </div>
+          <div class="price-card price-card-pro">
+            <span class="price-flag" data-en="Founding rate">سعر التأسيس</span>
+            <span class="price-tier" data-en="Pro">برو</span>
+            <div class="price-amount">
+              <span class="price-num" data-en="SAR 299">299 ريال</span>
+              <span class="price-per" data-en="/ year">/ سنة</span>
             </div>
-
-            <a class="ex-cta" href="chat.html?q=What+are+the+VFR+weather+minima+in+controlled+airspace%3F">
-              Try this question yourself →
-            </a>
+            <span class="price-note" data-en="≈ SAR 25/mo · or SAR 35 billed monthly">≈ 25 ريال/شهر · أو 35 ريال شهرياً</span>
+            <ul class="price-feats">
+              <li data-en="Unlimited cited questions">أسئلة موثّقة بلا حدود</li>
+              <li data-en="Priority during peak hours">أولوية في أوقات الذروة</li>
+              <li data-en="Oral-exam coach &amp; mock exam">مدرّب الاختبار الشفهي والتجريبي</li>
+              <li data-en="Everything in Free">كل مزايا المجاني</li>
+            </ul>
+            <button type="button" class="btn btn-primary price-cta" data-plan="annual" data-en="Go Pro">اشترك في برو</button>
+            <button type="button" class="price-alt" data-plan="monthly" data-en="Pay monthly instead">ادفع شهرياً بدلاً من ذلك</button>
           </div>
         </div>
+
+        <p class="price-disclaimer" data-i18n-html
+          data-en='<strong>Independent educational tool.</strong> A subscription supports the service and lifts the daily limit — it does not change the regulation. Captain Adel is not affiliated with GACA; always verify against the official source, <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.'>
+          <strong>أداة تعليمية مستقلة.</strong> الاشتراك يدعم الخدمة ويرفع الحدّ اليومي —
+          ولا يغيّر اللائحة. كابتن عادل غير تابع للهيئة؛ تحقّق دائماً من المصدر الرسمي،
+          <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.</p>
       </div>
     </section>
-
-    <!-- ============ FOR WHOM ============ -->
-    <section id="audience" class="section section-alt">
-      <div class="container">
-        <header class="section-head">
-          <span class="section-kicker">Who it is for</span>
-          <h2>From student pilots to airline captains.</h2>
-        </header>
-        <div class="audience-grid">
-          <article class="aud-card">
-            <span class="aud-tag">Student</span>
-            <h3>PPL &amp; CPL students</h3>
-            <p>Drill Part 61, drill Part 91, drill what your examiner is going to ask you
-            about weather minima, fuel reserves, and recent experience.</p>
-          </article>
-          <article class="aud-card">
-            <span class="aud-tag">Instructor</span>
-            <h3>CFIs &amp; ground school</h3>
-            <p>Show your students the exact regulation text behind every answer. Open the
-            console, walk through the citations, end the session with a <em>verify</em>.</p>
-          </article>
-          <article class="aud-card">
-            <span class="aud-tag">Operator</span>
-            <h3>Part 121 / 135 / 91 ops</h3>
-            <p>Look up a Part 121 fuel reserve rule, a Part 135 recency rule, or a Part 145
-            training-program clause — in seconds, with the section on the screen.</p>
-          </article>
-          <article class="aud-card">
-            <span class="aud-tag">School</span>
-            <h3>Flying schools &amp; academies</h3>
-            <p>Embed Captain Adel in your LMS, your student portal, or your discovery
-            flight workflow. <a href="mailto:hello@captadel.com?subject=Captain%20Adel%20for%20our%20school">Talk to us →</a></p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ FINAL CTA ============ -->
-    <section class="cta-band">
-      <div class="container">
-        <h2>Citation-first. Refusal-honest. Independent of GACA.</h2>
-        <p>Open the briefing room. Ask. Verify. Fly safe.</p>
-        <div class="cta-buttons">
-          <a class="btn btn-primary btn-lg" href="chat.html">Ask Captain Adel</a>
-          <a class="btn btn-ghost btn-lg" href="console.html">Open the console</a>
-        </div>
-      </div>
-    </section>
-
   </main>
 
   <footer class="site-footer">
     <div class="container">
-      <p class="footer-disclaimer">
-        <strong>Unofficial &amp; educational.</strong> Captain Adel is an independent
-        educational tool. It is <strong>not</strong> affiliated with, endorsed by, or
-        connected to the General Authority of Civil Aviation (GACA). The authoritative
-        source for any regulation is always GACA — always verify against the latest
-        official GACA publication at <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>
-        before relying on any information. Captain Adel is an educational AI and can
-        be wrong — <strong>not for operational use in flight</strong>.
-      </p>
+      <p class="footer-disclaimer" data-en="Unofficial &amp; educational. Captain Adel is an independent educational tool. It is not affiliated with, endorsed by, or connected to the General Authority of Civil Aviation (GACA). The authoritative source for any regulation is always GACA. Always verify against the latest official GACA publication at gaca.gov.sa before relying on any information. Captain Adel is an educational AI and can be wrong — not for operational use in flight.">
+        <strong>غير رسمي وتعليمي.</strong> كابتن عادل أداة تعليمية مستقلة. لا يتبع الهيئة
+        العامة للطيران المدني (GACA) ولا تعتمده ولا ترتبط به. المرجع المعتمد لأي لائحة هو
+        الهيئة دائماً. تحقّق دائماً من أحدث نشرة رسمية للهيئة على gaca.gov.sa قبل الاعتماد
+        على أي معلومة. كابتن عادل ذكاء اصطناعي تعليمي وقد يُخطئ — وليس للاستخدام التشغيلي في الطيران.</p>
       <div class="footer-bottom">
-        <span>&copy; <span id="year">2026</span> Captain Adel · Independent of GACA ·
-          Made in the Kingdom · صُنع في السعودية</span>
-        <span>
-          <a href="mailto:hello@captadel.com">hello@captadel.com</a>
-          &nbsp;·&nbsp;
-          <a href="https://flygaca.com" target="_blank" rel="noopener">Fly GACA ↗</a>
-        </span>
+        <span data-en="&copy; 2026 Captain Adel · Independent of GACA · Made in the Kingdom · صُنع في السعودية">&copy; <span id="year">2026</span> كابتن عادل · مستقل عن الهيئة · صُنع في السعودية · Made in the Kingdom</span>
+        <a href="mailto:hello@captadel.com">hello@captadel.com</a>
       </div>
     </div>
   </footer>
 
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
-  <script src="assets/js/landing.js" defer></script>
+  <script>var y=document.getElementById('year');if(y)y.textContent=new Date().getFullYear();</script>
+  <script type="module">
+    import { startProCheckout } from './assets/js/billing.js';
+    document.querySelectorAll('#pricing [data-plan]').forEach((btn) => {
+      btn.addEventListener('click', () => startProCheckout(btn.dataset.plan));
+    });
+  </script>
 </body>
 </html>

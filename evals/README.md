@@ -88,3 +88,32 @@ the fallback."
 
 Note: `citesPart` looks for the English "Part N"; the Arabic cases assert on
 `answerLang` + sources rather than the English citation token.
+
+## Citation faithfulness + the `kind` assertion
+
+Brain-changing PRs (retrieval, rewriting, prompt, providers, tools) should run
+the live eval with the faithfulness judge and report the mean alongside the
+pass rate:
+
+```bash
+GEMINI_API_KEY=...  node evals/run.js --faithfulness
+```
+
+The judge (evals/checks/citation-faithfulness.js, `--selftest` for its own
+suite) scores whether each cited section actually supports the claims that
+cite it — heuristics catch keyword regressions, the judge catches quiet
+overclaiming. There is no hard CI gate on the mean yet; treat a drop below
+~0.8 in any category as a stop-and-investigate signal.
+
+Cases may also assert the decorated verdict directly with `expect.kind`
+('grounded' | 'partial' | 'refusal' | 'na') — useful for pinning that a
+question stays a refusal (e.g. a fabricated-section request) or stays fully
+grounded. Multi-turn cases declare `history` and the runner feeds it to the
+brain, so follow-up retrieval (src/brain/rewrite.js) is eval-covered.
+
+Category filters keep iteration cheap while you work:
+
+```bash
+node evals/run.js multiturn      # only the multi-turn cases
+node evals/run.js compute        # only the flight-computer cases
+```

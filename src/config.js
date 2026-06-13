@@ -11,6 +11,11 @@ function list(name) {
     .filter(Boolean);
 }
 
+function intEnv(name, def) {
+  const v = parseInt(process.env[name], 10);
+  return Number.isFinite(v) && v >= 0 ? v : def;
+}
+
 const DEFAULT_ORIGINS = [
   'https://captadel.com',
   'https://www.captadel.com',
@@ -34,4 +39,32 @@ module.exports = {
 
   allowedOrigins: list('ALLOWED_ORIGINS').length ? list('ALLOWED_ORIGINS') : DEFAULT_ORIGINS,
   maxBodyBytes: parseInt(process.env.MAX_BODY_BYTES, 10) || 64 * 1024,
+
+  /* ---- SaaS layer (accounts, billing, quota) ----------------------------
+   * The whole layer ships dark: with none of these set, sign-in/billing are
+   * inert and the free quota is dormant (every caller is unmetered, exactly as
+   * today). See office/RUNBOOK-captadel-saas.md. */
+
+  // Absolute site origin for Stripe redirect URLs (success/cancel).
+  siteUrl: (process.env.SITE_URL || 'https://captadel.com').replace(/\/+$/, ''),
+
+  // LAUNCH MODE — 'free' makes every caller read as Pro (quota dormant) while
+  // billing paperwork completes. The abuse rate limiter still runs.
+  launchMode: String(process.env.ADEL_LAUNCH_MODE || '').toLowerCase() === 'free' ? 'free' : '',
+
+  // Firebase project for the Admin SDK. Automatic on Cloud Run via
+  // GOOGLE_CLOUD_PROJECT; override with FIREBASE_PROJECT_ID for local dev.
+  firebaseProjectId: process.env.FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT || '',
+
+  // Stripe — empty = billing endpoints return 503 (the SaaS layer is dark).
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
+  stripePriceMonthly: process.env.STRIPE_PRICE_MONTHLY || '',
+  stripePriceAnnual: process.env.STRIPE_PRICE_ANNUAL || '',
+
+  // Free-tier metering. 0 = dormant (only the abuse rate limiter runs).
+  freeDaily: intEnv('ADEL_DAILY_FREE', 0),     // free signed-in allowance / period
+  anonDaily: intEnv('ADEL_DAILY_ANON', 0),     // anonymous allowance / period
+  freePeriod: String(process.env.ADEL_FREE_PERIOD || 'day').toLowerCase() === 'month'
+    ? 'month' : 'day',
 };

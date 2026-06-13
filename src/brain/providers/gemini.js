@@ -18,6 +18,7 @@
 
 const { GoogleGenAI } = require('@google/genai');
 const bm25 = require('../bm25');
+const computeTools = require('../tools');
 const { makeSource } = require('../grounding');
 const { composeSystemInstruction } = require('../system-prompt');
 
@@ -89,6 +90,10 @@ const TOOL_DECLARATIONS = [
   },
 ];
 
+// Flight-computer tools (crosswind, fuel, W&B, recency, density altitude) —
+// pure math from brain/tools; regulatory figures stay retrieval-sourced.
+TOOL_DECLARATIONS.push(...computeTools.DECLARATIONS);
+
 function pushSource(sources, seen, citation, url, text, version) {
   if (!citation && !url) return;
   let anchor = String(url || '');
@@ -99,8 +104,15 @@ function pushSource(sources, seen, citation, url, text, version) {
   sources.push(makeSource(citation, url, text, version));
 }
 
-function runTool(name, args, sources, seen) {
+function runTool(name, args, sources, seen, toolLog) {
   try {
+    // Compute tools: log every successful call so decorate() can surface the
+    // worked calculation to the UI via meta.toolCalls.
+    if (computeTools.has(name)) {
+      const out = computeTools.run(name, args);
+      if (toolLog && out && !out.error) toolLog.push({ name, args, result: out });
+      return { result: out };
+    }
     if (name === 'search_library') {
       const hits = bm25.searchLibrary(args.query, args.top_k || 6, args.filter_part || null);
       for (const h of hits) pushSource(sources, seen, h.citation, h.page_url, h.text, h.version);
@@ -161,6 +173,7 @@ async function answerAgentic(message, history, opts = {}) {
       product: opts.product,
       systemSuffix: opts.systemSuffix,
       strategy: 'agentic',
+      mode: opts.mode,
     }),
     tools: [{ functionDeclarations: TOOL_DECLARATIONS }],
     temperature: 0.3,
@@ -169,6 +182,7 @@ async function answerAgentic(message, history, opts = {}) {
 
   const sources = [];
   const seen = new Set();
+  const toolLog = [];
   let lastText = '';
 
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
@@ -187,7 +201,7 @@ async function answerAgentic(message, history, opts = {}) {
     if (textBits.length) lastText = textBits.join('');
 
     if (calls.length === 0) {
-      return { answer: lastText.trim(), sources };
+      return { answer: lastText.trim(), sources, toolCalls: toolLog };
     }
 
     contents.push({ role: 'model', parts });
@@ -195,7 +209,7 @@ async function answerAgentic(message, history, opts = {}) {
     const responseParts = [];
     for (const fc of calls) {
       const args = (fc && fc.args) || {};
-      const result = runTool(fc.name, args, sources, seen);
+      const result = runTool(fc.name, args, sources, seen, toolLog);
       responseParts.push({
         functionResponse: { name: fc.name, response: result },
       });
@@ -207,7 +221,105 @@ async function answerAgentic(message, history, opts = {}) {
     'I had to dig through several sections and ran past my lookup limit for ' +
     'this turn. Ask me again, a little more specifically, and I will pull the ' +
     'exact citation.';
-  return { answer: fallback, sources };
+  return { answer: fallback, sources, toolCalls: toolLog };
+}
+
+/* Streaming twin of answerAgentic(): yields uniform events
+ *   { type:'token', delta }   — a chunk of the (final) answer text
+ *   { type:'reset' }          — discard any streamed text so far (a text-bearing
+ *                               round turned out to be non-final / tool round)
+ *   { type:'done', answer, sources } — terminal: full answer + accumulated sources
+ * Only the final round (no function calls) is the answer; tool rounds emit a
+ * reset so the client never keeps interim reasoning text. */
+async function* answerAgenticStream(message, history, opts = {}) {
+  const msg = String(message || '').trim().slice(0, MAX_MESSAGE_CHARS);
+  if (!msg) {
+    yield { type: 'done', answer: 'Say again — I did not catch a question there, Captain.', sources: [] };
+    return;
+  }
+  const apiKey = opts.apiKey || process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
+  const model = opts.model || DEFAULT_MODEL;
+  const ai = new GoogleGenAI({ apiKey });
+  const contents = buildContents(msg, history);
+  const config = {
+    systemInstruction: composeSystemInstruction({
+      product: opts.product, systemSuffix: opts.systemSuffix, strategy: 'agentic',
+      mode: opts.mode,
+    }),
+    tools: [{ functionDeclarations: TOOL_DECLARATIONS }],
+    temperature: 0.3,
+    maxOutputTokens: 4096,
+  };
+
+  const sources = [];
+  const seen = new Set();
+  const toolLog = [];
+  let lastText = '';
+
+  for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+    const stream = await ai.models.generateContentStream({ model, contents, config });
+    const calls = [];
+    const partsAll = [];
+    let roundText = '';
+    let streamedThisRound = false;
+    for await (const chunk of stream) {
+      const cand = chunk && chunk.candidates && chunk.candidates[0];
+      const parts = (cand && cand.content && cand.content.parts) || [];
+      for (const p of parts) {
+        if (p && p.functionCall) { calls.push(p.functionCall); partsAll.push(p); }
+        else if (p && typeof p.text === 'string') {
+          roundText += p.text; partsAll.push(p);
+          yield { type: 'token', delta: p.text }; streamedThisRound = true;
+        }
+      }
+    }
+    if (roundText) lastText = roundText;
+
+    if (calls.length === 0) {
+      yield { type: 'done', answer: lastText.trim(), sources, toolCalls: toolLog };
+      return;
+    }
+    // Tool round: drop any text we streamed (it was interim), run tools, continue.
+    if (streamedThisRound) { yield { type: 'reset' }; lastText = ''; }
+    contents.push({ role: 'model', parts: partsAll.length ? partsAll : [{ text: roundText }] });
+    const responseParts = [];
+    for (const fc of calls) {
+      const result = runTool(fc.name, (fc && fc.args) || {}, sources, seen, toolLog);
+      responseParts.push({ functionResponse: { name: fc.name, response: result } });
+    }
+    contents.push({ role: 'user', parts: responseParts });
+  }
+
+  const fallback = lastText.trim() ||
+    'I had to dig through several sections and ran past my lookup limit for ' +
+    'this turn. Ask me again, a little more specifically, and I will pull the ' +
+    'exact citation.';
+  if (!lastText.trim()) yield { type: 'reset' };
+  yield { type: 'done', answer: fallback, sources, toolCalls: toolLog };
+}
+
+/* Streaming twin of complete() — plain, tool-less token stream (read strategy). */
+async function* completeStream({ systemInstruction, contents, opts = {} }) {
+  const apiKey = opts.apiKey || process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
+  const model = opts.model || DEFAULT_MODEL;
+  const ai = new GoogleGenAI({ apiKey });
+  const geminiContents = (contents || []).map((c) => ({
+    role: c.role === 'model' ? 'model' : 'user',
+    parts: [{ text: String(c.text || '') }],
+  }));
+  const stream = await ai.models.generateContentStream({
+    model, contents: geminiContents,
+    config: { systemInstruction, temperature: 0.2, maxOutputTokens: 2048 },
+  });
+  for await (const chunk of stream) {
+    const cand = chunk && chunk.candidates && chunk.candidates[0];
+    const parts = (cand && cand.content && cand.content.parts) || [];
+    for (const p of parts) {
+      if (p && typeof p.text === 'string' && p.text) yield String(p.text);
+    }
+  }
 }
 
 /* Plain completion (no tools) — used by the retrieve-then-read strategy. */
@@ -240,7 +352,9 @@ async function complete({ systemInstruction, contents, opts = {} }) {
 module.exports = {
   name: 'gemini',
   answerAgentic,
+  answerAgenticStream,
   complete,
+  completeStream,
   configured: () => !!(process.env.GEMINI_API_KEY),
   TOOL_DECLARATIONS,
   DEFAULT_MODEL,

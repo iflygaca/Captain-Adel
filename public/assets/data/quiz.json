@@ -1,0 +1,2214 @@
+{
+  "generated": "2026-05-24",
+  "note": "Practice questions authored by Fly GACA from the GACAR library for study. Not actual GACA exam questions. Every answer cites its source — verify against the official GACAR.",
+  "exam": {
+    "title": "GACAR Knowledge — Mock Exam",
+    "questions": 25,
+    "minutes": 30,
+    "passMark": 75
+  },
+  "banks": [
+    {
+      "id": "vfr-flight-rules",
+      "title": "VFR & Flight Rules",
+      "desc": "Weather minima, cruising altitudes, special and night VFR, transponder codes.",
+      "source": "GACAR Part 91",
+      "questions": [
+        {
+          "q": "What is the minimum flight visibility for VFR flight in Class D airspace?",
+          "options": [
+            "3 km",
+            "5 km",
+            "8 km",
+            "1,500 m"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.165 sets 5 km flight visibility for VFR in Classes B, C, D and E below 10,000 ft MSL.",
+          "cite": "GACAR Part 91, §91.165",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-165"
+        },
+        {
+          "q": "When is VFR flight permitted at night in KSA airspace?",
+          "options": [
+            "Any time, with a serviceable landing light",
+            "Only between sunrise and sunset — night VFR is prohibited unless authorised",
+            "Above 3,000 ft AGL only",
+            "Only in Class G airspace"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.171 prohibits VFR from sunset to sunrise in KSA airspace unless authorised by the President, or for local flights under conditions set by ATC.",
+          "cite": "GACAR Part 91, §91.171",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-171"
+        },
+        {
+          "q": "Flying VFR in level cruise above 3,000 ft AGL on a magnetic course of 090°, below 13,000 ft MSL, which altitude is correct?",
+          "options": [
+            "6,000 ft",
+            "6,500 ft",
+            "7,000 ft",
+            "7,500 ft"
+          ],
+          "answer": 3,
+          "explain": "GACAR §91.169 — on a magnetic course 0°–179°, fly an odd thousand + 500 ft (3,500, 5,500, 7,500 …). 7,500 ft is correct.",
+          "cite": "GACAR Part 91, §91.169",
+          "citeUrl": "../document.html?type=regulations&id=part-91"
+        },
+        {
+          "q": "Special VFR may only be conducted with —",
+          "options": [
+            "No clearance, clear of cloud",
+            "An ATC clearance",
+            "An instrument rating in all cases",
+            "A flight plan filed 24 hours ahead"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.167 — Special VFR requires an ATC clearance, must be flown clear of cloud, with flight visibility at least 1,500 m.",
+          "cite": "GACAR Part 91, §91.167",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-167"
+        },
+        {
+          "q": "What is the minimum flight visibility for Special VFR (fixed-wing)?",
+          "options": [
+            "800 m",
+            "1,500 m",
+            "3 km",
+            "5 km"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.167 — Special VFR requires a flight visibility of at least 1,500 m (rotorcraft are exempt from the visibility limits).",
+          "cite": "GACAR Part 91, §91.167",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-167"
+        },
+        {
+          "q": "Which transponder code signals a general emergency?",
+          "options": [
+            "7500",
+            "7600",
+            "7700",
+            "7000"
+          ],
+          "answer": 2,
+          "explain": "7700 is the emergency squawk. 7600 is radio-communication failure and 7500 is unlawful interference.",
+          "cite": "ICAO Annex 10 / standard transponder codes",
+          "citeUrl": ""
+        },
+        {
+          "q": "A pilot loses two-way radio communication. Which transponder code should be selected?",
+          "options": [
+            "7500",
+            "7600",
+            "7700",
+            "2000"
+          ],
+          "answer": 1,
+          "explain": "7600 indicates radio-communication failure. Fly the aircraft, comply with lost-comms procedures and squawk 7600.",
+          "cite": "ICAO Annex 10 / standard transponder codes",
+          "citeUrl": ""
+        },
+        {
+          "q": "Who is directly responsible for, and the final authority as to, the operation of an aircraft?",
+          "options": [
+            "The operator's Director of Operations",
+            "Air traffic control",
+            "The pilot in command",
+            "The GACA Flight Standards inspector"
+          ],
+          "answer": 2,
+          "explain": "GACAR §91.3 — the pilot in command (PIC) is directly responsible for, and is the final authority as to, the operation of that aircraft.",
+          "cite": "GACAR Part 91, §91.3",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-3"
+        },
+        {
+          "q": "VFR flight in Class A airspace is —",
+          "options": [
+            "Permitted with an ATC clearance",
+            "Permitted above 10,000 ft only",
+            "Not permitted",
+            "Permitted in VMC only"
+          ],
+          "answer": 2,
+          "explain": "Class A is available to IFR flights only — VFR is not permitted in Class A airspace.",
+          "cite": "GACAR Part 91, §91.165 · ICAO Annex 11",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-165"
+        },
+        {
+          "q": "At or above 10,000 ft MSL, the VFR minimum flight visibility is —",
+          "options": [
+            "5 km",
+            "8 km",
+            "1,500 m",
+            "3 km"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.165 — at or above 10,000 ft MSL the VFR minimum flight visibility increases to 8 km, with 1,500 m horizontal cloud clearance.",
+          "cite": "GACAR Part 91, §91.165",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-165"
+        },
+        {
+          "q": "Special VFR at night additionally requires the pilot to —",
+          "options": [
+            "Carry a second crew member",
+            "Meet the instrument-flight requirements of GACAR Part 61 and have an IFR-equipped aircraft",
+            "Remain within 5 NM of the aerodrome",
+            "Hold an ATPL"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.167 — Special VFR is normally sunrise to sunset; at night it is allowed only when the pilot meets the Part 61 instrument requirements and the aircraft is suitably equipped.",
+          "cite": "GACAR Part 91, §91.167",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-167"
+        },
+        {
+          "q": "VFR weather minima and cloud clearances are set out in which GACAR section?",
+          "options": [
+            "§91.3",
+            "§91.155",
+            "§91.165",
+            "§91.213"
+          ],
+          "answer": 2,
+          "explain": "GACAR §91.165 — Basic VFR Weather Minimums — sets the visibility and distance-from-cloud requirements by airspace class.",
+          "cite": "GACAR Part 91, §91.165",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-165"
+        },
+        {
+          "q": "What is the maximum VFR cruising altitude under GACAR §91.169?",
+          "options": [
+            "10,000 ft MSL",
+            "12,500 ft MSL",
+            "13,000 ft MSL",
+            "14,500 ft MSL"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.169 sets the maximum VFR cruising altitude at 12,500 ft (3,800 m) MSL.",
+          "cite": "GACAR Part 91, §91.169",
+          "citeUrl": "../document.html?type=regulations&id=part-91"
+        },
+        {
+          "q": "For a flight in an airplane under VFR during the day, there must be enough fuel to fly to the first point of intended landing and then, at normal cruising speed, for at least —",
+          "options": [
+            "20 minutes",
+            "30 minutes",
+            "45 minutes",
+            "60 minutes"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.161 requires day VFR airplane flights to carry fuel to the first point of intended landing plus at least 30 minutes at normal cruising speed.",
+          "cite": "GACAR Part 91, §91.161",
+          "citeUrl": "../document.html?type=regulations&id=part-91"
+        },
+        {
+          "q": "For a flight in an airplane under VFR at night, the minimum fuel reserve beyond the first point of intended landing is —",
+          "options": [
+            "20 minutes",
+            "30 minutes",
+            "45 minutes",
+            "60 minutes"
+          ],
+          "answer": 2,
+          "explain": "GACAR §91.161 requires night VFR airplane flights to carry at least 45 minutes of fuel beyond the first point of intended landing.",
+          "cite": "GACAR Part 91, §91.161",
+          "citeUrl": "../document.html?type=regulations&id=part-91"
+        },
+        {
+          "q": "When two aircraft of the same category are converging at approximately the same altitude (other than head-on), which has the right of way?",
+          "options": [
+            "The faster aircraft",
+            "The aircraft to the other's right",
+            "The aircraft to the other's left",
+            "The higher aircraft"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.61 provides that when aircraft of the same category converge at about the same altitude, the aircraft to the other's right has the right of way.",
+          "cite": "GACAR Part 91, §91.61",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-mathbf-91-61-right-of-way-rules-except-water"
+        },
+        {
+          "q": "Under GACAR §91.61, when two aircraft are approaching each other head-on, or nearly so, each pilot must —",
+          "options": [
+            "Climb",
+            "Alter course to the right",
+            "Alter course to the left",
+            "Descend and maintain heading"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.61 requires each PIC to alter course to the right when aircraft are approaching head-on or nearly so.",
+          "cite": "GACAR Part 91, §91.61",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-mathbf-91-61-right-of-way-rules-except-water"
+        },
+        {
+          "q": "Unless otherwise authorized, the maximum indicated airspeed for an aircraft operating below 10,000 ft MSL is —",
+          "options": [
+            "200 kt",
+            "250 kt",
+            "230 kt",
+            "280 kt"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.65 prohibits operating an aircraft below 10,000 ft MSL at an indicated airspeed of more than 250 kt.",
+          "cite": "GACAR Part 91, §91.65",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-bfxi91-65-aircraft-speed"
+        }
+      ]
+    },
+    {
+      "id": "airspace",
+      "title": "Airspace & Air Traffic",
+      "desc": "ICAO classes A–G, the Jeddah FIR, control areas, speed limits and cruising levels.",
+      "source": "GACAR Part 71 · ICAO Annex 11",
+      "questions": [
+        {
+          "q": "Which airspace class is the most controlled?",
+          "options": [
+            "Class A",
+            "Class C",
+            "Class E",
+            "Class G"
+          ],
+          "answer": 0,
+          "explain": "Class A is the most controlled — IFR only, all aircraft separated, continuous ATC service. Class G is the least controlled.",
+          "cite": "GACAR Part 71 · ICAO Annex 11",
+          "citeUrl": ""
+        },
+        {
+          "q": "A 250 kt IAS speed limit applies below 10,000 ft AMSL in which airspace?",
+          "options": [
+            "Class A only",
+            "Classes C, D, E, F and G",
+            "Controlled airspace only",
+            "Class G only"
+          ],
+          "answer": 1,
+          "explain": "The 250 kt IAS limit below 10,000 ft AMSL applies in Classes C–G.",
+          "cite": "ICAO Annex 11 / Annex 2",
+          "citeUrl": ""
+        },
+        {
+          "q": "A Control Zone (CTR) is controlled airspace that —",
+          "options": [
+            "Extends upward from a base above the surface",
+            "Extends upward from the surface around an aerodrome",
+            "Has no defined upper limit",
+            "Is reserved for military use"
+          ],
+          "answer": 1,
+          "explain": "A CTR extends from the surface upward to a specified upper limit, protecting traffic arriving at and departing an aerodrome.",
+          "cite": "ICAO Annex 11",
+          "citeUrl": ""
+        },
+        {
+          "q": "The airspace of the Kingdom of Saudi Arabia is contained within which Flight Information Region?",
+          "options": [
+            "Riyadh FIR",
+            "Jeddah FIR",
+            "Dhahran FIR",
+            "Arabian FIR"
+          ],
+          "answer": 1,
+          "explain": "Saudi airspace is the Jeddah FIR, ICAO indicator OEJD.",
+          "cite": "AIP-KSA",
+          "citeUrl": ""
+        },
+        {
+          "q": "In Class G airspace, ATC provides —",
+          "options": [
+            "Radar separation to all flights",
+            "Control service to IFR only",
+            "A flight information service",
+            "No service at all"
+          ],
+          "answer": 2,
+          "explain": "Class G is uncontrolled — a flight information service (and alerting service) is provided; no separation is given.",
+          "cite": "ICAO Annex 11",
+          "citeUrl": ""
+        },
+        {
+          "q": "A Terminal Control Area (TMA) is normally established —",
+          "options": [
+            "Around a single small aerodrome",
+            "At the confluence of ATS routes near one or more major aerodromes",
+            "Only over the sea",
+            "From the surface upward"
+          ],
+          "answer": 1,
+          "explain": "A TMA is a control area at the confluence of ATS routes around one or more major aerodromes, usually based above the surface.",
+          "cite": "ICAO Annex 11",
+          "citeUrl": ""
+        },
+        {
+          "q": "Above the transition level, an aircraft's vertical position is expressed as —",
+          "options": [
+            "An altitude on the local QNH",
+            "A height above the aerodrome",
+            "A flight level on the standard pressure setting (1013.2 hPa)",
+            "A height above the transition layer"
+          ],
+          "answer": 2,
+          "explain": "Above the transition level, levels are flown as flight levels referenced to the standard setting of 1013.2 hPa.",
+          "cite": "ICAO Annex 2",
+          "citeUrl": ""
+        },
+        {
+          "q": "In Class C airspace, ATC separates —",
+          "options": [
+            "Nothing — it is uncontrolled",
+            "IFR from IFR only",
+            "IFR from IFR and from VFR; VFR receives traffic information on other VFR",
+            "All aircraft from all aircraft"
+          ],
+          "answer": 2,
+          "explain": "Class C: IFR is separated from IFR and from VFR; VFR is separated from IFR and given traffic information on other VFR traffic.",
+          "cite": "ICAO Annex 11",
+          "citeUrl": ""
+        },
+        {
+          "q": "Designation and classification of airspace in KSA is dealt with in which GACAR Part?",
+          "options": [
+            "Part 61",
+            "Part 71",
+            "Part 91",
+            "Part 121"
+          ],
+          "answer": 1,
+          "explain": "GACAR Part 71 — Designated Airspace, Routes, Points and Minimum Altitudes — covers the designation and classification of airspace.",
+          "cite": "GACAR Part 71, §71.11",
+          "citeUrl": "../document.html?type=regulations&id=part-71"
+        },
+        {
+          "q": "Does a VFR flight need an ATC clearance to operate in Class E airspace?",
+          "options": [
+            "Yes, always",
+            "No — clearance is required only for IFR in Class E",
+            "Only above 10,000 ft",
+            "Only at night"
+          ],
+          "answer": 1,
+          "explain": "In Class E, an ATC clearance and continuous two-way radio are required for IFR; VFR may operate without a clearance.",
+          "cite": "ICAO Annex 11",
+          "citeUrl": ""
+        },
+        {
+          "q": "Prohibited, restricted and danger areas are collectively known as —",
+          "options": [
+            "Controlled airspace",
+            "Special-use airspace",
+            "Terminal airspace",
+            "Advisory airspace"
+          ],
+          "answer": 1,
+          "explain": "Prohibited, restricted and danger areas are special-use airspace, depicted on charts and designated under the regulations.",
+          "cite": "GACAR Part 73 · AIP-KSA ENR 5",
+          "citeUrl": ""
+        },
+        {
+          "q": "The semicircular rule for IFR cruising levels assigns, on a magnetic track of 180°–359° —",
+          "options": [
+            "Odd flight levels",
+            "Even flight levels",
+            "Any level cleared by ATC only",
+            "Odd thousands + 500 ft"
+          ],
+          "answer": 1,
+          "explain": "Under the semicircular rule, magnetic tracks 180°–359° take even flight levels; 0°–179° take odd flight levels. All cruising levels remain subject to ATC clearance.",
+          "cite": "ICAO Annex 2",
+          "citeUrl": ""
+        },
+        {
+          "q": "When overlapping airspace designations apply to the same airspace, which operating rules apply?",
+          "options": [
+            "The least restrictive designation",
+            "The more restrictive airspace designation",
+            "The designation chosen by the pilot",
+            "Whichever was designated first"
+          ],
+          "answer": 1,
+          "explain": "GACAR §71.13 provides that where airspace designations overlap, the operating rules of the more restrictive designation apply.",
+          "cite": "GACAR Part 71, §71.13",
+          "citeUrl": "../document.html?type=regulations&id=part-71#sec-mathbfhat-igma-71-13-overlapping-airspace-de"
+        },
+        {
+          "q": "Before operating an aircraft in Class B airspace, the PIC must —",
+          "options": [
+            "Simply monitor the frequency",
+            "Receive an ATC clearance from the facility having jurisdiction",
+            "File an IFR flight plan in all cases",
+            "Hold an ATP certificate"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.131 requires the PIC to receive an ATC clearance from the ATC facility having jurisdiction before operating in Class B airspace.",
+          "cite": "GACAR Part 91, §91.131",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-131"
+        },
+        {
+          "q": "To take off or land at an aerodrome within Class B airspace, the PIC must hold at least —",
+          "options": [
+            "A student pilot certificate",
+            "A private pilot certificate",
+            "A commercial pilot certificate",
+            "An ATP certificate"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.131 requires the PIC to hold at least a private pilot certificate to take off or land at an aerodrome within a Class B airspace area.",
+          "cite": "GACAR Part 91, §91.131",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-131"
+        },
+        {
+          "q": "Each PIC operating in Class D airspace on an arrival or through flight must establish two-way radio communications with the ATC facility —",
+          "options": [
+            "After entering the airspace",
+            "Prior to entering that airspace, and maintain it while within",
+            "Only if requested by ATC",
+            "Within 10 minutes of landing"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.127 requires the PIC to establish two-way radio communications with ATC prior to entering Class D airspace and maintain them while within it.",
+          "cite": "GACAR Part 91, §91.127",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-127"
+        },
+        {
+          "q": "No person may operate an aircraft within a restricted area —",
+          "options": [
+            "Under any circumstances",
+            "Contrary to the restrictions imposed",
+            "Without an IFR flight plan",
+            "Above 10,000 ft MSL"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.133 prohibits operating an aircraft within a restricted area contrary to the restrictions imposed; entry to a prohibited area requires the administering authority's permission.",
+          "cite": "GACAR Part 91, §91.133",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-133"
+        },
+        {
+          "q": "Each person operating an aircraft in Class A airspace must operate —",
+          "options": [
+            "Under VFR only",
+            "Under IFR, with an ATC clearance received prior to entering",
+            "Under special VFR",
+            "Without a flight plan"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.135 requires operations in Class A airspace to be conducted under IFR with an ATC clearance received prior to entering the airspace.",
+          "cite": "GACAR Part 91, §91.135",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-mathbf-91-135-operations-in-class-a-airspace"
+        }
+      ]
+    },
+    {
+      "id": "aip-ais",
+      "title": "AIP & Aeronautical Information",
+      "desc": "The AIP structure, the AIRAC cycle, NOTAMs and how aeronautical information is managed.",
+      "source": "ICAO Annex 15 · AIP-KSA",
+      "questions": [
+        {
+          "q": "How long is one AIRAC cycle?",
+          "options": [
+            "7 days",
+            "28 days",
+            "30 days",
+            "56 days"
+          ],
+          "answer": 1,
+          "explain": "An AIRAC cycle is 28 days. Significant aeronautical changes are grouped onto common, pre-notified AIRAC effective dates.",
+          "cite": "ICAO Annex 15",
+          "citeUrl": ""
+        },
+        {
+          "q": "The AIP is divided into which three parts?",
+          "options": [
+            "GEN, ENR and AD",
+            "VFR, IFR and MIL",
+            "Part 1, Part 2 and Part 3",
+            "NOTAM, AIC and SUP"
+          ],
+          "answer": 0,
+          "explain": "An AIP has three parts: GEN (General), ENR (En-route) and AD (Aerodromes).",
+          "cite": "ICAO Annex 15",
+          "citeUrl": ""
+        },
+        {
+          "q": "AIRAC effective dates always fall on a —",
+          "options": [
+            "Monday",
+            "Thursday",
+            "Saturday",
+            "Sunday"
+          ],
+          "answer": 1,
+          "explain": "AIRAC effective dates are 28 days apart and always fall on a Thursday.",
+          "cite": "ICAO Annex 15",
+          "citeUrl": ""
+        },
+        {
+          "q": "Where in the AIP would you find the entry for a specific aerodrome?",
+          "options": [
+            "The GEN part",
+            "The ENR part",
+            "The AD part",
+            "The AIC"
+          ],
+          "answer": 2,
+          "explain": "Aerodrome data is published in the AD (Aerodromes) part of the AIP — e.g. AD 2 for individual aerodromes.",
+          "cite": "ICAO Annex 15",
+          "citeUrl": ""
+        },
+        {
+          "q": "A NOTAM is —",
+          "options": [
+            "A permanent change to the AIP",
+            "A notice of the establishment, condition or change of any aeronautical facility, service or hazard",
+            "A weather forecast",
+            "A type of flight plan"
+          ],
+          "answer": 1,
+          "explain": "A NOTAM gives time-critical notice of the establishment, condition or change of any aeronautical facility, service, procedure or hazard.",
+          "cite": "ICAO Annex 15",
+          "citeUrl": ""
+        },
+        {
+          "q": "\"AIRAC\" stands for —",
+          "options": [
+            "Aeronautical Information Regulation And Control",
+            "Air Route And Information Code",
+            "Aircraft Registration And Airworthiness Certificate",
+            "Aerodrome Information, Routes And Charts"
+          ],
+          "answer": 0,
+          "explain": "AIRAC — Aeronautical Information Regulation And Control — is the system of common effective dates for aeronautical information change.",
+          "cite": "ICAO Annex 15",
+          "citeUrl": ""
+        },
+        {
+          "q": "The AIP-KSA is published by —",
+          "options": [
+            "ICAO",
+            "The General Authority of Civil Aviation (GACA)",
+            "Each individual aerodrome operator",
+            "The airlines"
+          ],
+          "answer": 1,
+          "explain": "The Aeronautical Information Publication for the Kingdom (AIP-KSA) is published by GACA.",
+          "cite": "AIP-KSA",
+          "citeUrl": ""
+        },
+        {
+          "q": "En-route information — airways, significant points and en-route airspace — is found in which AIP part?",
+          "options": [
+            "GEN",
+            "ENR",
+            "AD",
+            "SUP"
+          ],
+          "answer": 1,
+          "explain": "The ENR (En-route) part of the AIP carries airways, significant points, ATS airspace and en-route procedures.",
+          "cite": "ICAO Annex 15",
+          "citeUrl": ""
+        },
+        {
+          "q": "An AIC is an —",
+          "options": [
+            "Aeronautical Information Circular",
+            "Aircraft Identification Code",
+            "Airspace Infringement Caution",
+            "Aerodrome Inspection Certificate"
+          ],
+          "answer": 0,
+          "explain": "An Aeronautical Information Circular (AIC) carries information that does not qualify for the AIP or a NOTAM but is important for safety, navigation or administration.",
+          "cite": "ICAO Annex 15",
+          "citeUrl": ""
+        },
+        {
+          "q": "Aeronautical charts and navigation databases are updated on —",
+          "options": [
+            "No fixed schedule",
+            "The 28-day AIRAC cycle",
+            "The first of every month",
+            "Each calendar quarter"
+          ],
+          "answer": 1,
+          "explain": "Charts and navigation databases update on the AIRAC cycle so that operators and data providers change in step worldwide.",
+          "cite": "ICAO Annex 15",
+          "citeUrl": ""
+        },
+        {
+          "q": "Before a flight, perishable safety information such as runway closures is found in —",
+          "options": [
+            "The AIP GEN part",
+            "Current NOTAMs",
+            "The aircraft AFM",
+            "GACAR Part 91"
+          ],
+          "answer": 1,
+          "explain": "Time-critical, perishable information — closures, unserviceabilities, hazards — is issued by NOTAM and must be checked before flight.",
+          "cite": "ICAO Annex 15",
+          "citeUrl": ""
+        },
+        {
+          "q": "An AIRAC cycle identified as 2605 means —",
+          "options": [
+            "The 26th cycle of 2005",
+            "The 5th cycle whose effective date falls in 2026",
+            "5 cycles before 2026",
+            "Cycle 2605 of the AIP"
+          ],
+          "answer": 1,
+          "explain": "AIRAC cycles are labelled YYNN — the two-digit year and the ordinal cycle within it. 2605 is the fifth cycle of 2026.",
+          "cite": "ICAO Annex 15",
+          "citeUrl": ""
+        }
+      ]
+    },
+    {
+      "id": "radio-elpt",
+      "title": "Radiotelephony & English Proficiency",
+      "desc": "The ICAO phonetic alphabet, standard phraseology and the language-proficiency requirement.",
+      "source": "ICAO Annex 10 · Annex 1",
+      "questions": [
+        {
+          "q": "In the ICAO phonetic alphabet, the letter 'R' is —",
+          "options": [
+            "Roger",
+            "Romeo",
+            "Radio",
+            "Rescue"
+          ],
+          "answer": 1,
+          "explain": "'R' is Romeo. 'Roger' is a separate procedure word meaning the transmission was received.",
+          "cite": "ICAO Annex 10",
+          "citeUrl": ""
+        },
+        {
+          "q": "The minimum ICAO language proficiency level for international operations is —",
+          "options": [
+            "Level 3 (Pre-operational)",
+            "Level 4 (Operational)",
+            "Level 5 (Extended)",
+            "Level 6 (Expert)"
+          ],
+          "answer": 1,
+          "explain": "ICAO Level 4 — Operational — is the minimum to exercise the privileges of a licence on international operations.",
+          "cite": "ICAO Annex 1",
+          "citeUrl": ""
+        },
+        {
+          "q": "How many skills are assessed in the ICAO language proficiency rating scale?",
+          "options": [
+            "Three",
+            "Four",
+            "Six",
+            "Nine"
+          ],
+          "answer": 2,
+          "explain": "Six skills: pronunciation, structure, vocabulary, fluency, comprehension and interactions.",
+          "cite": "ICAO Annex 1 / Doc 9835",
+          "citeUrl": ""
+        },
+        {
+          "q": "The spoken word used to declare a distress condition is —",
+          "options": [
+            "PAN-PAN",
+            "SECURITE",
+            "MAYDAY",
+            "EMERGENCY"
+          ],
+          "answer": 2,
+          "explain": "MAYDAY, spoken three times, declares distress — grave and imminent danger requiring immediate assistance.",
+          "cite": "ICAO Annex 10",
+          "citeUrl": ""
+        },
+        {
+          "q": "An urgency condition — a concern for safety but no immediate danger — is signalled by —",
+          "options": [
+            "MAYDAY",
+            "PAN-PAN",
+            "SECURITE",
+            "STANDBY"
+          ],
+          "answer": 1,
+          "explain": "PAN-PAN, spoken three times, signals urgency: a condition concerning safety that does not require immediate assistance.",
+          "cite": "ICAO Annex 10",
+          "citeUrl": ""
+        },
+        {
+          "q": "The procedure word 'WILCO' means —",
+          "options": [
+            "Repeat your message",
+            "Will comply",
+            "Wait — I will call you",
+            "Message received"
+          ],
+          "answer": 1,
+          "explain": "'WILCO' — short for 'will comply' — means the message has been understood and will be complied with.",
+          "cite": "ICAO Annex 10",
+          "citeUrl": ""
+        },
+        {
+          "q": "On the radio, the number 9 is spoken as —",
+          "options": [
+            "Nine",
+            "Niner",
+            "Nina",
+            "Niao"
+          ],
+          "answer": 1,
+          "explain": "To avoid confusion with 'nein' and other words, 9 is spoken 'niner' in aviation radiotelephony.",
+          "cite": "ICAO Annex 10",
+          "citeUrl": ""
+        },
+        {
+          "q": "'SAY AGAIN' is a request to —",
+          "options": [
+            "Repeat all, or the specified part, of the last transmission",
+            "Confirm you received the message",
+            "Speak more slowly",
+            "Change frequency"
+          ],
+          "answer": 0,
+          "explain": "'SAY AGAIN' asks the station to repeat all, or a specified part, of its last transmission.",
+          "cite": "ICAO Annex 10",
+          "citeUrl": ""
+        },
+        {
+          "q": "A read-back is specifically required for —",
+          "options": [
+            "Every transmission received",
+            "ATC route clearances and runway/level instructions",
+            "Weather information only",
+            "Position reports only"
+          ],
+          "answer": 1,
+          "explain": "Safety-critical instructions — route clearances, runway and level instructions, headings and frequency changes — must be read back so ATC can confirm correct receipt.",
+          "cite": "ICAO Annex 10 / Doc 4444",
+          "citeUrl": ""
+        },
+        {
+          "q": "In the ICAO phonetic alphabet, the letter 'A' is —",
+          "options": [
+            "Able",
+            "Alpha",
+            "Alfa",
+            "Apple"
+          ],
+          "answer": 2,
+          "explain": "ICAO spells the letter 'A' as 'Alfa' — deliberately with an 'f' so non-English speakers pronounce it correctly.",
+          "cite": "ICAO Annex 10",
+          "citeUrl": ""
+        },
+        {
+          "q": "An ICAO language proficiency assessment at Level 4 is valid for —",
+          "options": [
+            "12 months",
+            "3 years",
+            "6 years",
+            "It never expires"
+          ],
+          "answer": 1,
+          "explain": "Level 4 is re-assessed every 3 years; Level 5 every 6 years; Level 6 (Expert) does not require re-assessment.",
+          "cite": "ICAO Annex 1",
+          "citeUrl": ""
+        },
+        {
+          "q": "The procedure word 'ROGER' means —",
+          "options": [
+            "Yes / affirmative",
+            "I have received all of your last transmission",
+            "I will comply",
+            "Correct"
+          ],
+          "answer": 1,
+          "explain": "'ROGER' means 'I have received all of your last transmission'. It is not a substitute for 'AFFIRM' (yes) or a read-back.",
+          "cite": "ICAO Annex 10",
+          "citeUrl": ""
+        }
+      ]
+    },
+    {
+      "id": "air-law",
+      "title": "General Air Law",
+      "desc": "The structure of the GACARs, the regulator, and how Saudi aviation law fits together.",
+      "source": "GACAR · Civil Aviation Law",
+      "questions": [
+        {
+          "q": "The civil aviation regulator of the Kingdom of Saudi Arabia is —",
+          "options": [
+            "The General Authority of Civil Aviation (GACA)",
+            "Saudia",
+            "ICAO",
+            "The Ministry of Transport"
+          ],
+          "answer": 0,
+          "explain": "The General Authority of Civil Aviation (GACA) is the State's civil aviation regulator and publishes the GACARs.",
+          "cite": "Civil Aviation Law of KSA",
+          "citeUrl": ""
+        },
+        {
+          "q": "Which GACAR Part contains the general operating and flight rules?",
+          "options": [
+            "Part 1",
+            "Part 61",
+            "Part 91",
+            "Part 121"
+          ],
+          "answer": 2,
+          "explain": "GACAR Part 91 — General Operating and Flight Rules — governs the operation of aircraft within KSA.",
+          "cite": "GACAR Part 91",
+          "citeUrl": "../document.html?type=regulations&id=part-91"
+        },
+        {
+          "q": "Pilot certification and licensing requirements are set out in which GACAR Part?",
+          "options": [
+            "Part 21",
+            "Part 61",
+            "Part 91",
+            "Part 141"
+          ],
+          "answer": 1,
+          "explain": "GACAR Part 61 covers the certification of airmen — pilot licences, ratings and the associated requirements.",
+          "cite": "GACAR Part 61",
+          "citeUrl": "../document.html?type=regulations&id=part-61"
+        },
+        {
+          "q": "The GACARs are written to comply, as far as practicable, with —",
+          "options": [
+            "FAA Federal Aviation Regulations",
+            "EASA regulations",
+            "The Standards and Recommended Practices of ICAO",
+            "IATA resolutions"
+          ],
+          "answer": 2,
+          "explain": "The stated goal of the GACAR is to comply, to the maximum extent practicable, with ICAO Standards and Recommended Practices; differences are published in the AIP.",
+          "cite": "GACAR Foreword",
+          "citeUrl": "../document.html?type=handbooks&id=foreword"
+        },
+        {
+          "q": "The GACAR Parts are numbered in the range —",
+          "options": [
+            "Part 1 to Part 99",
+            "Part 1 to Part 199",
+            "Part 100 to Part 200",
+            "Part 1 to Part 500"
+          ],
+          "answer": 1,
+          "explain": "The GACARs run from Part 1 through Part 199, grouped by subject area.",
+          "cite": "GACAR",
+          "citeUrl": "../library.html"
+        },
+        {
+          "q": "A pilot holding a foreign (e.g. FAA or EASA) licence who wishes to fly on the Saudi register must —",
+          "options": [
+            "Use the foreign licence directly with no further action",
+            "Convert it to, or obtain, a GACA licence",
+            "Only fly with a Saudi co-pilot",
+            "Notify ICAO"
+          ],
+          "answer": 1,
+          "explain": "A foreign licence must be converted to — or a GACA licence otherwise obtained — to exercise privileges on the Saudi register.",
+          "cite": "GACAR Part 61",
+          "citeUrl": "../document.html?type=regulations&id=part-61"
+        },
+        {
+          "q": "May a pilot in command deviate from a rule of GACAR Part 91 in an in-flight emergency?",
+          "options": [
+            "Never — the rules are absolute",
+            "Yes — to the extent required to meet that emergency",
+            "Only with prior ATC approval",
+            "Only above 10,000 ft"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.3 allows the PIC, in an in-flight emergency requiring immediate action, to deviate from the rules to the extent required to meet that emergency.",
+          "cite": "GACAR Part 91, §91.3",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-3"
+        },
+        {
+          "q": "The authoritative, current source for any GACAR requirement is —",
+          "options": [
+            "Any aviation training website",
+            "GACA's official publication",
+            "The aircraft AFM",
+            "The most recent NOTAM"
+          ],
+          "answer": 1,
+          "explain": "Only GACA's official publication is authoritative. Study tools and summaries must always be verified against the current official GACAR.",
+          "cite": "GACAR",
+          "citeUrl": "https://gaca.gov.sa"
+        },
+        {
+          "q": "Where ICAO Annex provisions are adopted into Saudi law, they take effect —",
+          "options": [
+            "Automatically, without any Saudi instrument",
+            "When adopted by reference within the GACARs",
+            "Only after a NOTAM is issued",
+            "Only for international flights"
+          ],
+          "answer": 1,
+          "explain": "ICAO Annex provisions apply in KSA where the GACARs adopt them — often by reference within a relevant Part.",
+          "cite": "GACAR",
+          "citeUrl": ""
+        },
+        {
+          "q": "The topical handbook that explains the legal basis, ICAO compliance and scope of the GACARs is the —",
+          "options": [
+            "Change History",
+            "Foreword",
+            "GACARs Map",
+            "Miscellaneous handbook"
+          ],
+          "answer": 1,
+          "explain": "The Foreword sets out the legal basis, historical background, ICAO compliance and applicability of the GACARs.",
+          "cite": "GACAR Foreword",
+          "citeUrl": "../document.html?type=handbooks&id=foreword"
+        },
+        {
+          "q": "Amendments to the GACARs and their effective dates are tracked in the —",
+          "options": [
+            "Foreword",
+            "Change History document",
+            "GACARs Map",
+            "AIP GEN"
+          ],
+          "answer": 1,
+          "explain": "The Change History document records GACAR amendments and the version in which each change took effect.",
+          "cite": "GACAR Change History",
+          "citeUrl": "../document.html?type=handbooks&id=change-history"
+        },
+        {
+          "q": "GACAR Part 91 applies to aircraft operations —",
+          "options": [
+            "Only at international aerodromes",
+            "Within the sovereign area and territorial waters of KSA",
+            "Only to Saudi-registered aircraft worldwide",
+            "Only above FL100"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.1 — Part 91 prescribes rules governing the operation of aircraft within the sovereign area and territorial waters of the Kingdom.",
+          "cite": "GACAR Part 91, §91.1",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-1"
+        },
+        {
+          "q": "Which GACAR Part prescribes the rules governing the issuance, amendment and repeal of the GACARs?",
+          "options": [
+            "Part 1",
+            "Part 11",
+            "Part 13",
+            "Part 91"
+          ],
+          "answer": 1,
+          "explain": "GACAR §11.1 states that Part 11 prescribes the rules governing the issuance, amendment and repeal of the GACARs and the requirements for petitions for exemption.",
+          "cite": "GACAR Part 11, §11.1",
+          "citeUrl": "../document.html?type=regulations&id=part-11#sec-11-1"
+        },
+        {
+          "q": "Under GACAR Part 11, who may petition the President for an exemption from all or part of a regulatory requirement?",
+          "options": [
+            "Only air operators",
+            "Any person",
+            "Only the GACA Board of Directors",
+            "Only ICAO"
+          ],
+          "answer": 1,
+          "explain": "GACAR §11.9 provides that any person may petition the President for an exemption from all or part of a regulatory requirement issued by the GACA.",
+          "cite": "GACAR Part 11, §11.9",
+          "citeUrl": "../document.html?type=regulations&id=part-11#sec-11-9"
+        },
+        {
+          "q": "If a petition for exemption is denied, the petitioner may next file —",
+          "options": [
+            "An appeal directly to ICAO",
+            "A petition for reconsideration with the President",
+            "A new application after five years",
+            "A formal complaint under Part 13"
+          ],
+          "answer": 1,
+          "explain": "GACAR §11.13 allows a petitioner whose exemption was denied to file a petition for reconsideration with the President, based on an erroneous material fact or new relevant facts.",
+          "cite": "GACAR Part 11, §11.13",
+          "citeUrl": "../document.html?type=regulations&id=part-11#sec-11-13"
+        },
+        {
+          "q": "Under GACAR §13.23, a person who knows of a violation of the Civil Aviation Law or a rule issued under it must —",
+          "options": [
+            "Keep it confidential",
+            "Report it to the President",
+            "Report it directly to ICAO",
+            "Report it only if asked"
+          ],
+          "answer": 1,
+          "explain": "GACAR §13.23 requires any person who knows of a violation of the Civil Aviation Law or any rule, regulation or order under it to report it to the President.",
+          "cite": "GACAR Part 13, §13.23",
+          "citeUrl": "../document.html?type=regulations&id=part-13"
+        },
+        {
+          "q": "Which remedial administrative action may the President issue to bring to a person's attention that an incident appears contrary to the regulations but does not warrant further enforcement?",
+          "options": [
+            "A warning notice",
+            "A cease and desist order",
+            "A certificate revocation",
+            "A punitive fine"
+          ],
+          "answer": 0,
+          "explain": "GACAR §13.63 allows the President to issue a warning notice when the facts appear contrary to the regulations but do not warrant further compliance enforcement action.",
+          "cite": "GACAR Part 13, §13.63",
+          "citeUrl": "../document.html?type=regulations&id=part-13#sec-13-63"
+        },
+        {
+          "q": "As a result of an investigation, the President may issue an order amending, suspending or revoking an airman certificate when —",
+          "options": [
+            "Requested by another pilot",
+            "The public interest and aviation safety require it",
+            "The certificate is more than five years old",
+            "The holder changes address"
+          ],
+          "answer": 1,
+          "explain": "GACAR §13.103 allows the President to issue an order amending, suspending or revoking a certificate when the public interest and aviation safety require it.",
+          "cite": "GACAR Part 13, §13.103",
+          "citeUrl": "../document.html?type=regulations&id=part-13#sec-13-103"
+        }
+      ]
+    },
+    {
+      "id": "pilot-licensing",
+      "title": "Pilot Licensing & Ratings",
+      "desc": "Eligibility ages, medical classes, currency, flight reviews and instrument recency under GACAR Part 61.",
+      "source": "GACAR Part 61",
+      "questions": [
+        {
+          "q": "What is the minimum age to be eligible for a GACAR private pilot certificate for a rating other than a glider or balloon?",
+          "options": [
+            "16",
+            "17",
+            "18",
+            "21"
+          ],
+          "answer": 1,
+          "explain": "GACAR §61.133 requires an applicant to be at least 17 years of age for a private pilot certificate in other than a glider or balloon.",
+          "cite": "GACAR Part 61, §61.133",
+          "citeUrl": "../document.html?type=regulations&id=part-61#sec-61-133"
+        },
+        {
+          "q": "What is the minimum age for a GACAR commercial pilot certificate?",
+          "options": [
+            "17",
+            "18",
+            "21",
+            "23"
+          ],
+          "answer": 1,
+          "explain": "GACAR §61.153 requires a commercial pilot applicant to be at least 18 years of age.",
+          "cite": "GACAR Part 61, §61.153",
+          "citeUrl": "../document.html?type=regulations&id=part-61#sec-61-153"
+        },
+        {
+          "q": "What is the minimum age to be eligible for an airline transport pilot (ATP) certificate under GACAR?",
+          "options": [
+            "18",
+            "21",
+            "23",
+            "25"
+          ],
+          "answer": 2,
+          "explain": "GACAR §61.173 requires an ATP applicant to be at least 23 years of age and of good moral character.",
+          "cite": "GACAR Part 61, §61.173",
+          "citeUrl": "../document.html?type=regulations&id=part-61#sec-61-173"
+        },
+        {
+          "q": "To be eligible for a student pilot certificate (for other than a glider or balloon), an applicant must be at least —",
+          "options": [
+            "14 years of age",
+            "16 years of age",
+            "17 years of age",
+            "18 years of age"
+          ],
+          "answer": 1,
+          "explain": "GACAR §61.103 sets the minimum age for a student pilot certificate at 16 (14 for a glider or balloon).",
+          "cite": "GACAR Part 61, §61.103",
+          "citeUrl": "../document.html?type=regulations&id=part-61#sec-61-103"
+        },
+        {
+          "q": "Which class of medical certificate must a person normally hold when exercising the privileges of a student pilot certificate?",
+          "options": [
+            "Class 1",
+            "At least Class 2",
+            "At least Class 3",
+            "No medical is required"
+          ],
+          "answer": 1,
+          "explain": "GACAR §61.105 requires at least a Class 2 medical certificate for a student pilot, except a student training to become a sport pilot need only hold at least a Class 3.",
+          "cite": "GACAR Part 61, §61.105",
+          "citeUrl": "../document.html?type=regulations&id=part-61"
+        },
+        {
+          "q": "An applicant for an ATP certificate must hold at least which class of medical certificate (except for glider/balloon operations)?",
+          "options": [
+            "Class 1",
+            "Class 2",
+            "Class 3",
+            "Any valid class"
+          ],
+          "answer": 0,
+          "explain": "GACAR §61.173 requires an ATP applicant to hold a Class 1 medical certificate, except glider or balloon operations need only a Class 2.",
+          "cite": "GACAR Part 61, §61.173",
+          "citeUrl": "../document.html?type=regulations&id=part-61#sec-61-173"
+        },
+        {
+          "q": "Within what period must a required flight crew member have completed a flight review to act as a required crew member of an aircraft?",
+          "options": [
+            "The preceding 12 months",
+            "The preceding 24 months",
+            "The preceding 36 months",
+            "The preceding 6 months"
+          ],
+          "answer": 1,
+          "explain": "GACAR §61.21 prohibits acting as a required flight crew member unless a flight review has been satisfactorily completed in the 24 months before the month of flight.",
+          "cite": "GACAR Part 61, §61.21",
+          "citeUrl": "../document.html?type=regulations&id=part-61"
+        },
+        {
+          "q": "A standard GACAR flight review consists of, as a minimum —",
+          "options": [
+            "1 hour of flight training and 1 hour of ground training",
+            "2 hours of flight training only",
+            "3 hours of ground training only",
+            "1 hour of flight training and 3 hours of ground training"
+          ],
+          "answer": 0,
+          "explain": "GACAR §61.21 specifies a flight review as a minimum of 1 hour of flight training and 1 hour of ground training.",
+          "cite": "GACAR Part 61, §61.21",
+          "citeUrl": "../document.html?type=regulations&id=part-61"
+        },
+        {
+          "q": "To act as PIC of an aircraft carrying passengers, a pilot must have made at least three takeoffs and three landings within —",
+          "options": [
+            "The preceding 30 days",
+            "The preceding 60 days",
+            "The preceding 90 days",
+            "The preceding 6 months"
+          ],
+          "answer": 2,
+          "explain": "GACAR §61.17 requires three takeoffs and three landings within the preceding 90 days to carry passengers, in the same category, class and type.",
+          "cite": "GACAR Part 61, §61.17",
+          "citeUrl": "../document.html?type=regulations&id=part-61#sec-61-17"
+        },
+        {
+          "q": "Under GACAR §61.17, to act as PIC under IFR a pilot must, within the preceding 6 months, have performed and logged at least —",
+          "options": [
+            "Three instrument approaches",
+            "Six instrument approaches, holding procedures, and course intercepting and tracking",
+            "One instrument approach and one hold",
+            "Twelve instrument approaches"
+          ],
+          "answer": 1,
+          "explain": "GACAR §61.17(a)(3) requires, within the preceding 6 months, six instrument approaches plus holding procedures and intercepting/tracking courses, flown solely by reference to instruments.",
+          "cite": "GACAR Part 61, §61.17",
+          "citeUrl": "../document.html?type=regulations&id=part-61#sec-61-17"
+        },
+        {
+          "q": "Which English language proficiency level is the minimum required for eligibility for most GACAR pilot certificates?",
+          "options": [
+            "Level 3 (Pre-operational)",
+            "Level 4 (Operational)",
+            "Level 5 (Extended)",
+            "Level 6 (Expert)"
+          ],
+          "answer": 1,
+          "explain": "GACAR §61.53 requires an ability equivalent to or greater than Operational Level (Level 4) of the Language Proficiency Rating Scale in Appendix A.",
+          "cite": "GACAR Part 61, §61.53",
+          "citeUrl": "../document.html?type=regulations&id=part-61#sec-61-53"
+        },
+        {
+          "q": "A holder of a foreign pilot licence from an ICAO Contracting State may be issued which Saudi Arabian certificate under GACAR §61.55?",
+          "options": [
+            "A Saudi Arabian ATP certificate",
+            "A Saudi Arabian commercial pilot certificate",
+            "A Saudi Arabian private pilot certificate with appropriate ratings",
+            "A Saudi Arabian flight instructor certificate"
+          ],
+          "answer": 2,
+          "explain": "GACAR §61.55 allows a person holding a foreign licence at private pilot level or higher from an ICAO Contracting State to be issued a Saudi Arabian private pilot certificate with the appropriate ratings.",
+          "cite": "GACAR Part 61, §61.55",
+          "citeUrl": "../document.html?type=regulations&id=part-61#sec-61-55"
+        }
+      ]
+    },
+    {
+      "id": "medical",
+      "title": "Medical Fitness",
+      "desc": "Medical certificate classes, vision and hearing standards, special issuance and AME procedures under GACAR Part 67.",
+      "source": "GACAR Part 67",
+      "questions": [
+        {
+          "q": "GACAR Part 67 prescribes the medical standards and certification procedures for which document?",
+          "options": [
+            "Airman medical certificates",
+            "Aerodrome certificates",
+            "Airworthiness certificates",
+            "Air operator certificates"
+          ],
+          "answer": 0,
+          "explain": "GACAR §67.1 states that Part 67 prescribes the medical standards and certification procedures for issuing medical certificates for airmen.",
+          "cite": "GACAR Part 67, §67.1",
+          "citeUrl": "../document.html?type=regulations&id=part-67#sec-67-1"
+        },
+        {
+          "q": "An applicant for a Class 1, 2 or 3 medical certificate must be examined by —",
+          "options": [
+            "Any licensed physician",
+            "An aviation medical examiner (AME) designated under GACAR Part 183",
+            "The GACA Board of Directors",
+            "An air traffic controller"
+          ],
+          "answer": 1,
+          "explain": "GACAR §67.3 requires the applicant to be examined by an aviation medical examiner (AME) designated in accordance with GACAR Part 183.",
+          "cite": "GACAR Part 67, §67.3",
+          "citeUrl": "../document.html?type=regulations&id=part-67"
+        },
+        {
+          "q": "At the discretion of the GACA medical assessor, the validity of a medical certificate may be extended by up to —",
+          "options": [
+            "15 days",
+            "30 days",
+            "45 days",
+            "90 days"
+          ],
+          "answer": 2,
+          "explain": "GACAR §67.7 allows the GACA medical assessor, at his discretion, to extend the validity of a medical certificate by up to 45 days.",
+          "cite": "GACAR Part 67, §67.7",
+          "citeUrl": "../document.html?type=regulations&id=part-67#sec-67-7"
+        },
+        {
+          "q": "For a Class 1 medical certificate, the required distant visual acuity in each eye separately, with or without correction, is —",
+          "options": [
+            "6/12 (20/40) or better",
+            "6/9 (20/30) or better",
+            "6/6 (20/20) or better",
+            "6/18 (20/60) or better"
+          ],
+          "answer": 2,
+          "explain": "GACAR §67.17 requires distant visual acuity of 6/6 (20/20) or better in each eye separately, with or without corrective lenses, for Class 1.",
+          "cite": "GACAR Part 67, §67.17",
+          "citeUrl": "../document.html?type=regulations&id=part-67"
+        },
+        {
+          "q": "For a Class 2 medical certificate, the minimum distant visual acuity in each eye separately (with or without correction) is —",
+          "options": [
+            "6/6 (20/20)",
+            "6/9 (20/30)",
+            "6/12 (20/40)",
+            "6/24 (20/80)"
+          ],
+          "answer": 2,
+          "explain": "GACAR §67.41 sets the Class 2 distant visual acuity standard at 6/12 (20/40) or better in each eye separately, with binocular acuity of 6/9 (20/30) or better.",
+          "cite": "GACAR Part 67, §67.41",
+          "citeUrl": "../document.html?type=regulations&id=part-67"
+        },
+        {
+          "q": "A person who does not meet the standards of GACAR §§67.17 through 67.27 for a Class 1 certificate may apply for —",
+          "options": [
+            "An automatic waiver",
+            "Discretionary issuance of a certificate under §67.87",
+            "A foreign medical certificate",
+            "An exemption from GACAR Part 11"
+          ],
+          "answer": 1,
+          "explain": "GACAR §67.29 allows a person who does not meet §§67.17–67.27 to apply for the discretionary issuance of a certificate under §67.87.",
+          "cite": "GACAR Part 67, §67.29",
+          "citeUrl": "../document.html?type=regulations&id=part-67#sec-67-29"
+        },
+        {
+          "q": "Under GACAR §67.87, which document granted to a person with a static, non-progressive disqualifying condition does NOT expire?",
+          "options": [
+            "An Authorization for Special Issuance",
+            "A Statement of Demonstrated Ability (SODA)",
+            "A Class 1 medical certificate",
+            "A discretionary waiver"
+          ],
+          "answer": 1,
+          "explain": "GACAR §67.87 states a Statement of Demonstrated Ability (SODA) does not expire and authorizes an AME to issue a medical certificate if the condition has not adversely changed.",
+          "cite": "GACAR Part 67, §67.87",
+          "citeUrl": "../document.html?type=regulations&id=part-67#sec-67-87"
+        },
+        {
+          "q": "Examinations for a Class 1 medical certificate may be performed by —",
+          "options": [
+            "Any AME",
+            "Only an AME specifically designated for that purpose",
+            "Any licensed general practitioner",
+            "The GACA Board of Directors"
+          ],
+          "answer": 1,
+          "explain": "GACAR §67.91 provides that only an AME specifically designated for the purpose may perform examinations for Class 1 medical certificates; any AME may perform Class 2 or 3 examinations.",
+          "cite": "GACAR Part 67, §67.91",
+          "citeUrl": "../document.html?type=regulations&id=part-67#sec-67-91"
+        },
+        {
+          "q": "A person denied a medical certificate by an AME may appeal the decision in accordance with —",
+          "options": [
+            "GACAR Part 11",
+            "GACAR Part 13 procedures",
+            "GACAR Part 61",
+            "ICAO Annex 1"
+          ],
+          "answer": 1,
+          "explain": "GACAR §67.93 provides that a person denied a medical certificate by an AME may appeal the decision in accordance with the procedures prescribed in GACAR Part 13.",
+          "cite": "GACAR Part 67, §67.93",
+          "citeUrl": "../document.html?type=regulations&id=part-67#sec-67-93"
+        },
+        {
+          "q": "If a holder fails to provide medical information requested by the President under GACAR §67.95, the President may —",
+          "options": [
+            "Take no action",
+            "Suspend, modify, or revoke the medical certificate",
+            "Only issue a warning notice",
+            "Refer the matter to ICAO"
+          ],
+          "answer": 1,
+          "explain": "GACAR §67.95 allows the President to suspend, modify, or revoke a medical certificate (or deny an application) if the holder fails to provide requested medical information or authorize its release.",
+          "cite": "GACAR Part 67, §67.95",
+          "citeUrl": "../document.html?type=regulations&id=part-67#sec-67-95"
+        },
+        {
+          "q": "Under GACAR §67.5, the level of medical fitness required for renewal of a medical certificate is —",
+          "options": [
+            "Lower than for the initial certificate",
+            "The same as for the initial certificate, except where otherwise specifically stated",
+            "Higher than for the initial certificate",
+            "Determined solely by the airman"
+          ],
+          "answer": 1,
+          "explain": "GACAR §67.5 states the level of medical fitness required for renewal is the same as for the initial certificate, except where otherwise specifically stated.",
+          "cite": "GACAR Part 67, §67.5",
+          "citeUrl": "../document.html?type=regulations&id=part-67"
+        },
+        {
+          "q": "The holder of a medical certificate that has been suspended or revoked must —",
+          "options": [
+            "Keep it for their records",
+            "Return it to the President upon request",
+            "Destroy it immediately",
+            "Send it to ICAO"
+          ],
+          "answer": 1,
+          "explain": "GACAR §67.97 requires the holder of any suspended or revoked medical certificate to return it to the President upon his request.",
+          "cite": "GACAR Part 67, §67.97",
+          "citeUrl": "../document.html?type=regulations&id=part-67#sec-67-97"
+        }
+      ]
+    },
+    {
+      "id": "aircraft-equipment",
+      "title": "Aircraft, Equipment & Airworthiness",
+      "desc": "Oxygen, transponders, instrument tests, airworthiness directives and maintenance under GACAR Parts 91, 39 and 43.",
+      "source": "GACAR Part 91 · 39 · 43",
+      "questions": [
+        {
+          "q": "On a non-pressurized aircraft, above which cabin pressure altitude must the required minimum flight crew use supplemental oxygen for the entire flight time at those altitudes?",
+          "options": [
+            "Above 8,000 ft MSL",
+            "Above 10,000 ft MSL",
+            "Above 13,000 ft MSL",
+            "Above 15,000 ft MSL"
+          ],
+          "answer": 2,
+          "explain": "GACAR §91.223 requires the minimum flight crew to use supplemental oxygen during the entire flight time at cabin pressure altitudes above 13,000 ft MSL.",
+          "cite": "GACAR Part 91, §91.223",
+          "citeUrl": "../document.html?type=regulations&id=part-91"
+        },
+        {
+          "q": "Between cabin pressure altitudes above 10,000 ft and up to and including 13,000 ft MSL, the required minimum flight crew must use supplemental oxygen for that part of the flight at those altitudes that lasts more than —",
+          "options": [
+            "10 minutes",
+            "30 minutes",
+            "60 minutes",
+            "90 minutes"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.223 requires supplemental oxygen for the minimum flight crew when the flight above 10,000 ft up to 13,000 ft MSL exceeds 30 minutes duration.",
+          "cite": "GACAR Part 91, §91.223",
+          "citeUrl": "../document.html?type=regulations&id=part-91"
+        },
+        {
+          "q": "Within what period must an ATC transponder have been tested and inspected for it to be used as required by GACAR Part 91?",
+          "options": [
+            "The preceding 12 months",
+            "The preceding 24 months",
+            "The preceding 36 months",
+            "The preceding 6 months"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.453 prohibits use of an ATC transponder unless it has been tested and inspected within the preceding 24 months and found to comply with Appendix E to GACAR Part 43.",
+          "cite": "GACAR Part 91, §91.453",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-453"
+        },
+        {
+          "q": "To operate an aircraft in controlled airspace under IFR, the altimeter and static pressure system must have been tested and inspected within —",
+          "options": [
+            "The preceding 12 months",
+            "The preceding 24 months",
+            "The preceding 36 months",
+            "The preceding 48 months"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.451 requires each static pressure system, altimeter and automatic pressure altitude reporting system to have been tested within the preceding 24 months to operate in controlled airspace under IFR.",
+          "cite": "GACAR Part 91, §91.451",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-451"
+        },
+        {
+          "q": "Generally, no person may operate an aircraft unless within the preceding 12 months it has had —",
+          "options": [
+            "A 100-hour inspection",
+            "An annual inspection in accordance with GACAR Part 43",
+            "A progressive inspection only",
+            "A flight manual review"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.449 prohibits operating an aircraft unless within the preceding 12 months it has had an annual inspection in accordance with GACAR Part 43 and been approved for return to service.",
+          "cite": "GACAR Part 91, §91.449",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-bf-91-449-inspections"
+        },
+        {
+          "q": "Who is primarily responsible for maintaining an aircraft in an airworthy condition, including compliance with GACAR Part 39?",
+          "options": [
+            "The President",
+            "The aircraft manufacturer",
+            "The owner or operator of the aircraft",
+            "The aviation medical examiner"
+          ],
+          "answer": 2,
+          "explain": "GACAR §91.443 states the owner or operator of an aircraft is primarily responsible for maintaining it in an airworthy condition, including compliance with GACAR Part 39.",
+          "cite": "GACAR Part 91, §91.443",
+          "citeUrl": "../document.html?type=regulations&id=part-91#sec-91-443"
+        },
+        {
+          "q": "Under GACAR Part 39, a person may operate an aircraft to which an airworthiness directive applies —",
+          "options": [
+            "Only in accordance with the requirements of that airworthiness directive",
+            "Freely, since ADs are advisory",
+            "Only with the manufacturer's permission",
+            "Only under VFR"
+          ],
+          "answer": 0,
+          "explain": "GACAR §39.3 prohibits operating an aircraft to which an airworthiness directive applies except in accordance with the requirements of that directive.",
+          "cite": "GACAR Part 39, §39.3",
+          "citeUrl": "../document.html?type=regulations&id=part-39#sec-39-3"
+        },
+        {
+          "q": "If there is a conflict between an airworthiness directive and a related service document, the affected person must —",
+          "options": [
+            "Comply with the service document",
+            "Comply with the airworthiness directive",
+            "Choose whichever is less restrictive",
+            "Ground the aircraft permanently"
+          ],
+          "answer": 1,
+          "explain": "GACAR §39.7 requires that, in the event of conflict between a service document and an airworthiness directive, the affected person must comply with the airworthiness directive.",
+          "cite": "GACAR Part 39, §39.7",
+          "citeUrl": "../document.html?type=regulations&id=part-39"
+        },
+        {
+          "q": "Under GACAR Part 39, a special flight permit may be issued for an aircraft to —",
+          "options": [
+            "Carry passengers for hire despite an open AD",
+            "Fly to a repair facility to complete work required by an airworthiness directive, provided it is capable of safe flight",
+            "Operate indefinitely with an unsafe condition",
+            "Be exported without inspection"
+          ],
+          "answer": 1,
+          "explain": "GACAR §39.15 allows a special flight permit for an aircraft to fly to a repair facility to complete work required by an AD, provided the aircraft is capable of safe flight.",
+          "cite": "GACAR Part 39, §39.15",
+          "citeUrl": "../document.html?type=regulations&id=part-39#sec-39-15"
+        },
+        {
+          "q": "Under GACAR §43.5, the holder of a pilot certificate (other than a sport pilot) may perform which work on an aircraft they own or operate and not used under Part 121 or 135?",
+          "options": [
+            "Major repairs",
+            "Major alterations",
+            "Preventive maintenance",
+            "Annual inspections"
+          ],
+          "answer": 2,
+          "explain": "GACAR §43.5(g) allows a pilot certificate holder (except a sport pilot) to perform preventive maintenance on an aircraft owned or operated by that pilot and not used under Part 121 or 135.",
+          "cite": "GACAR Part 43, §43.5",
+          "citeUrl": "../document.html?type=regulations&id=part-43#sec-43-5"
+        },
+        {
+          "q": "Under GACAR §43.3, an aircraft component may be described as 'rebuilt' only if it has been disassembled, cleaned, inspected, repaired, reassembled and tested —",
+          "options": [
+            "To any standard acceptable to the owner",
+            "To the same tolerances and limits as a new item",
+            "Only by the original manufacturer",
+            "Without any testing"
+          ],
+          "answer": 1,
+          "explain": "GACAR §43.3 permits describing an item as rebuilt only if it has been disassembled, cleaned, inspected, repaired, reassembled and tested to the same tolerances and limits as a new item.",
+          "cite": "GACAR Part 43, §43.3",
+          "citeUrl": "../document.html?type=regulations&id=part-43#sec-43-3"
+        },
+        {
+          "q": "GACAR §43.19 requires that work done in maintenance, alteration or preventive maintenance leaves the item in a condition —",
+          "options": [
+            "At least equal to its original or properly altered condition",
+            "Better than new in all respects",
+            "Acceptable to the aircraft owner only",
+            "Equal to the minimum equipment list standard"
+          ],
+          "answer": 0,
+          "explain": "GACAR §43.19 requires the work to be done so the condition of the item is at least equal to its original or properly altered condition with regard to airworthiness.",
+          "cite": "GACAR Part 43, §43.19",
+          "citeUrl": "../document.html?type=regulations&id=part-43#sec-mathbf-43-19-performance-rules-general"
+        }
+      ]
+    },
+    {
+      "id": "weather",
+      "title": "Aviation Weather",
+      "desc": "Atmosphere, clouds, fronts, thunderstorms, icing and visibility hazards drawn from the FAA Aviation Weather Handbook.",
+      "source": "FAA Aviation Weather Handbook",
+      "questions": [
+        {
+          "q": "What type of cloud is associated with severe turbulence, icing, lightning and hail, and should be avoided?",
+          "options": [
+            "Stratus",
+            "Cirrus",
+            "Cumulonimbus",
+            "Altostratus"
+          ],
+          "answer": 2,
+          "explain": "The FAA Aviation Weather Handbook identifies cumulonimbus clouds as thunderstorm clouds carrying severe turbulence, icing, lightning and hail - all thunderstorms are hazardous to aircraft.",
+          "cite": "FAA Aviation Weather Handbook",
+          "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
+        },
+        {
+          "q": "A thunderstorm cell transitions to the mature stage when which event occurs?",
+          "options": [
+            "The updraft first forms",
+            "Precipitation reaches the surface",
+            "The anvil cloud dissipates",
+            "The downdraft cuts off the moisture supply"
+          ],
+          "answer": 1,
+          "explain": "The FAA Aviation Weather Handbook states a cell transitions to the mature stage when precipitation reaches the surface, creating a strong downdraft alongside the updraft; weather hazards peak toward the end of this stage.",
+          "cite": "FAA Aviation Weather Handbook",
+          "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
+        },
+        {
+          "q": "In the International Standard Atmosphere, what are the sea level temperature and pressure?",
+          "options": [
+            "15 degrees C and 29.92 inHg",
+            "0 degrees C and 1013.25 inHg",
+            "20 degrees C and 29.92 hPa",
+            "15 degrees F and 1013.25 inHg"
+          ],
+          "answer": 0,
+          "explain": "The FAA Aviation Weather Handbook gives the standard atmosphere as 15 degrees C (59 degrees F) and 29.92 inches of mercury (1013.25 hPa) at sea level.",
+          "cite": "FAA Aviation Weather Handbook",
+          "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
+        },
+        {
+          "q": "What is the standard temperature lapse rate in the troposphere?",
+          "options": [
+            "1 degree C per 1,000 ft",
+            "Approximately 2 degrees C per 1,000 ft",
+            "6.5 degrees C per 1,000 ft",
+            "10 degrees C per 1,000 ft"
+          ],
+          "answer": 1,
+          "explain": "The FAA Aviation Weather Handbook lists the standard tropospheric lapse rate as 6.5 degrees C per 1,000 metres, which is about 3.57 degrees F - roughly 2 degrees C per 1,000 feet.",
+          "cite": "FAA Aviation Weather Handbook",
+          "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
+        },
+        {
+          "q": "Which surface weather measurement is most useful for anticipating the formation of fog?",
+          "options": [
+            "Barometric pressure trend",
+            "The temperature-dewpoint spread",
+            "Wind direction",
+            "Cloud base height"
+          ],
+          "answer": 1,
+          "explain": "The FAA Aviation Weather Handbook notes the surface temperature-dewpoint spread is important in anticipating fog; when the spread reaches zero the air is saturated and fog can form.",
+          "cite": "FAA Aviation Weather Handbook",
+          "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
+        },
+        {
+          "q": "Radiation fog forms primarily under which conditions?",
+          "options": [
+            "Strong winds and overcast skies over water",
+            "Clear skies, light winds and moist air over land at night",
+            "Warm air moving over a cold sea surface",
+            "Air being forced up sloping terrain in daytime"
+          ],
+          "answer": 1,
+          "explain": "Per the FAA Aviation Weather Handbook, radiation fog is favoured by a shallow moist surface layer, clear skies and light surface winds; it is a nighttime land occurrence caused by terrestrial cooling.",
+          "cite": "FAA Aviation Weather Handbook",
+          "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
+        },
+        {
+          "q": "How does advection fog form?",
+          "options": [
+            "Moist air moving over a colder surface and cooling below its dewpoint",
+            "Nighttime radiational cooling of the ground",
+            "Rain evaporating into cold air beneath a front",
+            "Air being lifted over a mountain ridge"
+          ],
+          "answer": 0,
+          "explain": "The FAA Aviation Weather Handbook defines advection fog as forming when moist air moves over a colder surface and is cooled below its dewpoint; it is common along coasts and is called sea fog at sea.",
+          "cite": "FAA Aviation Weather Handbook",
+          "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
+        },
+        {
+          "q": "A microburst is best described as which type of weather hazard?",
+          "options": [
+            "A gentle, long-lasting updraft",
+            "A small-scale, intense downdraft - the most severe type of wind shear",
+            "A persistent layer of stratus cloud",
+            "A slow-moving warm front"
+          ],
+          "answer": 1,
+          "explain": "The FAA Aviation Weather Handbook describes a microburst as a small-scale, intense downdraft that spreads outward at the surface and is the most severe type of wind shear, with downdrafts up to 6,000 fpm.",
+          "cite": "FAA Aviation Weather Handbook",
+          "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
+        },
+        {
+          "q": "Which structural icing type is rough, milky and opaque, and is the most frequently reported icing type?",
+          "options": [
+            "Clear (glaze) ice",
+            "Rime ice",
+            "Mixed ice",
+            "Frost"
+          ],
+          "answer": 1,
+          "explain": "The FAA Aviation Weather Handbook describes rime ice as rough, milky and opaque ice formed by instantaneous freezing of small supercooled droplets, and notes it is the most frequently reported icing type.",
+          "cite": "FAA Aviation Weather Handbook",
+          "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
+        },
+        {
+          "q": "Which force, caused by the Earth's rotation, deflects moving air to the right in the Northern Hemisphere?",
+          "options": [
+            "Pressure gradient force",
+            "Friction",
+            "Coriolis force",
+            "Centrifugal force"
+          ],
+          "answer": 2,
+          "explain": "The FAA Aviation Weather Handbook explains the Coriolis force is an apparent force from the Earth's rotation that deflects air to the right in the Northern Hemisphere, acting at a right angle to wind direction.",
+          "cite": "FAA Aviation Weather Handbook",
+          "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
+        },
+        {
+          "q": "What effect does stable air generally have on the vertical motion of air?",
+          "options": [
+            "It enhances vertical motion",
+            "It suppresses vertical motion",
+            "It has no effect on vertical motion",
+            "It reverses vertical motion"
+          ],
+          "answer": 1,
+          "explain": "The FAA Aviation Weather Handbook states atmospheric stability affects vertical motion: stable air suppresses vertical motion, while unstable air enhances it.",
+          "cite": "FAA Aviation Weather Handbook",
+          "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
+        },
+        {
+          "q": "The arc-shaped leading edge of cool, gusty downdraft air spreading out ahead of a mature thunderstorm is called what?",
+          "options": [
+            "An anvil",
+            "A gust front",
+            "An overshooting top",
+            "Virga"
+          ],
+          "answer": 1,
+          "explain": "The FAA Aviation Weather Handbook calls the arc-shaped leading edge of downdraft air a gust front; uplift along it can trigger new cells ahead of the parent cell.",
+          "cite": "FAA Aviation Weather Handbook",
+          "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
+        }
+      ]
+    },
+    {
+      "id": "aerodynamics",
+      "title": "Aerodynamics & Aircraft Systems",
+      "desc": "Forces of flight, stalls, load factor, airspeeds and powerplant systems from the FAA Pilot's Handbook and Airplane Flying Handbook.",
+      "source": "FAA Pilot's & Airplane Flying Handbooks",
+      "questions": [
+        {
+          "q": "What are the four forces acting on an aircraft in flight?",
+          "options": [
+            "Lift, weight, thrust and drag",
+            "Lift, gravity, power and friction",
+            "Pitch, roll, yaw and thrust",
+            "Lift, weight, drag and torque"
+          ],
+          "answer": 0,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge identifies the four forces acting on an aircraft in straight-and-level flight as lift, weight, thrust and drag.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "An aerodynamic stall occurs when which condition is reached?",
+          "options": [
+            "A specific low airspeed is reached",
+            "Engine power is reduced to idle",
+            "The wing exceeds its critical angle of attack",
+            "The flaps are fully extended"
+          ],
+          "answer": 2,
+          "explain": "The FAA Airplane Flying Handbook states a stall occurs when the angle of attack exceeds the wing's critical angle of attack; it can occur at any airspeed, attitude or power setting.",
+          "cite": "FAA Airplane Flying Handbook",
+          "citeUrl": "../document.html?type=reference&id=airplane-flying-handbook-faa-h-8083-3c"
+        },
+        {
+          "q": "Is it possible to exceed the critical angle of attack and stall the wing at high airspeed?",
+          "options": [
+            "No, stalls only occur at low airspeed",
+            "Yes, the critical AOA can be exceeded at any airspeed",
+            "Only with the flaps extended",
+            "Only above maximum structural cruising speed"
+          ],
+          "answer": 1,
+          "explain": "The FAA Airplane Flying Handbook explicitly states it is possible to exceed the critical angle of attack - and therefore stall - at any airspeed, at any attitude and at any power setting.",
+          "cite": "FAA Airplane Flying Handbook",
+          "citeUrl": "../document.html?type=reference&id=airplane-flying-handbook-faa-h-8083-3c"
+        },
+        {
+          "q": "On a standard airspeed indicator, the lower limit of the white arc represents which airspeed?",
+          "options": [
+            "Never-exceed speed (VNE)",
+            "Maximum flap extended speed (VFE)",
+            "The power-off stall speed in the landing configuration (VS0)",
+            "Maximum structural cruising speed (VNO)"
+          ],
+          "answer": 2,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge states the lower limit of the white arc is VS0 - the stalling speed or minimum steady flight speed in the landing configuration with gear and flaps down.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "What does the red line on a standard airspeed indicator indicate?",
+          "options": [
+            "Maximum flap extended speed",
+            "Never-exceed speed (VNE)",
+            "Best rate-of-climb speed",
+            "Maneuvering speed"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge states the red line marks VNE, the never-exceed speed; operating above it is prohibited as it may cause structural damage or failure.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "The yellow arc on an airspeed indicator represents which range?",
+          "options": [
+            "The normal operating range",
+            "The flap operating range",
+            "The caution range, to be used only in smooth air",
+            "The never-exceed range"
+          ],
+          "answer": 2,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge describes the yellow arc as the caution range, to be flown within only in smooth air and then only with caution.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "Design maneuvering speed (VA) is best described as which of the following?",
+          "options": [
+            "The maximum speed at which the design's limit load can be imposed without structural damage",
+            "The best speed for climbing over an obstacle",
+            "The maximum speed with flaps extended",
+            "The minimum controllable airspeed"
+          ],
+          "answer": 0,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge defines VA as the maximum speed at which the structural design's limit load can be imposed - by gusts or full control deflection - without causing structural damage; it decreases with lighter weight.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "Carburetor ice is most likely to form under which conditions?",
+          "options": [
+            "Only in sub-freezing outside air temperatures",
+            "Temperatures below 21 degrees C (70 degrees F) with relative humidity above 80 percent",
+            "High temperatures with very dry air",
+            "Only at high altitude"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge states carburetor ice is most likely when temperatures are below 70 degrees F (21 degrees C) and relative humidity is above 80 percent, though it can occur even at higher temperatures.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "Adverse yaw causes an aircraft to yaw in which direction during a turn entry?",
+          "options": [
+            "In the same direction as the bank",
+            "Opposite to the direction of the bank",
+            "Straight ahead with no yaw",
+            "Toward the lowered wing"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge explains adverse yaw results from extra drag on the rising (outside) wing, so from the pilot's perspective the yaw is opposite the direction of the bank.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "How does an increased load factor affect an aircraft's stalling speed?",
+          "options": [
+            "It has no effect on stalling speed",
+            "An increased load factor raises the stalling speed",
+            "An increased load factor lowers the stalling speed",
+            "It only affects stalling speed below 1g"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge discusses load factors and stalling speeds: increasing load factor, such as in a steep turn, increases the speed at which the wing stalls.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "For a given calibrated airspeed, how does true airspeed behave as altitude increases?",
+          "options": [
+            "True airspeed decreases as altitude increases",
+            "True airspeed stays the same at all altitudes",
+            "True airspeed increases as altitude increases",
+            "True airspeed equals groundspeed at all altitudes"
+          ],
+          "answer": 2,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge states that because air density decreases with altitude, for a given calibrated airspeed the true airspeed increases as altitude increases.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "In a spark-ignition reciprocating engine, what is the function of the magnetos?",
+          "options": [
+            "To pressurise the fuel system",
+            "To provide the spark that ignites the fuel-air mixture",
+            "To cool the cylinders",
+            "To meter air into the carburetor"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge explains the ignition system uses magnetos, spark plugs and leads to provide the spark that ignites the fuel-air mixture in the cylinders.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        }
+      ]
+    },
+    {
+      "id": "human-factors",
+      "title": "Human Factors & Aeromedical",
+      "desc": "Hypoxia, carbon monoxide, spatial disorientation, fatigue and aeronautical decision-making from FAA aeromedical and risk-management references.",
+      "source": "FAA aeromedical & risk-management references",
+      "questions": [
+        {
+          "q": "Oxygen starvation from hypoxia affects which part of the body first?",
+          "options": [
+            "The lungs",
+            "The brain, impairing judgment",
+            "The muscles",
+            "The eyes only"
+          ],
+          "answer": 1,
+          "explain": "The FAA Hypoxia brochure states oxygen starvation first affects the brain so judgment is impaired - a pilot may not realise they are in trouble.",
+          "cite": "FAA Brochure - Hypoxia",
+          "citeUrl": "../document.html?type=reference&id=faa-brochure-hypoxia"
+        },
+        {
+          "q": "At 18,000 feet MSL, how does the available oxygen compare with sea level?",
+          "options": [
+            "It is the same as at sea level",
+            "There is about half the oxygen of sea level",
+            "There is about one-quarter the oxygen of sea level",
+            "There is more oxygen than at sea level"
+          ],
+          "answer": 1,
+          "explain": "The FAA Hypoxia brochure notes that at 18,000 feet MSL the air pressure is half that at sea level, so only half the oxygen is available.",
+          "cite": "FAA Brochure - Hypoxia",
+          "citeUrl": "../document.html?type=reference&id=faa-brochure-hypoxia"
+        },
+        {
+          "q": "If a pilot detects an unusual cabin smell suggesting carbon monoxide, what is an appropriate immediate action?",
+          "options": [
+            "Turn the cabin heat fully off and increase fresh-air ventilation",
+            "Increase cabin heat to clear the air",
+            "Ignore it and continue the flight",
+            "Close all fresh-air vents"
+          ],
+          "answer": 0,
+          "explain": "The FAA Carbon Monoxide brochure advises pilots to turn cabin heat fully off, increase fresh-air ventilation to maximum, consider supplemental oxygen, and land as promptly as possible.",
+          "cite": "FAA Brochure - Carbon Monoxide",
+          "citeUrl": "../document.html?type=reference&id=faa-brochure-carbon-monoxide"
+        },
+        {
+          "q": "A 'black-hole approach' visual illusion is most likely to occur in which situation?",
+          "options": [
+            "A daytime approach over a city",
+            "A night approach over water or unlit terrain to a lighted runway with no visible horizon",
+            "An instrument approach in cloud",
+            "A crosswind landing in daylight"
+          ],
+          "answer": 1,
+          "explain": "The FAA Spatial Disorientation brochure describes the black-hole approach illusion as occurring on a night final approach over water or unlighted terrain to a lighted runway beyond which the horizon is not visible.",
+          "cite": "FAA Brochure - Spatial Disorientation",
+          "citeUrl": "../document.html?type=reference&id=faa-brochure-spatial-disorientation"
+        },
+        {
+          "q": "If a pilot experiences a visual illusion or spatial disorientation in flight, what is the recommended response?",
+          "options": [
+            "Trust bodily sensations over the instruments",
+            "Have confidence in the flight instruments and ignore conflicting bodily signals",
+            "Close the eyes briefly to reset perception",
+            "Make an immediate steep turn"
+          ],
+          "answer": 1,
+          "explain": "The FAA Spatial Disorientation brochure advises pilots to have confidence in their instruments and ignore conflicting bodily signals, noting accidents usually result from indecision to rely on instruments.",
+          "cite": "FAA Brochure - Spatial Disorientation",
+          "citeUrl": "../document.html?type=reference&id=faa-brochure-spatial-disorientation"
+        },
+        {
+          "q": "Which type of photoreceptor in the eye is used for low-light and night vision?",
+          "options": [
+            "Cones",
+            "Rods",
+            "The optic disk",
+            "The fovea"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot Vision brochure states rods are used for low light intensity or night vision, while cones handle colour and detail in brighter light.",
+          "cite": "FAA Brochure - Pilot Vision",
+          "citeUrl": "../document.html?type=reference&id=faa-brochure-pilot-vision"
+        },
+        {
+          "q": "For effective visual scanning to detect other traffic, each eye movement should be limited to roughly what arc, observing each area for at least one second?",
+          "options": [
+            "About 10 degrees",
+            "About 45 degrees",
+            "About 90 degrees",
+            "A single continuous sweep"
+          ],
+          "answer": 0,
+          "explain": "The FAA Pilot Vision brochure recommends a series of short, regularly-spaced eye movements not exceeding 10 degrees, with each area observed for at least one second to enable detection.",
+          "cite": "FAA Brochure - Pilot Vision",
+          "citeUrl": "../document.html?type=reference&id=faa-brochure-pilot-vision"
+        },
+        {
+          "q": "Altitude-induced decompression sickness is caused by which mechanism?",
+          "options": [
+            "Excess oxygen in the bloodstream",
+            "Nitrogen coming out of solution and forming bubbles in the body",
+            "Carbon monoxide binding to hemoglobin",
+            "Dehydration of the inner ear"
+          ],
+          "answer": 1,
+          "explain": "The FAA Altitude-Induced Decompression Sickness brochure explains that with reduced pressure, dissolved nitrogen can come out of solution and form bubbles in the body - the condition known as 'the bends'.",
+          "cite": "FAA Brochure - Altitude-Induced Decompression Sickness",
+          "citeUrl": "../document.html?type=reference&id=faa-brochure-altitude-induced-decompression-sickness"
+        },
+        {
+          "q": "Why must a pilot allow sufficient time after SCUBA diving before flying?",
+          "options": [
+            "Diving causes permanent hearing loss",
+            "Excess nitrogen stored in the body can trigger decompression sickness at altitudes as low as 5,000 ft",
+            "Diving reduces visual acuity for several days",
+            "Flying too soon causes carbon monoxide poisoning"
+          ],
+          "answer": 1,
+          "explain": "The FAA Altitude-Induced Decompression Sickness brochure warns that if not enough time is allowed to eliminate excess body nitrogen after diving, altitude DCS can occur at altitudes as low as 5,000 ft or less.",
+          "cite": "FAA Brochure - Altitude-Induced Decompression Sickness",
+          "citeUrl": "../document.html?type=reference&id=faa-brochure-altitude-induced-decompression-sickness"
+        },
+        {
+          "q": "What does the IMSAFE checklist help a pilot assess?",
+          "options": [
+            "Aircraft weight and balance",
+            "Personal fitness for flight - Illness, Medication, Stress, Alcohol, Fatigue and Emotion",
+            "Weather minimums for departure",
+            "Required navigation equipment"
+          ],
+          "answer": 1,
+          "explain": "The FAA Risk Management Handbook describes IMSAFE as an acronym for Illness, Medication, Stress, Alcohol, Fatigue and Emotion, used by a pilot to identify personal hazards before flight.",
+          "cite": "FAA Risk Management Handbook",
+          "citeUrl": "../document.html?type=reference&id=risk-management-handbook-faa-h-8083-2a"
+        },
+        {
+          "q": "Which of the following is one of the five hazardous attitudes identified in the FAA Risk Management Handbook?",
+          "options": [
+            "Curiosity",
+            "Invulnerability - 'It won't happen to me'",
+            "Patience",
+            "Discipline"
+          ],
+          "answer": 1,
+          "explain": "The FAA Risk Management Handbook lists five hazardous attitudes: anti-authority, impulsivity, invulnerability ('It won't happen to me'), macho and resignation.",
+          "cite": "FAA Risk Management Handbook",
+          "citeUrl": "../document.html?type=reference&id=risk-management-handbook-faa-h-8083-2a"
+        },
+        {
+          "q": "The PAVE checklist is used by a pilot for what purpose?",
+          "options": [
+            "Calculating fuel burn",
+            "Identifying hazards and managing risk before and during a flight",
+            "Tuning navigation radios",
+            "Recording engine performance"
+          ],
+          "answer": 1,
+          "explain": "The FAA Risk Management Handbook presents the PAVE checklist as a tool for risk management analysis, helping the pilot identify hazards to decide on the desirability of undertaking or continuing a flight.",
+          "cite": "FAA Risk Management Handbook",
+          "citeUrl": "../document.html?type=reference&id=risk-management-handbook-faa-h-8083-2a"
+        }
+      ]
+    },
+    {
+      "id": "navigation",
+      "title": "Navigation & Flight Planning",
+      "desc": "Charts, the coordinate system, magnetic variation and deviation, VOR navigation and wind correction from the FAA Pilot's Handbook.",
+      "source": "FAA Pilot's Handbook & Instrument references",
+      "questions": [
+        {
+          "q": "Lines running east and west, parallel to the equator and used to measure position north or south, are called what?",
+          "options": [
+            "Meridians of longitude",
+            "Parallels of latitude",
+            "Isogonic lines",
+            "Radials"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge states circles parallel to the equator are parallels of latitude, used to measure degrees of latitude north or south of the equator.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "From which location is longitude measured as the zero (Prime) meridian?",
+          "options": [
+            "The North Pole",
+            "Greenwich, England",
+            "The equator",
+            "The Magnetic North Pole"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge states the Prime Meridian, which passes through Greenwich, England, is the zero line from which longitude is measured east and west to 180 degrees.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "In aerial navigation, what is the angular difference between true direction and magnetic direction called?",
+          "options": [
+            "Deviation",
+            "Variation",
+            "Dip",
+            "Wind correction angle"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge states the difference between true and magnetic directions is called variation; isogonic lines join points of equal variation.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "A line along which there is zero magnetic variation is known as what?",
+          "options": [
+            "The agonic line",
+            "An isogonic line",
+            "The Prime Meridian",
+            "A radial"
+          ],
+          "answer": 0,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge explains that along the agonic line the two poles are aligned and there is no variation.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "Compass deviation is an error caused by what?",
+          "options": [
+            "The difference between true and magnetic north",
+            "The aircraft's own localised magnetic influences acting on the compass",
+            "Wind drifting the aircraft off course",
+            "The curvature of the Earth"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge states each aircraft has internal magnetic influences affecting its compass; deviation is corrected using a compass deviation card to obtain the compass course.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "Navigating by reference to visible landmarks on the ground is known as what?",
+          "options": [
+            "Dead reckoning",
+            "Pilotage",
+            "Radio navigation",
+            "Triangulation"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge defines pilotage as navigating by reference to visible landmarks, distinct from dead reckoning and radio navigation.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "Dead reckoning is best described as which method of navigation?",
+          "options": [
+            "Following visible landmarks",
+            "Computing direction and distance from a known position",
+            "Tracking a VOR radial",
+            "Using satellite positioning only"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge defines dead reckoning as navigation by computations of direction and distance from a known position.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "A VOR ground station projects courses outward in all directions; these courses are referred to as what?",
+          "options": [
+            "Bearings",
+            "Radials",
+            "Meridians",
+            "Isogons"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge explains a VOR projects straight-line courses called radials in all directions, identified by numbers from 001 to 360 and referenced to magnetic north.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "Because VOR transmits on VHF, its signal reception is subject to what limitation?",
+          "options": [
+            "It is blocked by daylight",
+            "It is restricted to line-of-sight, so range varies with altitude",
+            "It only works over water",
+            "It is unaffected by altitude"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge notes VOR signals are VHF and therefore subject to line-of-sight restrictions, so reception range varies in direct proportion to the aircraft's altitude.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "The wind correction angle is applied to do what?",
+          "options": [
+            "Correct for compass deviation",
+            "Counteract wind drift so the aircraft's track matches the desired course",
+            "Adjust for magnetic variation",
+            "Compensate for altimeter error"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge explains the wind correction angle is the number of degrees the heading is offset from the true course to counteract wind drift and keep the track on the desired course.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "What is the scale of a standard sectional aeronautical chart?",
+          "options": [
+            "1:1,000,000",
+            "1:500,000",
+            "1:250,000",
+            "1:2,000,000"
+          ],
+          "answer": 1,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge states sectional charts have a scale of 1:500,000 (1 inch = about 6.86 NM), allowing detailed information to be shown.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        },
+        {
+          "q": "Groundspeed differs from true airspeed in what way?",
+          "options": [
+            "Groundspeed is true airspeed adjusted for wind",
+            "Groundspeed is always higher than true airspeed",
+            "Groundspeed is true airspeed corrected for temperature",
+            "Groundspeed and true airspeed are always equal"
+          ],
+          "answer": 0,
+          "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge defines groundspeed as the actual speed over the ground - true airspeed adjusted for wind; it decreases with a headwind and increases with a tailwind.",
+          "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
+          "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        }
+      ]
+    }
+  ]
+}

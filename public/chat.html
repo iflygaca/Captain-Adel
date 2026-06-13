@@ -1,41 +1,50 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Captain Adel — ask the GACAR</title>
-  <meta name="description" content="Ask Captain Adel about the GACAR regulations and get answers with the exact section cited. Independent and educational.">
+  <title>كابتن عادل — اسأل عن GACAR</title>
+  <meta name="description" content="اسأل كابتن عادل عن لوائح GACAR واحصل على إجابة مع الاستشهاد بالقسم الدقيق. مستقل وتعليمي.">
   <meta name="theme-color" content="#0A0E12">
   <link rel="icon" href="assets/img/captain/avatar.png" type="image/png">
   <link rel="canonical" href="https://captadel.com/chat.html">
   <link rel="stylesheet" href="assets/css/adel.css">
+  <link rel="stylesheet" href="assets/css/adel-character.css">
+  <script src="assets/js/i18n.js" defer></script>
+  <script src="assets/js/adel-character.js" defer></script>
 </head>
 <body>
-  <a class="visually-hidden" href="#main">Skip to content</a>
+  <a class="visually-hidden" href="#main" data-en="Skip to content">تخطَّ إلى المحتوى</a>
 
   <div class="disclaimer-strip">
     <div class="container">
-      <span><strong>Independent educational reference.</strong> Not affiliated with GACA —
-      always verify against the official source,
-      <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.</span>
+      <span data-i18n-html
+        data-en='<strong>Independent educational reference.</strong> Not affiliated with GACA — always verify against the official source, <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.'>
+        <strong>مرجع تعليمي مستقل.</strong> غير تابع للهيئة العامة للطيران المدني —
+        تحقّق دائماً من المصدر الرسمي،
+        <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.</span>
     </div>
   </div>
 
   <header class="site-nav">
     <div class="container nav-inner">
-      <a class="lockup" href="/" aria-label="Captain Adel — home">
+      <a class="lockup" href="/" aria-label="كابتن عادل — الرئيسية">
         <img src="assets/img/captain/avatar.png" alt="" width="40" height="40">
         <span>
-          <span class="wordmark"><span class="wm-capt">Captain</span> <span class="wm-adel">Adel</span></span>
-          <span class="lockup-sub">Saudi civil aviation</span>
+          <span class="wordmark" data-i18n-html
+            data-en='<span class="wm-capt">Captain</span> <span class="wm-adel">Adel</span>'><span class="wm-capt">كابتن</span> <span class="wm-adel">عادل</span></span>
+          <span class="lockup-sub" data-en="Saudi civil aviation">الطيران المدني السعودي</span>
         </span>
       </a>
-      <nav class="nav-links" aria-label="Primary">
-        <a href="/">Home</a>
-        <a href="chat.html" aria-current="page">Ask</a>
-        <a href="console.html">Console</a>
-        <a href="https://gaca.gov.sa" target="_blank" rel="noopener">GACA ↗</a>
+      <nav class="nav-links" aria-label="رئيسية">
+        <a href="/" data-en="Home">الرئيسية</a>
+        <a href="chat.html" aria-current="page" data-en="Ask">اسأل</a>
+        <a href="https://gaca.gov.sa" target="_blank" rel="noopener" data-en="GACA ↗">الهيئة ↗</a>
       </nav>
+      <div class="nav-actions">
+        <button type="button" class="lang-toggle" lang="en">EN</button>
+        <a class="btn btn-ghost" href="account.html" data-en="Account">حسابي</a>
+      </div>
     </div>
   </header>
 
@@ -44,46 +53,78 @@
       <section class="chat">
         <header class="chat-header">
           <div class="chat-id">
-            <img class="chat-avatar" src="assets/img/captain/avatar.png" alt="Captain Adel" width="44" height="44">
-            <div>
-              <span class="chat-name">Captain Adel</span>
-              <span class="chat-status"><span class="on-duty"></span> GACA ATPL · CFII · on duty</span>
+            <div class="chat-avatar" data-adel-mount>
+              <img src="assets/img/captain/avatar.png" alt="كابتن عادل" width="44" height="44">
             </div>
+            <div>
+              <span class="chat-name" data-en="Captain Adel">كابتن عادل</span>
+              <span class="chat-status"><span class="on-duty"></span> <span data-en="GACA ATPL · CFII · on duty">رخصة GACA ATPL · CFII · في الخدمة</span></span>
+            </div>
+          </div>
+          <div class="chat-head-actions">
+            <span id="chat-quota" class="chat-quota" hidden></span>
+            <button type="button" id="chat-exam" class="chat-exam">ابدأ اختبار 🎓</button>
+            <button type="button" id="chat-clear" class="chat-clear" data-en="Clear chat">مسح المحادثة</button>
           </div>
         </header>
 
-        <div class="chat-log" id="chat-log" role="log" aria-live="polite" aria-label="Conversation with Captain Adel">
+        <div class="chat-log" id="chat-log" role="log" aria-live="polite" aria-label="محادثة مع كابتن عادل">
           <div class="chat-welcome" id="chat-welcome">
-            <img class="welcome-avatar" src="assets/img/captain/avatar.png" alt="" width="96" height="96">
-            <h1>Captain Adel — on the line.</h1>
-            <p>GACA-licensed ATPL and flight instructor. Ask me about the GACAR regulations,
-            Saudi airspace, licensing, or operations — I answer with the section citation.</p>
+            <!-- adel-character.js replaces the static avatar with the animated
+                 SVG Captain; the <img> stays as the no-JS fallback. -->
+            <div class="welcome-avatar" data-adel-mount>
+              <img src="assets/img/captain/avatar.png" alt="" width="96" height="96">
+            </div>
+            <h1 data-en="Captain Adel — on duty.">الكابتن عادل — في الخدمة.</h1>
+            <p data-en="GACA-licensed ATPL and flight instructor. Ask me about the GACAR regulations, Saudi airspace, licensing, or operations — I answer with the section citation.">طيّار نقل جوي ATPL ومرشد طيران مرخّص من الهيئة.
+            اسألني عن لوائح GACAR أو المجال الجوي السعودي أو الرخص أو العمليات —
+            أجيبك مع الاستشهاد بالقسم.</p>
             <div class="chat-suggest" id="chat-suggest">
-              <button type="button" data-q="What are the VFR weather minima in controlled airspace?">VFR weather minima</button>
-              <button type="button" data-q="What's required for a GACAR commercial pilot licence?">CPL requirements</button>
-              <button type="button" data-q="What are the fuel reserve requirements for a Part 121 flight?">Part 121 fuel reserves</button>
-              <button type="button" data-q="What does GACAR Part 91 say about carry-on baggage?">Carry-on baggage rules</button>
+              <button type="button"
+                data-q="What are the VFR weather minima in controlled airspace?"
+                data-q-ar="ما هي حدود الطقس للطيران البصري VFR في المجال الجوي المراقب؟"
+                data-en="VFR weather minima">حدود طقس الطيران البصري</button>
+              <button type="button"
+                data-q="What's required for a GACAR commercial pilot licence?"
+                data-q-ar="ما متطلبات رخصة الطيار التجاري CPL وفق لوائح GACAR؟"
+                data-en="CPL requirements">متطلبات الرخصة التجارية</button>
+              <button type="button"
+                data-q="What are the fuel reserve requirements for a Part 121 flight?"
+                data-q-ar="ما متطلبات احتياطي الوقود لرحلة وفق Part 121؟"
+                data-en="Part 121 fuel reserves">احتياطي وقود Part 121</button>
+              <button type="button"
+                data-q="What does GACAR Part 91 say about carry-on baggage?"
+                data-q-ar="ماذا تقول GACAR Part 91 عن الأمتعة المحمولة في المقصورة؟"
+                data-en="Carry-on baggage rules">قواعد الأمتعة المحمولة</button>
             </div>
           </div>
         </div>
 
         <div class="chat-input">
           <form class="chat-form" id="chat-form">
-            <label class="visually-hidden" for="chat-text">Ask Captain Adel</label>
-            <textarea id="chat-text" rows="1" placeholder="Ask Captain Adel about the GACAR…" autocomplete="off"></textarea>
-            <button class="chat-send" type="submit" aria-label="Send">
+            <label class="visually-hidden" for="chat-text" data-en="Ask Captain Adel">اسأل كابتن عادل</label>
+            <textarea id="chat-text" rows="1"
+              placeholder="اسأل كابتن عادل عن لوائح GACAR…"
+              data-ph-en="Ask Captain Adel about the GACAR…" autocomplete="off"></textarea>
+            <button class="chat-mic" type="button" id="chat-mic" aria-label="إملاء صوتي" title="إملاء صوتي" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/>
+              </svg>
+            </button>
+            <button class="chat-send" type="submit" aria-label="إرسال">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
               </svg>
             </button>
           </form>
-          <p class="chat-disclaimer">Captain Adel is an educational AI and can be wrong.
-          Always verify against the official GACA source — not for operational use.</p>
+          <p class="chat-disclaimer" data-en="Captain Adel is an educational AI and can be wrong. Always verify against the official GACA source — not for operational use.">كابتن عادل ذكاء اصطناعي تعليمي وقد يُخطئ.
+          تحقّق دائماً من مصدر الهيئة الرسمي — وليس للاستخدام التشغيلي.</p>
         </div>
       </section>
     </div>
   </main>
 
+  <script type="module" src="assets/js/auth.js"></script>
   <script src="assets/js/chat.js" defer></script>
 </body>
 </html>
