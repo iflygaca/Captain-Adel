@@ -1,20 +1,12 @@
 name: Deploy (captadel)
 
-# Inert mirror of the monorepo's .github/workflows/deploy-captadel.yml, staged
-# for when this subtree is promoted to its own FlyGACA/captadel repo
-# (office/RUNBOOK-captadel-extraction.md). GitHub only runs workflows under the
-# repository root's .github/workflows, so this file does NOT run while captadel/
-# is a subtree — the active deploy lives at the monorepo root.
-#
-# When promoted: this file becomes the active deploy. Drop the `paths:` filter
-# and the `working-directory: captadel` default below (the repo root becomes
-# captadel/), exactly as captadel CI's ci.yml documents.
+# Deploys Captain Adel (captadel.com) to Cloud Run on push to main. The deploy
+# job is gated on the GCP_SA_KEY secret: until it is set in this repo's Actions
+# secrets, the build/test job runs and the deploy step skips with a warning.
 
 on:
   push:
     branches: [main]
-    paths:
-      - 'captadel/**'
   workflow_dispatch:
     inputs:
       region:
@@ -27,10 +19,6 @@ permissions:
 concurrency:
   group: deploy-captadel
   cancel-in-progress: false
-
-defaults:
-  run:
-    working-directory: captadel
 
 jobs:
   test:
