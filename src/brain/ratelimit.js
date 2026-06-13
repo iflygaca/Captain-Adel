@@ -50,7 +50,17 @@ function sweep(now) {
     if (live.length === 0) hits.delete(k);
     else if (live !== arr) hits.set(k, live);
   }
-  if (hits.size > MAX_KEYS) hits.clear();
+  // If still over the ceiling after pruning expired entries, evict the
+  // least-recently-active keys down to the cap. Never wipe live counters
+  // wholesale: that resets every window at once and lets a burst through right
+  // after an overflow. Sort by each key's newest timestamp (ascending) and drop
+  // the oldest until back at the cap. O(n log n), only on the rare overflow.
+  if (hits.size > MAX_KEYS) {
+    const byIdle = [...hits.entries()].sort(
+      (a, b) => a[1][a[1].length - 1] - b[1][b[1].length - 1],
+    );
+    for (let i = 0, n = hits.size - MAX_KEYS; i < n; i++) hits.delete(byIdle[i][0]);
+  }
 }
 
 function peek(ruleName, key, now) {
@@ -93,5 +103,6 @@ function check(id) {
 }
 
 function _reset() { hits.clear(); sinceSweep = 0; }
+function _size() { return hits.size; }
 
-module.exports = { check, RULES, _reset };
+module.exports = { check, RULES, _reset, _size };
