@@ -29,6 +29,12 @@ const { resolveTier } = require('./billing/tier-core');
 const PRODUCTS = new Set(['captadel', 'flygaca']);
 const PROVIDERS = new Set(['gemini', 'allam', 'jais', 'fanar', 'qwen', 'commandr', 'auto']);
 
+// The /v1/chat contract version this service speaks. Echoed on every response as
+// X-Adel-Api-Version so a caller (the Fly GACA gateway) can detect a contract
+// mismatch. Additive: a request without the header is treated as v1. Bump only
+// on a breaking change to the request/response shape (see the contract doc).
+const ADEL_API_VERSION = '1';
+
 const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', true);
@@ -97,6 +103,17 @@ app.get('/health', (req, res) => {
 app.post('/v1/chat', corsMiddleware, apiKeyMiddleware, authMiddleware, async (req, res) => {
   const body = req.body || {};
   const session = clientSession(req, body);
+
+  // Echo the contract version on every response (success or error), and warn if
+  // the caller assumes a different one. Set before any branch so it covers the
+  // streaming, JSON and early-return paths alike.
+  res.set('X-Adel-Api-Version', ADEL_API_VERSION);
+  const callerVersion = req.get('X-Adel-Api-Version');
+  if (callerVersion && callerVersion !== ADEL_API_VERSION) {
+    // eslint-disable-next-line no-console
+    console.warn('captain-adel /v1/chat version mismatch',
+      { caller: callerVersion, service: ADEL_API_VERSION });
+  }
 
   if (!req.trusted) {
     // 1) Abuse rate limiter — protects model spend for everyone (Pro included).
