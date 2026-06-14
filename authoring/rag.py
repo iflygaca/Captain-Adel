@@ -3,9 +3,9 @@ Python BM25 retriever over the same corpus the production Cloud Function
 serves — lets the prototype Captain Adel agent (captain_adel.py) cite real
 GACAR sections instead of hard-coded fixtures.
 
-Loads functions/rag/_chunks.json.gz and the precomputed _index.json.gz
-shipped alongside it. Mirrors the algorithm in functions/rag/bm25.js so the
-Python and JS retrievers return matching results for the same query.
+Loads src/brain/_chunks.json.gz (the corpus the deployed brain serves) and the
+precomputed _index.json.gz if present. Mirrors the algorithm in src/brain/bm25.js
+so the Python and JS retrievers return matching results for the same query.
 """
 
 from __future__ import annotations
@@ -17,9 +17,9 @@ import re
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parent.parent
-CHUNKS_PATH = ROOT / "functions" / "rag" / "_chunks.json.gz"
-INDEX_PATH = ROOT / "functions" / "rag" / "_index.json.gz"
+ROOT = Path(__file__).resolve().parent.parent  # repo root (authoring/ -> ..)
+CHUNKS_PATH = ROOT / "src" / "brain" / "_chunks.json.gz"
+INDEX_PATH = ROOT / "src" / "brain" / "_index.json.gz"
 
 # Mirror the stopword sets from functions/rag/bm25.js so tokenization stays
 # consistent across the JS and Python retrievers.
@@ -192,7 +192,7 @@ def _load() -> dict:
     if not CHUNKS_PATH.exists():
         raise FileNotFoundError(
             f"Corpus not found at {CHUNKS_PATH}. "
-            f"Run `python3 functions/rag/build_chunks.py` first."
+            f"Expected the deployed brain's corpus at src/brain/_chunks.json.gz."
         )
     corpus = _load_gz_json(CHUNKS_PATH)
     chunks: list[dict] = corpus["chunks"]
