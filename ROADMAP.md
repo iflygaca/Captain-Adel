@@ -106,7 +106,7 @@ The fastest wins are in retrieval quality, evaluation depth, and hardening the p
 
 ## 🌅 Later — Captain Adel as a platform
 
-- [ ] **Accounts, billing & quota** on captadel.com (the daily-quota concept exists in Fly GACA;
+- [x] **Accounts, billing & quota** on captadel.com (the daily-quota concept exists in Fly GACA;
   give Captain Adel its own metering).
 - [ ] **Public multi-tenant API** — API keys, per-tenant rate tiers, usage metering, OpenAPI docs.
   The `X-Adel-Api-Key` trusted tier is the seed.

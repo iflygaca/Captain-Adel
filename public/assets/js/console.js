@@ -194,16 +194,34 @@
   }
 
   /* ---- backend ---- */
-  async function ask(message) {
-    const res = await fetch(ENDPOINT, {
+  async function* askStream(message) {
+    const res = await fetch(ENDPOINT + '?stream=1', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
       body: JSON.stringify({ message, history, session: sessionId(), provider: 'auto' }),
     });
     if (res.status === 429) throw new Error('rate_limited');
-    if (!res.ok) throw new Error('backend');
-    return res.json();
+    if (!res.ok || !res.body) throw new Error('backend');
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      let nl;
+      while ((nl = buf.indexOf('\n')) !== -1) {
+        const line = buf.slice(0, nl).trim();
+        buf = buf.slice(nl + 1);
+        if (!line.startsWith('data:')) continue;
+        const payload = line.slice(5).trim();
+        if (payload === '[DONE]') return;
+        try { yield JSON.parse(payload); } catch (_) {}
+      }
+    }
   }
+
   function send(text) {
     text = String(text || '').trim();
     if (!text) return;
@@ -212,17 +230,40 @@
     history.push({ role: 'user', text });
     input.value = '';
     if (sendBtn) sendBtn.disabled = true;
-    ask(text)
-      .then((data) => {
-        fillCard(card, text, data || {});
-        history.push({ role: 'model', text: (data && data.answer) || ERROR });
-        if (sendBtn) sendBtn.disabled = false;
-      })
-      .catch((err) => {
-        const reply = (err && err.message) === 'rate_limited' ? RATE_LIMITED : ERROR;
-        fillCard(card, text, { answer: reply });
-        if (sendBtn) sendBtn.disabled = false;
-      });
+
+    let answer = '';
+    let final = null;
+
+    (async () => {
+      for await (const ev of askStream(text)) {
+        if (ev.type === 'token') {
+          answer += ev.delta;
+          const typing = card.querySelector('.rc-typing');
+          if (typing) typing.remove();
+          
+          let body = card.querySelector('.rc-body');
+          if (!body) {
+            body = document.createElement('div');
+            body.className = 'rc-body';
+            card.appendChild(body);
+          }
+          body.innerHTML = `<p class="rc-q">${esc(text)}</p>` + md(answer);
+          card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } else if (ev.type === 'final') {
+          final = ev;
+          answer = ev.answer != null ? ev.answer : answer;
+        } else if (ev.type === 'error') {
+          throw new Error('backend');
+        }
+      }
+      fillCard(card, text, final || { answer });
+      history.push({ role: 'model', text: answer || ERROR });
+      if (sendBtn) sendBtn.disabled = false;
+    })().catch((err) => {
+      const reply = (err && err.message) === 'rate_limited' ? RATE_LIMITED : ERROR;
+      fillCard(card, text, { answer: reply });
+      if (sendBtn) sendBtn.disabled = false;
+    });
   }
 
   /* ---- events ---- */
