@@ -56,6 +56,18 @@ test('retryAfter is a positive integer number of seconds', () => {
   assert.ok(blocked.retryAfter <= rl.RULES.burst.windowMs / 1000);
 });
 
+test('overflow evicts down to the cap instead of wiping all state', () => {
+  // Flood far past MAX_KEYS with unique session keys (one key each) so the
+  // periodic sweep has to shed keys. The old bug did a wholesale hits.clear()
+  // here, dropping every live window to ~0; bounded eviction keeps the map
+  // pinned near the cap, so an active attacker's counter is not reset.
+  const FLOOD = 6000;
+  for (let i = 0; i < FLOOD; i++) rl.check({ session: 'flood-' + i });
+  const size = rl._size();
+  assert.ok(size < FLOOD, `eviction must cap the map below the flood size (got ${size})`);
+  assert.ok(size > FLOOD / 2, `overflow must evict to the cap, not wipe all state (got ${size})`);
+});
+
 test('_reset clears all state', () => {
   const id = { ip: '5.5.5.5' };
   for (let i = 0; i < rl.RULES.burst.limit; i++) rl.check(id);
