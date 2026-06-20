@@ -165,7 +165,8 @@ async function answerAgentic(message, history, opts = {}) {
   if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
   const model = opts.model || DEFAULT_MODEL;
 
-  const ai = new GoogleGenAI({ apiKey });
+  // opts._ai is a test-only injection seam; production always builds the client.
+  const ai = opts._ai || new GoogleGenAI({ apiKey });
   const contents = buildContents(msg, history);
 
   const config = {
@@ -240,7 +241,7 @@ async function* answerAgenticStream(message, history, opts = {}) {
   const apiKey = opts.apiKey || process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
   const model = opts.model || DEFAULT_MODEL;
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = opts._ai || new GoogleGenAI({ apiKey });
   const contents = buildContents(msg, history);
   const config = {
     systemInstruction: composeSystemInstruction({
@@ -358,4 +359,5 @@ module.exports = {
   configured: () => !!(process.env.GEMINI_API_KEY),
   TOOL_DECLARATIONS,
   DEFAULT_MODEL,
+  buildContents,
 };
