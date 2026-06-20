@@ -27,6 +27,8 @@
 
 'use strict';
 
+const { suggestFollowups } = require('./followups');
+
 const MAX_VERBATIM = 600;
 
 // How many sources the UI shows. Retrieval may hand us more (topK), and grounding
@@ -299,6 +301,9 @@ async function decorate(raw, opts = {}) {
     kind,
     refusalClass: kind === 'refusal' ? refusalClass : null,
     grounding: { state, score, mode, claims, resolved, unresolved },
+    // Context-aware "keep exploring" chips, derived from the Parts this answer
+    // touched (falls back to a curated set for refusals / non-answers).
+    suggestions: suggestFollowups({ answer, sources, kind }),
     // Grounding above weighed every source; the UI gets a tight, deduplicated top set.
     sources: sources.slice(0, MAX_SOURCES),
     meta: {
