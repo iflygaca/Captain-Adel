@@ -223,6 +223,7 @@ app.post('/v1/chat', corsMiddleware, apiKeyMiddleware, authMiddleware, async (re
       kind: result.kind,
       refusalClass: result.refusalClass,
       grounding: result.grounding,
+      suggestions: result.suggestions,
       meta: result.meta,
     });
   } catch (err) {

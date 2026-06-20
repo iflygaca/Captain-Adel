@@ -93,7 +93,8 @@ The fastest wins are in retrieval quality, evaluation depth, and hardening the p
 - [ ] **Streaming chat UI** + inline "show the passage" expanders on the source links.
 - [ ] **Arabic / RTL parity** on the captadel.com site (today the standalone site is EN-only).
 - [ ] **Feedback loop** — 👍/👎 on answers, logged (PDPL-safe) to feed evals and fine-tuning.
-- [ ] **Context-aware follow-ups** — generate suggestions from the actual answer, not a fixed list.
+- [x] **Context-aware follow-ups** — suggestions are derived from the Parts the
+  answer cited (`src/brain/followups.js`), not a fixed list; curated set is the fallback.
 
 ### 🎓 Domain capability (a better instructor, not just a lookup)
 - [ ] **Compute, don't just cite** — wire the flight tools (E6B, W&B, fuel, VFR minima) as tools
