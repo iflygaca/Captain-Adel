@@ -16,7 +16,7 @@
 const path = require('path');
 const express = require('express');
 
-const brain = require('./brain');
+let brain = require('./brain');
 const config = require('./config');
 const corsMiddleware = require('./middleware/cors');
 const apiKeyMiddleware = require('./middleware/apikey');
@@ -284,3 +284,9 @@ function start() {
 if (require.main === module) start();
 
 module.exports = { app, start };
+// Exported for unit tests — pure request helpers.
+module.exports.clientIp = clientIp;
+module.exports.clientSession = clientSession;
+// Test-only seam: swap the brain for a fake so the /v1/chat success and
+// injection-hardening paths can be exercised without calling a real model.
+module.exports.__setBrain = (b) => { brain = b; };

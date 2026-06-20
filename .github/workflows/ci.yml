@@ -23,7 +23,9 @@ jobs:
       - run: npm run smoke
       # Unit tests for the deterministic brain: guards, routing, rate limiter and
       # the BM25 retriever (runs against the bundled corpus — no API key needed).
-      - run: npm run test:unit
+      # Coverage is reported (report-only — it never fails the build) so the
+      # per-file table is visible on every push/PR.
+      - run: npm run test:coverage
       - run: npm run eval:dry
 
   # Live model eval against the real brain. Needs a PAID Gemini key — the free

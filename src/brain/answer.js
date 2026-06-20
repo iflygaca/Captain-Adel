@@ -270,4 +270,8 @@ async function* answerStream(message, history = [], opts = {}) {
   };
 }
 
-module.exports = { answer, answerStream, answerRead, buildContents };
+module.exports = {
+  answer, answerStream, answerRead, buildContents,
+  // Exported for unit tests — pure routing/compute-intent helpers.
+  looksLikeCompute, routeTurn, pickFallback,
+};
