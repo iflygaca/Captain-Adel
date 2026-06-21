@@ -388,9 +388,15 @@
     { q: 'What is the transition altitude in Saudi Arabia?', qAr: 'ما هو ارتفاع الانتقال في السعودية؟', en: 'Saudi transition altitude', ar: 'ارتفاع الانتقال في السعودية' },
     { q: 'What medical certificate does a private pilot need?', qAr: 'ما الشهادة الطبية التي يحتاجها الطيار الخاص PPL؟', en: 'PPL medical class', ar: 'الفحص الطبي لرخصة الطيار الخاص' },
   ];
-  function addFollowups() {
+  function addFollowups(data) {
     const ar = isAr();
-    const pick = FOLLOWUPS.slice().sort(() => Math.random() - 0.5).slice(0, 3);
+    // Prefer the server's context-aware suggestions (derived from the answer
+    // just given); fall back to a random pick from the static set when the
+    // backend sent none (offline transcript replay / older API).
+    const server = data && Array.isArray(data.suggestions) ? data.suggestions : null;
+    const pick = (server && server.length)
+      ? server.slice(0, 3)
+      : FOLLOWUPS.slice().sort(() => Math.random() - 0.5).slice(0, 3);
     const wrap = document.createElement('div');
     wrap.className = 'chat-followups';
     wrap.innerHTML = `<span class="cf-label" data-en="Keep exploring">${ar ? 'تابع الاستكشاف' : 'Keep exploring'}</span>`
@@ -519,11 +525,11 @@
         role: 'adel', text: answer, turn,
         data: final && {
           kind: final.kind, refusalClass: final.refusalClass,
-          sources: final.sources, meta: final.meta,
+          sources: final.sources, meta: final.meta, suggestions: final.suggestions,
         },
       });
       persist();
-      addFollowups();
+      addFollowups(final);
       if (sendBtn) sendBtn.disabled = false;
     })().catch((err) => {
       const code = err && err.message;

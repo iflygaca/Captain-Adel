@@ -18,6 +18,8 @@ const http = require('node:http');
 process.env.STRIPE_SECRET_KEY = 'sk_test_dummy';
 process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_dummy';
 // No FIREBASE_PROJECT_ID / price ids — billing stays "dark" for the other paths.
+delete process.env.FIREBASE_PROJECT_ID;
+delete process.env.GOOGLE_CLOUD_PROJECT;
 
 const { app } = require('../src/server');
 const Stripe = require('stripe');

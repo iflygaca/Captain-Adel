@@ -178,7 +178,7 @@ async function answer(message, history = [], opts = {}) {
  *   { type: 'token', delta }   — a chunk of answer text to append
  *   { type: 'reset' }          — clear the answer so far (provider fell back, or
  *                                an agentic tool round emitted interim text)
- *   { type: 'final', answer, kind, refusalClass, grounding, sources, meta }
+ *   { type: 'final', answer, kind, refusalClass, grounding, suggestions, sources, meta }
  *
  * The grounding/kind/sources are only known once the full answer is in hand
  * (decorate, grounding.js), so they ride the terminal 'final' event. The control
@@ -216,7 +216,7 @@ async function* answerStream(message, history = [], opts = {}) {
   const msg = String(message || '').trim().slice(0, MAX_MESSAGE_CHARS);
   if (!msg) {
     const d = await decorate({ answer: 'Say again — I did not catch a question there, Captain.', sources: [] }, opts);
-    yield { type: 'final', answer: d.answer, kind: d.kind, refusalClass: d.refusalClass, grounding: d.grounding, sources: d.sources, meta: d.meta };
+    yield { type: 'final', answer: d.answer, kind: d.kind, refusalClass: d.refusalClass, grounding: d.grounding, suggestions: d.suggestions, sources: d.sources, meta: d.meta };
     return;
   }
 
@@ -266,8 +266,12 @@ async function* answerStream(message, history = [], opts = {}) {
   yield {
     type: 'final',
     answer: d.answer, kind: d.kind, refusalClass: d.refusalClass,
-    grounding: d.grounding, sources: d.sources, meta: d.meta,
+    grounding: d.grounding, suggestions: d.suggestions, sources: d.sources, meta: d.meta,
   };
 }
 
-module.exports = { answer, answerStream, answerRead, buildContents };
+module.exports = {
+  answer, answerStream, answerRead, buildContents,
+  // Exported for unit tests — pure routing/compute-intent helpers.
+  looksLikeCompute, routeTurn, pickFallback,
+};

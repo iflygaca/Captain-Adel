@@ -10,6 +10,7 @@
   "scripts": {
     "start": "node src/server.js",
     "test:unit": "node --test test/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage test/*.test.js",
     "eval": "node evals/run.js",
     "eval:dry": "node evals/run.js --dry",
     "eval:allam": "node evals/run.js --provider allam",
