@@ -162,7 +162,8 @@ Fatigue, stress, mental health, fitness to fly.
   [`captain_adel_system_prompt.md:120-123`](../../assistant/captain_adel_system_prompt.md#L120)).
 - **Canonical (pattern):** acknowledges seriously → GACA Aeromedical (medical) / peer
   support (personal) → no diagnosis.
-- **Eval coverage:** [`refuse-personal-fitness`](../evals/cases.json).
+- **Eval coverage:** [`refuse-personal-fitness`](../evals/cases.json) (English) +
+  [`arabic-refuse-personal-fitness`](../evals/cases.json) (Arabic).
 
 ### 3.3 Requests to enable non-compliance
 "What if I just departed below minima?" — a workaround request, even framed as hypothetical.
@@ -261,7 +262,7 @@ but not reconciling *retrieved* conflicts.
 | 2.2 | Type-specific limits (AFM/POH) | Soft | `refuse-type-specific-limits` |
 | 2.3 | Off-domain | Soft | `refuse-off-domain` · `refuse-off-domain-coding` · `arabic-refuse-off-domain` |
 | 3.1 | Real-time emergency | Handoff | `emergency-defer-to-qrh` |
-| 3.2 | Personal safety / medical | Handoff | `refuse-personal-fitness` |
+| 3.2 | Personal safety / medical | Handoff | `refuse-personal-fitness` · `arabic-refuse-personal-fitness` |
 | 3.3 | Enable non-compliance | Hard | `refuse-enable-noncompliance` · `arabic-refuse-enable-noncompliance` |
 | 4.1 | Instruction override | Soft-harden | `injection-reveal-prompt` |
 | 4.2 | Persona override | Soft-harden | `injection-new-persona` |
@@ -269,11 +270,16 @@ but not reconciling *retrieved* conflicts.
 | 5.1 | Ambiguous question | Clarify | *proposed — not encoded* |
 | 5.2 | Conflicting sources | Reconcile | *proposed — not encoded* |
 
-**Bilingual coverage:** Arabic counterparts now exist for real-time (§2.1
-`arabic-refuse-realtime`), off-domain (§2.3 `arabic-refuse-off-domain`), binding legal
-interpretation (§1.3 `arabic-refuse-legal`), and enable-non-compliance (§3.3
+**Bilingual coverage:** every grounding/honesty, out-of-scope, and safety-critical-handoff
+category (§1–§3) now has an Arabic counterpart in `cases.json` — including unverifiable
+limit (§1.1 `arabic-refuse-unverifiable-limit`), no-fabricated-citation (§1.2
+`arabic-no-fabricated-citation`), binding legal interpretation (§1.3 `arabic-refuse-legal`),
+real-time (§2.1 `arabic-refuse-realtime`), type-specific limits (§2.2
+`arabic-refuse-type-specific-limits`), off-domain (§2.3 `arabic-refuse-off-domain`),
+emergency handoff (§3.1 `arabic-emergency-defer-to-qrh`), personal fitness (§3.2
+`arabic-refuse-personal-fitness`), and enable-non-compliance (§3.3
 `arabic-refuse-enable-noncompliance`). Still English-only and worth an Arabic counterpart:
-type-specific limits (§2.2), unverifiable limit (§1.1), no-fabricated-citation (§1.2),
-emergency handoff (§3.1), personal fitness (§3.2). Full refusal calibration is not proven
-until every category's Arabic pass rate sits within the AR-parity bar — this is the
-refusal-track input to the Arabic parity work.
+the prompt-injection / role-integrity persona (§4.2) and architecture-disclosure (§4.3)
+cases — only instruction-override (§4.1) has an Arabic case (`inject-arabic-override`). Full
+refusal calibration is not proven until every category's Arabic pass rate sits within the
+AR-parity bar — this is the refusal-track input to the Arabic parity work.
