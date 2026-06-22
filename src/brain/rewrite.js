@@ -93,6 +93,17 @@ const AR_EN_GLOSSARY = [
   ['الدرون', 'unmanned UAS drone'],
   ['العمر', 'age eligibility'],
   ['التحويل', 'conversion foreign'],
+  ['المروحية', 'helicopter rotorcraft'],
+  ['الطائرة المروحية', 'helicopter rotorcraft'],
+  ['المدرج', 'runway'],
+  ['البرج', 'tower control'],
+  ['التصريح', 'clearance authorization'],
+  ['الاقتراب', 'approach'],
+  ['خطة الطيران', 'flight plan'],
+  ['الطوارئ', 'emergency'],
+  ['القيادة', 'command authority'],
+  ['المناورة', 'manoeuvre maneuver'],
+  ['المطار الأرضي', 'aerodrome'],
 ];
 
 function mode() {

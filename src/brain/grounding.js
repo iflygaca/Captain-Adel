@@ -91,12 +91,19 @@ function extractCitations(text) {
 const NUM = '[0-9\\u0660-\\u0669][0-9\\u0660-\\u0669.,]*';
 const UNITS = [
   'ft', 'feet', 'foot', 'nm', 'sm', 'km', 'm', 'metre', 'metres', 'meter', 'meters',
-  'kt', 'kts', 'knot', 'knots', 'lb', 'lbs', 'kg', 'hpa', 'inhg', 'hours?', 'hrs?',
+  'kt', 'kts', 'knot', 'knots', 'kias', 'ktas', 'fpm', 'lb', 'lbs', 'kg', 'hpa', 'inhg',
+  '%', 'percent', 'hours?', 'hrs?',
   'minutes?', 'mins?', 'seconds?', 'days?', 'weeks?', 'months?', 'years?', 'nautical',
-  'قدم', 'متر', 'كم', 'عقدة', 'دقيقة', 'دقائق', 'ساعة', 'ساعات', 'يوم', 'أيام', 'سنة', 'سنوات', 'شهر', 'أشهر',
+  'قدم', 'متر', 'كم', 'عقدة', 'دقيقة', 'دقائق', 'ساعة', 'ساعات', 'يوم', 'أيام', 'سنة', 'سنوات', 'شهر', 'أشهر', 'بالمئة',
 ].join('|');
-const NUM_UNIT_RE = new RegExp('(?:^|[^.\\d])' + NUM + '\\s*(?:' + UNITS + ')\\b', 'iu');
-const MODAL_RE = /\b(?:shall|must(?:\s+not)?|may\s+not|no\s+person\s+may|is\s+prohibited|are\s+prohibited|is\s+required|are\s+required|not\s+less\s+than|not\s+more\s+than|at\s+least|no\s+later\s+than|minimum|maximum)\b|يجب|لا\s*يجوز|يُ?حظر|يُشترط|يُمنع|الحد\s*الأدنى|الحد\s*الأقصى/iu;
+// Trailing guard is a "not a letter" lookahead rather than \b so non-word units
+// like "%" still anchor (a \b after "%" never matches before a space).
+const NUM_UNIT_RE = new RegExp(
+  '(?:^|[^.\\d])' + NUM + '\\s*(?:' + UNITS + ')(?![a-z\\u0600-\\u06ff])', 'iu');
+const MODAL_RE = /\b(?:shall|must(?:\s+not)?|may\s+not|no\s+person\s+may|is\s+prohibited|are\s+prohibited|is\s+required|are\s+required|not\s+less\s+than|not\s+more\s+than|no\s+more\s+than|no\s+less\s+than|no\s+fewer\s+than|no\s+greater\s+than|not\s+exceeding|in\s+excess\s+of|at\s+least|no\s+later\s+than|minimum|maximum)\b|يجب|لا\s*يجوز|يُ?حظر|يُشترط|يُمنع|الحد\s*الأدنى|الحد\s*الأقصى|على\s*الأقل|بحدّ?\s*أقصى|أكثر\s*من|أقل\s*من/iu;
+// Regulatory thresholds written symbolically: "≥ 17", "<= 5". Bare >/< and "up to"
+// are intentionally excluded — too noisy outside a comparison-operator context.
+const COMPARISON_RE = new RegExp('(?:\\u2265|\\u2264|>=|<=|=>)\\s*' + NUM, 'u');
 const SECTION_REF_RE = /§\s*\d+\.\d+/;
 const HEDGE_RE = /\b(?:can(?:'|no)?t\s+verify|cannot\s+verify|don'?t\s+have|do\s+not\s+have|not\s+able\s+to|unable\s+to|verify\s+(?:in|against|with)|before\s+you\s+rely|rely\s+on\s+(?:this|it)|outside\s+the\s+library|only\s+gaca|refer\s+to\s+the\s+(?:afm|poh|operator)|official\s+source|i\s+don'?t\s+know|no\s+such\s+(?:part|section)|i'?m\s+here\s+for\s+aviation)\b|لا\s*أستطيع\s*التحقق|تحقق\s*في|راجع\s*دليل|المصدر\s*الرسمي/iu;
 const META_LINE_RE = /^(?:cite|see\s*also|sources?|المصدر|انظر\s*أيضا)\s*:/i;
@@ -123,7 +130,8 @@ function intoSentences(answer) {
 }
 function isClaim(sentence) {
   if (HEDGE_RE.test(sentence)) return false;
-  return NUM_UNIT_RE.test(sentence) || MODAL_RE.test(sentence) || SECTION_REF_RE.test(sentence);
+  return NUM_UNIT_RE.test(sentence) || MODAL_RE.test(sentence) ||
+    COMPARISON_RE.test(sentence) || SECTION_REF_RE.test(sentence);
 }
 function splitClaims(answer) {
   return intoSentences(answer).filter(isClaim);
@@ -377,6 +385,20 @@ async function selftest() {
 
   const uncited = deriveStructural('The limit is at least 17 years of age.', []);
   ok('structural: uncited claim → partial', uncited.kind === 'partial', uncited.kind);
+
+  // claim detection: symbolic thresholds and added modal/unit phrasings
+  ok('claim: ≥ operator threshold', isClaim('The applicant must hold ≥ 17 of something.') === true);
+  ok('claim: <= operator threshold', isClaim('Keep the rate <= 500 on the gauge.') === true);
+  ok('claim: "no more than" modal', isClaim('Carry no more than four passengers.') === true);
+  ok('claim: "not exceeding" modal', isClaim('A bank not exceeding thirty in the turn.') === true);
+  ok('claim: percent unit', isClaim('Add a 5% margin to the figure.') === true);
+  ok('claim: fpm unit', isClaim('Maintain 500 fpm on the climb.') === true);
+  ok('claim: Arabic "على الأقل"', isClaim('العمر على الأقل سبعة عشر عاماً.') === true);
+  ok('claim: hedge still excluded', isClaim("I can't verify that 17 is right.") === false);
+  ok('claim: plain prose is not a claim', isClaim('On the line, Captain.') === false);
+
+  const symThreshold = deriveStructural('The minimum age is ≥ 17 for this licence.', []);
+  ok('structural: symbolic threshold uncited → partial', symThreshold.kind === 'partial', symThreshold.kind);
 
   const fabricated = deriveStructural(
     'See §91.999 — minimum is 3 SM.',
