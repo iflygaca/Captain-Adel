@@ -102,6 +102,29 @@ test('splitClaims: Arabic modal sentence is recognised as a claim', () => {
   ]);
 });
 
+test('splitClaims: symbolic threshold (≥/≤) is recognised as a claim', () => {
+  // Regulatory minima are often written symbolically; the cite-or-refuse net
+  // must catch these or they slip through as a non-answer (na).
+  assert.deepEqual(G.splitClaims('The applicant must be ≥ 17 to qualify.'),
+    ['The applicant must be ≥ 17 to qualify.']);
+  assert.deepEqual(G.splitClaims('Keep the descent rate <= 500 here.'),
+    ['Keep the descent rate <= 500 here.']);
+});
+
+test('splitClaims: added modal/unit phrasings are recognised', () => {
+  assert.deepEqual(G.splitClaims('Carry no more than four passengers.'),
+    ['Carry no more than four passengers.']);
+  assert.deepEqual(G.splitClaims('Maintain a 5% safety margin.'),
+    ['Maintain a 5% safety margin.']);
+  assert.deepEqual(G.splitClaims('Hold 500 fpm on the climb.'),
+    ['Hold 500 fpm on the climb.']);
+});
+
+test('splitClaims: Arabic "على الأقل" threshold is recognised as a claim', () => {
+  assert.deepEqual(G.splitClaims('العمر على الأقل سبعة عشر عاماً.'),
+    ['العمر على الأقل سبعة عشر عاماً.']);
+});
+
 /* -------------------------------------------------------------- classifyRefusal */
 
 test('classifyRefusal: maps the canonical phrasings to taxonomy ids', () => {

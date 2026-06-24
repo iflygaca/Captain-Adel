@@ -151,6 +151,18 @@ async function runProvider(name, message, history, opts) {
   return answerRead(provider, message, history, opts);
 }
 
+/* Attach diagnostic context to a propagating provider error WITHOUT changing its
+ * type or message — server.js logs read `err.provider` / `err.brainStage` so an
+ * outage is attributable to the model path that failed. Existing fields win. */
+function annotateError(err, fields) {
+  if (err && typeof err === 'object') {
+    for (const [k, v] of Object.entries(fields)) {
+      if (err[k] == null) err[k] = v;
+    }
+  }
+  return err;
+}
+
 async function answer(message, history = [], opts = {}) {
   const msg = String(message || '').trim().slice(0, MAX_MESSAGE_CHARS);
   if (!msg) {
@@ -165,9 +177,13 @@ async function answer(message, history = [], opts = {}) {
     return await decorate(raw, { ...opts, _provider: name });
   } catch (err) {
     const fallback = pickFallback(name, opts);
-    if (!fallback) throw err;
-    const raw = await runProvider(fallback, msg, history, opts);
-    return await decorate(raw, { ...opts, _provider: fallback });
+    if (!fallback) throw annotateError(err, { provider: name, brainStage: 'provider' });
+    try {
+      const raw = await runProvider(fallback, msg, history, opts);
+      return await decorate(raw, { ...opts, _provider: fallback });
+    } catch (err2) {
+      throw annotateError(err2, { provider: fallback, brainStage: 'fallback', primaryProvider: name });
+    }
   }
 }
 
@@ -254,10 +270,14 @@ async function* answerStream(message, history = [], opts = {}) {
     yield* drive(primary);
   } catch (err) {
     const fb = pickFallback(primary, opts);
-    if (!fb) throw err;
+    if (!fb) throw annotateError(err, { provider: primary, brainStage: 'stream' });
     raw = ''; emitted = 0; sources = []; toolCalls = null; used = fb;
     yield { type: 'reset' };
-    yield* drive(fb);
+    try {
+      yield* drive(fb);
+    } catch (err2) {
+      throw annotateError(err2, { provider: fb, brainStage: 'stream-fallback', primaryProvider: primary });
+    }
   }
 
   const d = await decorate({ answer: raw, sources, toolCalls }, { ...opts, _provider: used });

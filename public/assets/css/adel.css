@@ -133,7 +133,11 @@ a:hover { color: var(--gold); text-decoration: underline; text-underline-offset:
 
 ::selection { background: rgba(200, 160, 74, .28); color: #fff; }
 
-:focus-visible { outline: none; box-shadow: var(--ring); border-radius: 6px; }
+/* The box-shadow is the visible focus ring in normal rendering. The transparent
+   outline is invisible there, but Windows High Contrast / forced-colors mode does
+   NOT paint box-shadow — it substitutes a system colour for the transparent
+   outline, so keyboard focus stays visible (WCAG 2.4.7 Focus Visible). */
+:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--ring); border-radius: 6px; }
 
 .container { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--s-5); }
 .visually-hidden {
@@ -460,7 +464,7 @@ div.chat-avatar img { width: 44px; height: 44px; border-radius: 50%; box-shadow:
   transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-2) var(--ease);
 }
 .chat-form textarea::placeholder { color: var(--ink-faint); }
-.chat-form textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(87, 174, 201, .16); }
+.chat-form textarea:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(87, 174, 201, .16); }
 .chat-send {
   background: var(--grad-gold); color: #1A1206; border: none; border-radius: var(--r); width: 48px; height: 48px;
   cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
@@ -550,7 +554,8 @@ html[dir="rtl"] .cite, html[dir="rtl"] .src-cite { direction: ltr; unicode-bidi:
 }
 .cite:hover { background: rgba(200, 160, 74, .2); }
 .cite:focus-visible, .cite.snapped {
-  outline: none; border-color: var(--accent);
+  /* transparent outline -> visible system focus ring under forced-colors */
+  outline: 2px solid transparent; outline-offset: 2px; border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(87, 174, 201, .35); background: rgba(87, 174, 201, .12); color: var(--accent);
 }
 
@@ -705,7 +710,7 @@ html[dir="rtl"] .price-tier { letter-spacing: normal; text-transform: none; }
 .acct-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--s-3); }
 .acct-field label { font-size: 13px; color: var(--ink-dim); }
 .acct-field input { background: var(--night-2); border: 1px solid var(--line-2); border-radius: var(--r-sm); padding: 12px 14px; color: var(--ink); font-size: 15px; font-family: inherit; transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-2) var(--ease); }
-.acct-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(87, 174, 201, .15); }
+.acct-field input:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(87, 174, 201, .15); }
 .acct-actions { display: flex; flex-direction: column; gap: var(--s-2); margin-top: 6px; }
 .acct-actions .btn { width: 100%; }
 .acct-divider { display: flex; align-items: center; gap: var(--s-3); color: var(--ink-faint); font-size: 12px; margin: var(--s-4) 0; }

@@ -88,7 +88,8 @@
      and drives the source lockstep. Runs on already-escaped text. */
   function citeTokens(html) {
     return html.replace(/§\s?(\d+\.\d+(?:\.\d+)?(?:\([^)]*\))?)/g, (m, sec) =>
-      `<span class="cite" tabindex="0" role="button" data-section="${esc(sec)}">`
+      `<span class="cite" tabindex="0" role="button"`
+      + ` aria-label="${t('View source', 'عرض المصدر')} ${esc(sec)}" data-section="${esc(sec)}">`
       + `<bdi dir="ltr" lang="en">${m}</bdi></span>`);
   }
   function inline(text) {

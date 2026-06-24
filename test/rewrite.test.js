@@ -59,6 +59,16 @@ test('glossaryTerms: maps Arabic aviation phrases to corpus English', () => {
   assert.deepEqual(glossaryTerms('plain english question'), []);
 });
 
+test('glossaryTerms: covers the expanded operational vocabulary', () => {
+  assert.ok(glossaryTerms('قواعد تشغيل المروحية').includes('helicopter'));
+  assert.ok(glossaryTerms('الحد الأدنى لرؤية المدرج').includes('runway'));
+  assert.ok(glossaryTerms('إجراءات الطوارئ').includes('emergency'));
+  assert.ok(glossaryTerms('متطلبات خطة الطيران').includes('flight'));
+  // dedup holds across the longer table.
+  const terms = glossaryTerms('المروحية المروحية');
+  assert.equal(terms.filter((t) => t === 'helicopter').length, 1);
+});
+
 test('rewriteQuery: non-follow-up EN passes through unchanged', async () => {
   const q = 'What does GACAR Part 61 say about flight reviews?';
   assert.equal(await rewriteQuery(q, HISTORY), q);
