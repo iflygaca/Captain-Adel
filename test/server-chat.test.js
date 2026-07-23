@@ -51,6 +51,7 @@ beforeEach(() => {
     lastOpts = opts;
     return { answer: 'ROGER', sources: [], kind: 'grounded' };
   };
+  fakeBrain.answerStream = realBrain.answerStream;
   realBrain.ratelimit._reset && realBrain.ratelimit._reset();
   firebase.available = () => false;   // SaaS layer dark unless a test opts in
 });
@@ -130,6 +131,98 @@ test('POST /v1/chat: an exhausted quota returns 402 with the upgrade hint', asyn
   } finally {
     quota.check = realCheck;
   }
+});
+
+/* ---- streaming (SSE) ------------------------------------------------------*/
+
+/* Frames of an SSE body: the JSON payloads plus the literal [DONE] marker. */
+function sseFrames(text) {
+  return text.split('\n\n').filter(Boolean).map((f) => {
+    const data = f.replace(/^data: /, '');
+    return data === '[DONE]' ? '[DONE]' : JSON.parse(data);
+  });
+}
+
+test('POST /v1/chat?stream=1: streams SSE frames and terminates with [DONE]', async () => {
+  fakeBrain.answerStream = async function* () {
+    yield { type: 'token', delta: 'Cleared ' };
+    yield { type: 'token', delta: 'to land.' };
+    yield { type: 'final', answer: 'Cleared to land.', kind: 'grounded', sources: [] };
+  };
+  const res = await fetch(baseUrl + '/v1/chat?stream=1', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: 'clearance?' }),
+  });
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get('content-type'), /text\/event-stream/);
+  assert.equal(res.headers.get('x-adel-api-version'), '1', 'version header covers the stream path');
+  const frames = sseFrames(await res.text());
+  assert.equal(frames[frames.length - 1], '[DONE]');
+  const tokens = frames.filter((f) => f.type === 'token').map((f) => f.delta).join('');
+  assert.equal(tokens, 'Cleared to land.');
+  assert.equal(frames.find((f) => f.type === 'final').kind, 'grounded');
+});
+
+test('POST /v1/chat with Accept: text/event-stream also selects the SSE path', async () => {
+  fakeBrain.answerStream = async function* () {
+    yield { type: 'final', answer: 'ROGER', kind: 'na', sources: [] };
+  };
+  const res = await fetch(baseUrl + '/v1/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
+    body: JSON.stringify({ message: 'hi' }),
+  });
+  assert.match(res.headers.get('content-type'), /text\/event-stream/);
+  assert.equal(sseFrames(await res.text()).pop(), '[DONE]');
+});
+
+test('POST /v1/chat?stream=1: a mid-stream brain failure emits an error frame and ends', async () => {
+  fakeBrain.answerStream = async function* () {
+    yield { type: 'token', delta: 'partial…' };
+    throw new Error('model exploded mid-stream');
+  };
+  const res = await fetch(baseUrl + '/v1/chat?stream=1', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: 'hi' }),
+  });
+  assert.equal(res.status, 200, 'headers were already flushed — the stream carries the error');
+  const frames = sseFrames(await res.text());
+  assert.deepEqual(frames[frames.length - 1], { type: 'error', error: 'engine_error' },
+    'the terminal frame signals the failure (no [DONE])');
+});
+
+/* ---- /v1/feedback ---------------------------------------------------------*/
+
+test('POST /v1/feedback: a valid rating is accepted', async () => {
+  const r = await req('/v1/feedback', { body: { rating: 'up', turnId: 't-1', provider: 'gemini' } });
+  assert.equal(r.status, 200);
+  assert.deepEqual(r.json, { ok: true });
+});
+
+test('POST /v1/feedback: anything but up/down is rejected with 400', async () => {
+  for (const rating of ['sideways', '', undefined]) {
+    const r = await req('/v1/feedback', { body: { rating } });
+    assert.equal(r.status, 400);
+    assert.equal(r.json.error, 'bad_rating');
+  }
+});
+
+/* ---- body-parse error middleware ------------------------------------------*/
+
+test('POST /v1/chat: a body over the size limit returns 413 payload_too_large', async () => {
+  // config.maxBodyBytes defaults to 64 KiB; send well past it.
+  const r = await req('/v1/chat', { body: { message: 'x'.repeat(80 * 1024) } });
+  assert.equal(r.status, 413);
+  assert.equal(r.json.error, 'payload_too_large');
+});
+
+test('POST /v1/chat: malformed JSON returns a clean 400 bad_request', async () => {
+  const res = await fetch(baseUrl + '/v1/chat', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: '{"message": broken',
+  });
+  assert.equal(res.status, 400);
+  assert.equal((await res.json()).error, 'bad_request');
 });
 
 /* ---- security headers -----------------------------------------------------*/

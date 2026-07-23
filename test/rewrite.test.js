@@ -102,3 +102,77 @@ test('rewriteQuery: empty message stays empty', async () => {
   assert.equal(await rewriteQuery('', HISTORY), '');
   assert.equal(await rewriteQuery(null, HISTORY), '');
 });
+
+/* ---- llm mode (SDK swapped in the require cache) --------------------------*/
+
+/* llmRewrite requires '@google/genai' lazily on every call, so swapping the
+ * cached exports (assign-and-restore) injects a deterministic fake — no
+ * network, no real key. */
+require('@google/genai');
+const GENAI_PATH = require.resolve('@google/genai');
+
+async function withLlm({ generateContent }, fn) {
+  const savedExports = require.cache[GENAI_PATH].exports;
+  const savedEnv = { ADEL_REWRITE: process.env.ADEL_REWRITE, GEMINI_API_KEY: process.env.GEMINI_API_KEY };
+  require.cache[GENAI_PATH].exports = {
+    GoogleGenAI: class { constructor() { this.models = { generateContent }; } },
+  };
+  process.env.ADEL_REWRITE = 'llm';
+  process.env.GEMINI_API_KEY = 'test-key';
+  try { return await fn(); } finally {
+    require.cache[GENAI_PATH].exports = savedExports;
+    for (const [k, v] of Object.entries(savedEnv)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+  }
+}
+
+test('rewriteQuery (llm): a follow-up uses the model rewrite verbatim', async () => {
+  let prompt;
+  await withLlm({
+    generateContent: async (req) => {
+      prompt = req.contents[0].parts[0].text;
+      return { text: 'VFR weather minimums at night GACAR Part 91 §91.155' };
+    },
+  }, async () => {
+    const out = await rewriteQuery('And at night?', HISTORY);
+    assert.equal(out, 'VFR weather minimums at night GACAR Part 91 §91.155');
+    assert.match(prompt, /Q: And at night\?/, 'the final question rides the prompt');
+    assert.match(prompt, /Class G airspace/, 'the thread is included for pronoun resolution');
+  });
+});
+
+test('rewriteQuery (llm): an over-long model output is rejected — heuristic fallback', async () => {
+  await withLlm({ generateContent: async () => ({ text: 'x'.repeat(400) }) }, async () => {
+    const out = await rewriteQuery('And at night?', HISTORY);
+    assert.ok(out.startsWith('And at night?'), 'falls back to the heuristic expansion');
+    assert.match(out, /part 91/i);
+  });
+});
+
+test('rewriteQuery (llm): a throwing SDK falls back to the heuristic', async () => {
+  await withLlm({ generateContent: async () => { throw new Error('quota exceeded'); } }, async () => {
+    const out = await rewriteQuery('And at night?', HISTORY);
+    assert.ok(out.startsWith('And at night?'));
+    assert.match(out, /part 91/i);
+  });
+});
+
+test('rewriteQuery (llm): a non-follow-up never calls the model', async () => {
+  let called = 0;
+  await withLlm({ generateContent: async () => { called++; return { text: 'nope' }; } }, async () => {
+    const q = 'What does GACAR Part 61 say about flight reviews?';
+    assert.equal(await rewriteQuery(q, HISTORY), q);
+    assert.equal(called, 0, 'self-contained questions skip the LLM entirely');
+  });
+});
+
+test('rewriteQuery (llm): no GEMINI_API_KEY means heuristic, not a throw', async () => {
+  await withLlm({ generateContent: async () => ({ text: 'should not be used' }) }, async () => {
+    delete process.env.GEMINI_API_KEY;
+    const out = await rewriteQuery('And at night?', HISTORY);
+    assert.ok(out.startsWith('And at night?'));
+    assert.match(out, /part 91/i);
+  });
+});
