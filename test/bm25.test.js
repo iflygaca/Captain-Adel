@@ -64,3 +64,36 @@ test('searchLibrary: results are de-duplicated by section', () => {
   const keys = hits.map((h) => h.citation + '|' + (h.section_title || ''));
   assert.equal(new Set(keys).size, keys.length, 'no duplicate sections in the result set');
 });
+
+/* ------------------------------------------------------------- versionNumber */
+
+test('versionNumber: parses v-prefixed and bare numeric versions', () => {
+  assert.equal(bm25.versionNumber('v100'), 100);
+  assert.equal(bm25.versionNumber('V7'), 7);
+  assert.equal(bm25.versionNumber('7'), 7);
+  assert.equal(bm25.versionNumber(' v12 '), 12);
+});
+
+test('versionNumber: unparseable inputs yield null', () => {
+  assert.equal(bm25.versionNumber(''), null);
+  assert.equal(bm25.versionNumber(null), null);
+  assert.equal(bm25.versionNumber('AIRAC 2505'), null);
+  assert.equal(bm25.versionNumber('v1.2'), null);
+});
+
+test('versionNumber: orders numerically where string compare fails', () => {
+  // The bug this guards against: as strings, 'v100' <= 'v99' is true.
+  assert.ok('v100' <= 'v99', 'precondition: lexicographic compare is wrong');
+  assert.ok(bm25.versionNumber('v100') > bm25.versionNumber('v99'));
+});
+
+test('listChanges: sinceVersion filters numerically, unknown part returns []', () => {
+  assert.deepEqual(bm25.listChanges('9999'), []);
+  // Whatever the corpus holds, a v0 floor must never drop MORE entries than
+  // a v99999 floor would keep — the floor is monotonic under numeric compare.
+  const all = bm25.listChanges('91');
+  const floored = bm25.listChanges('91', 'v0');
+  const versioned = all.filter((e) => bm25.versionNumber(e.version) != null);
+  assert.equal(floored.filter((e) => bm25.versionNumber(e.version) != null).length,
+    versioned.filter((e) => bm25.versionNumber(e.version) > 0).length);
+});

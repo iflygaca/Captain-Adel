@@ -4,7 +4,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { rewriteQuery, isFollowUp, harvestTerms, glossaryTerms } = require('../src/brain/rewrite');
+const { rewriteQuery, isFollowUp, harvestTerms, glossaryTerms, raceNullOnTimeout } = require('../src/brain/rewrite');
 
 const HISTORY = [
   { role: 'user', text: 'What are the basic VFR weather minimums in Class G airspace under GACAR Part 91?' },
@@ -101,4 +101,38 @@ test('rewriteQuery: ADEL_REWRITE=off is a strict passthrough', async () => {
 test('rewriteQuery: empty message stays empty', async () => {
   assert.equal(await rewriteQuery('', HISTORY), '');
   assert.equal(await rewriteQuery(null, HISTORY), '');
+});
+
+/* --------------------------------------------------------- raceNullOnTimeout */
+
+test('raceNullOnTimeout: resolves the value when the promise settles first', async () => {
+  assert.equal(await raceNullOnTimeout(Promise.resolve('fast'), 1000), 'fast');
+});
+
+test('raceNullOnTimeout: resolves null when the timeout wins', async () => {
+  const never = new Promise(() => {});
+  assert.equal(await raceNullOnTimeout(never, 10), null);
+});
+
+test('raceNullOnTimeout: resolves null on rejection, before or after the timeout', async () => {
+  let unhandled = null;
+  const sentinel = (err) => { unhandled = err; };
+  process.on('unhandledRejection', sentinel);
+  try {
+    // Early rejection: swallowed, resolves null.
+    assert.equal(await raceNullOnTimeout(Promise.reject(new Error('early')), 50), null);
+
+    // Late rejection: the timeout wins first, then the promise rejects — the
+    // bare Promise.race this replaced would surface this as unhandled.
+    let rejectLate;
+    const late = new Promise((_, rej) => { rejectLate = rej; });
+    assert.equal(await raceNullOnTimeout(late, 10), null);
+    rejectLate(new Error('late'));
+
+    await new Promise((r) => setImmediate(r));
+    await new Promise((r) => setImmediate(r));
+    assert.equal(unhandled, null, 'no unhandledRejection may fire');
+  } finally {
+    process.removeListener('unhandledRejection', sentinel);
+  }
 });

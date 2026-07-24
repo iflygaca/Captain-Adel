@@ -28,6 +28,15 @@ const DEFAULT_MODEL = process.env.CAPTAIN_ADEL_MODEL || 'gemini-2.5-flash';
 const MAX_TOOL_ROUNDS = 5;
 
 const EMPTY_ANSWER = 'Say again — I did not catch a question there, Captain.';
+
+/* Client construction options with a request timeout — openai-compatible.js
+ * bounds every request at 60s, but without this a hung Gemini request would
+ * hold the /v1/chat turn open until the socket died. Read at call time so
+ * tests and deployments can tune ADEL_GEMINI_TIMEOUT_MS without a reload. */
+function clientOptions(apiKey) {
+  const timeout = parseInt(process.env.ADEL_GEMINI_TIMEOUT_MS, 10) || 60000;
+  return { apiKey, httpOptions: { timeout } };
+}
 const LOOKUP_LIMIT_FALLBACK =
   'I had to dig through several sections and ran past my lookup limit for ' +
   'this turn. Ask me again, a little more specifically, and I will pull the ' +
@@ -146,7 +155,7 @@ function initAgentic(message, history, opts) {
   if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
   return {
     model: opts.model || DEFAULT_MODEL,
-    ai: opts._ai || new GoogleGenAI({ apiKey }),
+    ai: opts._ai || new GoogleGenAI(clientOptions(apiKey)),
     contents: buildContents(message, history),
     config: {
       systemInstruction: composeSystemInstruction({
@@ -169,7 +178,7 @@ function initComplete({ systemInstruction, contents, opts }) {
   if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
   return {
     model: opts.model || DEFAULT_MODEL,
-    ai: new GoogleGenAI({ apiKey }),
+    ai: new GoogleGenAI(clientOptions(apiKey)),
     contents: (contents || []).map((c) => ({
       role: c.role === 'model' ? 'model' : 'user',
       parts: [{ text: String(c.text || '') }],
@@ -327,4 +336,5 @@ module.exports = {
   TOOL_DECLARATIONS,
   DEFAULT_MODEL,
   buildContents,
+  clientOptions,
 };

@@ -13,11 +13,12 @@
 const crypto = require('crypto');
 const config = require('../config');
 
+/* Hash both sides to a fixed width before the constant-time compare, so the
+ * comparison cannot leak the configured key's length via an early return. */
 function safeEqual(a, b) {
-  const ba = Buffer.from(String(a));
-  const bb = Buffer.from(String(b));
-  if (ba.length !== bb.length) return false;
-  return crypto.timingSafeEqual(ba, bb);
+  const ha = crypto.createHash('sha256').update(String(a)).digest();
+  const hb = crypto.createHash('sha256').update(String(b)).digest();
+  return crypto.timingSafeEqual(ha, hb);
 }
 
 function apiKeyMiddleware(req, res, next) {

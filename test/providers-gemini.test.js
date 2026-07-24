@@ -139,3 +139,19 @@ test('answerAgenticStream: a text-bearing tool round emits a reset before the fi
   // The reset precedes the final token stream.
   assert.ok(types.indexOf('reset') < types.lastIndexOf('token'));
 });
+
+test('clientOptions: 60s default timeout, ADEL_GEMINI_TIMEOUT_MS overrides', () => {
+  const prev = process.env.ADEL_GEMINI_TIMEOUT_MS;
+  delete process.env.ADEL_GEMINI_TIMEOUT_MS;
+  try {
+    assert.deepEqual(gemini.clientOptions('k'),
+      { apiKey: 'k', httpOptions: { timeout: 60000 } });
+    process.env.ADEL_GEMINI_TIMEOUT_MS = '15000';
+    assert.equal(gemini.clientOptions('k').httpOptions.timeout, 15000);
+    process.env.ADEL_GEMINI_TIMEOUT_MS = 'not-a-number';
+    assert.equal(gemini.clientOptions('k').httpOptions.timeout, 60000, 'garbage falls back to the default');
+  } finally {
+    if (prev === undefined) delete process.env.ADEL_GEMINI_TIMEOUT_MS;
+    else process.env.ADEL_GEMINI_TIMEOUT_MS = prev;
+  }
+});
