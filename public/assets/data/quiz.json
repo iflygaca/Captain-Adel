@@ -1,6 +1,6 @@
 {
   "generated": "2026-05-24",
-  "note": "Practice questions authored by Fly GACA from the GACAR library for study. Not actual GACA exam questions. Every answer cites its source — verify against the official GACAR.",
+  "note": "Practice questions authored by Fly GACA from the GACAR library for study. Not actual GACA exam questions. Every answer cites its source — verify against the official GACAR. citeUrl values are Fly GACA app paths (document.html/library.html) that do not exist on captadel.com; exam.js renders only the cite text and never reads citeUrl.",
   "exam": {
     "title": "GACAR Knowledge — Mock Exam",
     "questions": 25,

@@ -203,6 +203,19 @@ a:hover { color: var(--gold); text-decoration: underline; text-underline-offset:
 .nav-links a:hover::after, .nav-links a[aria-current="page"]::after { width: 100%; }
 .nav-actions { display: flex; align-items: center; gap: var(--s-3); }
 
+/* Mobile nav disclosure — the .nav-burger button (first child of .nav-actions
+   on every page, wired by site.js) replaces the links at ≤820px, where the
+   row would not fit. Hidden on desktop. */
+.nav-burger {
+  display: none; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: var(--r-pill);
+  background: transparent; border: 1px solid var(--line-2);
+  color: var(--ink); font-size: 17px; line-height: 1; cursor: pointer;
+  box-shadow: var(--hair);
+}
+.nav-burger:hover { background: var(--panel-3); }
+.nav-burger:focus-visible { box-shadow: var(--ring); }
+
 /* ============================================================================
    Buttons — tactile gold + ghost
    ==========================================================================*/
@@ -501,7 +514,24 @@ div.chat-avatar img { width: 44px; height: 44px; border-radius: 50%; box-shadow:
   .hero-art { order: -1; }
   .hero-art img { width: min(220px, 60%); }
   .cards { grid-template-columns: 1fr; }
-  .nav-links { display: none; }
+  /* The link row becomes a dropdown panel under the header, opened by the
+     .nav-burger (site.js toggles .site-nav.nav-open + aria-expanded).
+     Logical inset keeps it on the trailing edge in both LTR and RTL. */
+  .nav-burger { display: inline-flex; }
+  .nav-links {
+    position: absolute; top: 100%; inset-inline-end: var(--s-3); z-index: 30;
+    flex-direction: column; align-items: stretch; gap: var(--s-2);
+    min-width: 200px; margin-top: 6px; padding: var(--s-3);
+    background: var(--grad-panel); border: 1px solid var(--line-2);
+    border-radius: var(--r); box-shadow: var(--sh-2), var(--hair);
+    opacity: 0; visibility: hidden; transform: translateY(-6px);
+    transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease),
+                visibility var(--dur-2);
+  }
+  .site-nav.nav-open .nav-links { opacity: 1; visibility: visible; transform: none; }
+  .nav-links a { padding: 8px 10px; border-radius: 8px; }
+  .nav-links a::after { display: none; }
+  .nav-links a:hover, .nav-links a[aria-current="page"] { background: var(--panel-3); }
 }
 
 /* ============================================================================
@@ -743,4 +773,5 @@ html[dir="rtl"] .acct-plan-badge { text-transform: none; letter-spacing: normal;
   .exam-timer.urgent,
   .msg, .chat-followups, .chat-welcome, .exam-explain.visible { animation: none !important; }
   .card:hover, .price-card:hover, .exam-opt:hover, .btn:hover, .chat-suggest button:hover { transform: none; }
+  .nav-links { transition: none; }
 }

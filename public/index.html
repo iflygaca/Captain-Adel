@@ -19,6 +19,7 @@
   <script src="assets/js/i18n.js" defer></script>
 </head>
 <body>
+  <a class="visually-hidden" href="#main" data-en="Skip to content">تخطَّ إلى المحتوى</a>
   <div class="disclaimer-strip">
     <div class="container">
       <span data-i18n-html
@@ -39,7 +40,7 @@
           <span class="lockup-sub" data-en="Saudi civil aviation">الطيران المدني السعودي</span>
         </span>
       </a>
-      <nav class="nav-links" aria-label="رئيسية">
+      <nav class="nav-links" id="site-menu" aria-label="رئيسية">
         <a href="#what" data-en="What he does">ماذا يقدّم</a>
         <a href="#how" data-en="How it works">كيف يعمل</a>
         <a href="#pricing" data-en="Pricing">الأسعار</a>
@@ -47,6 +48,7 @@
         <a href="https://gaca.gov.sa" target="_blank" rel="noopener" data-en="GACA ↗">الهيئة ↗</a>
       </nav>
       <div class="nav-actions">
+        <button type="button" class="nav-burger" aria-expanded="false" aria-controls="site-menu" aria-label="القائمة">☰</button>
         <button type="button" class="lang-toggle" lang="en">EN</button>
         <a class="btn btn-ghost" href="account.html" data-en="Account">حسابي</a>
         <a class="btn btn-primary" href="chat.html" data-en="Ask Captain Adel">اسأل كابتن عادل</a>
@@ -227,7 +229,7 @@
     </div>
   </footer>
 
-  <script>var y=document.getElementById('year');if(y)y.textContent=new Date().getFullYear();</script>
+  <script src="assets/js/site.js" defer></script>
   <script type="module">
     import { startProCheckout } from './assets/js/billing.js';
     document.querySelectorAll('#pricing [data-plan]').forEach((btn) => {

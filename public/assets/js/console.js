@@ -73,7 +73,9 @@
       `<p class="secline">${esc(d.cite || '')}</p><p class="passage">${esc(d.verbatim || '')}</p>`;
     const foot = document.getElementById('src-foot');
     foot.hidden = false;
-    document.getElementById('src-open').href = d.url && d.url !== '#' ? d.url : ('library.html#' + encodeURIComponent(d.anchor || ''));
+    // No per-source URL on captadel (the library lives in the Fly GACA app) —
+    // fall back to the regulator itself rather than a page that 404s here.
+    document.getElementById('src-open').href = d.url && d.url !== '#' ? d.url : 'https://gaca.gov.sa';
     document.getElementById('src-ver').innerHTML = d.ver ? `<bdi dir="ltr" lang="en">${esc(d.ver)}</bdi>` : '';
   }
   function chipData(chip) {
@@ -195,8 +197,13 @@
     const next = e.key === 'ArrowDown' ? (cur + 1) % cites.length : (cur - 1 + cites.length) % cites.length;
     cites[next].focus(); snapFrom(cites[next]);
   });
+  // A suggestion chip carries the question in both languages; send the one that
+  // matches the current UI language so an Arabic UI routes to the Arabic model.
+  function chipQuestion(btn) {
+    return (isAr() && btn.dataset.qAr) ? btn.dataset.qAr : btn.dataset.q;
+  }
   results.addEventListener('click', (e) => {
-    const sug = e.target.closest('button[data-q]'); if (sug) { send(sug.dataset.q); return; }
+    const sug = e.target.closest('button[data-q]'); if (sug) { send(chipQuestion(sug)); return; }
     const chip = e.target.closest('.src-chip'); if (chip && !chip.disabled) { snapFrom(chip); return; }
     const cite = e.target.closest('.cite'); if (cite) { snapFrom(cite); }
   });
@@ -205,22 +212,9 @@
     if (cite && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); snapFrom(cite); }
   });
 
-  /* ---- language toggle ---- */
-  const enBtn = document.getElementById('lang-en');
-  const arBtn = document.getElementById('lang-ar');
-  function setLang(lang) {
-    const ar = lang === 'ar';
-    document.documentElement.lang = lang;
-    document.documentElement.dir = ar ? 'rtl' : 'ltr';
-    enBtn.setAttribute('aria-pressed', String(!ar));
-    arBtn.setAttribute('aria-pressed', String(ar));
-    document.querySelectorAll('[data-en]').forEach((el) => { el.innerHTML = ar ? el.dataset.ar : el.dataset.en; });
-    input.placeholder = ar ? input.dataset.arPh : input.dataset.enPh;
-  }
-  if (enBtn && arBtn) {
-    enBtn.addEventListener('click', () => setLang('en'));
-    arBtn.addEventListener('click', () => setLang('ar'));
-  }
+  /* Language is handled by the sitewide engine (i18n.js): it owns the
+     .lang-toggle, <html lang|dir>, [data-en]/[data-ar] swaps, placeholder
+     swaps and the persisted captadel:lang choice. */
 
   /* ---- primed prompt: console.html?q=... ---- */
   const primed = new URLSearchParams(location.search).get('q');
