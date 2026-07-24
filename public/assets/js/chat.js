@@ -23,29 +23,18 @@
   const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
   const TTS = window.speechSynthesis || null;
 
-  const API     = (window.ADEL_API_BASE || '');
+  // Shared client core (chat-core.js, loaded first): safe markdown, § cites,
+  // grounding badge, session id, bilingual error copy, SSE transport.
+  const core = window.AdelChatCore;
+  const { esc, safeUrl, md, sessionId, newTurnId, verifyActions } = core;
+
+  const API     = core.apiBase();
   const ENDPOINT = API + '/v1/chat';
   const AVATAR  = 'assets/img/captain/avatar.png';
   const history = [];
   let examMode = false;     // GACA oral-exam mode (Adel plays the examiner)
   const isAr = () => document.documentElement.lang === 'ar';
   const t = (en, ar) => (isAr() ? ar : en);
-
-  /* Stable per-browser id so the backend rate-limits each browser on its own
-     budget rather than lumping everyone behind one IP. No personal data. */
-  function sessionId() {
-    try {
-      let s = localStorage.getItem('captadel:adel-session');
-      if (!s) {
-        s = 'ca-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
-        localStorage.setItem('captadel:adel-session', s);
-      }
-      return s;
-    } catch (_) { return ''; }
-  }
-  function newTurnId() {
-    return 'tn-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
-  }
 
   /* Reflect the free-tier "questions left" count from the X-Adel-Quota-Remaining
      response header into an optional header pill (#chat-quota). No-op when the
@@ -60,77 +49,13 @@
       : `${remaining} left today`;
   }
 
-  const ERROR = `I couldn't reach my engine just now. Please try again in a moment.`;
-  const RATE_LIMITED = `**Ease off a moment, Captain.** That's a lot of questions in a `
-    + `short span — give it a minute, then ask again.`;
   const QUOTA = () => isAr()
     ? `**استنفدت أسئلتك المجانية لهذه الفترة يا كابتن.** ارتقِ إلى **برو** للأسئلة بلا حدود — `
       + `[شاهد الأسعار](/#pricing) — أو عُد عند تجدّد الرصيد.`
     : `**You've used your free questions for now, Captain.** Go **Pro** for unlimited `
       + `questions — [see pricing](/#pricing) — or come back when the allowance resets.`;
 
-  /* ---- minimal markdown ----
-     Answer text + source links come from the model, so they are untrusted:
-     esc() neutralises quotes, and every URL is scheme-checked before it lands
-     in an href. */
-  function esc(s) {
-    return String(s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
-  function safeUrl(u) {
-    const raw = String(u).replace(/&amp;/g, '&').trim();
-    if (/^(https?:\/\/|mailto:|\/|#)/i.test(raw)) return u;
-    if (/^[\w./-]+\.html(?:[?#].*)?$/i.test(raw)) return u;
-    return '#';
-  }
-  /* Wrap every "§91.155(a)(2)" token as a focusable cite that stays LTR in RTL
-     and drives the source lockstep. Runs on already-escaped text. */
-  function citeTokens(html) {
-    return html.replace(/§\s?(\d+\.\d+(?:\.\d+)?(?:\([^)]*\))?)/g, (m, sec) =>
-      `<span class="cite" tabindex="0" role="button"`
-      + ` aria-label="${t('View source', 'عرض المصدر')} ${esc(sec)}" data-section="${esc(sec)}">`
-      + `<bdi dir="ltr" lang="en">${m}</bdi></span>`);
-  }
-  function inline(text) {
-    return citeTokens(esc(text)
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g,
-        (_m, label, url) => `<a href="${safeUrl(url)}" rel="noopener nofollow ugc">${label}</a>`));
-  }
-  function md(text) {
-    let html = '', list = false;
-    for (const raw of String(text).split('\n')) {
-      const line = raw.trim();
-      if (/^[-*]\s+/.test(line)) {
-        if (!list) { html += '<ul>'; list = true; }
-        html += '<li>' + inline(line.replace(/^[-*]\s+/, '')) + '</li>';
-      } else {
-        if (list) { html += '</ul>'; list = false; }
-        if (line) html += '<p>' + inline(line) + '</p>';
-      }
-    }
-    if (list) html += '</ul>';
-    return html;
-  }
-
-  /* ---- grounding contract rendering ---- */
-  const GBADGE = {
-    grounded: ['Grounded', 'موثَّق بالمصدر'],
-    partial:  ['Partially grounded', 'موثَّق جزئياً'],
-    refusal:  ['Hold — not grounded', 'توقّف — غير موثَّق'],
-  };
-  function groundingBadge(data) {
-    const k = data.kind;
-    if (!k || !GBADGE[k]) return '';                 // 'na' / unknown → no badge
-    const lbl = GBADGE[k][isAr() ? 1 : 0];
-    const cls = (k === 'refusal' && data.refusalClass)
-      ? `<span class="gb-class"><bdi dir="ltr" lang="en">§${esc(data.refusalClass)}</bdi></span>` : '';
-    return `<div class="grounding-badge" data-state="${esc(k)}" role="status">`
-      + `<span class="gb-dot" aria-hidden="true"></span>`
-      + `<span class="gb-label">${esc(lbl)}</span>${cls}</div>`;
-  }
-
+  /* ---- grounding contract rendering (markdown + badge live in chat-core) ---- */
   function renderSources(sources) {
     if (!sources || !sources.length) return '';
     const rows = sources.map((s) => {
@@ -148,16 +73,6 @@
       return `<div class="src-row"${secAttr}>${toggle}${open}${verbatim}</div>`;
     }).join('');
     return `<div class="msg-sources"><span class="src-label">${t('Sources', 'المصدر')}</span>${rows}</div>`;
-  }
-
-  function verifyActions(data) {
-    if (data.kind !== 'refusal') return '';
-    const part = (data.sources || []).map((s) => s.part).find(Boolean);
-    let btns = '';
-    if (part) btns += `<a class="vbtn" href="library.html#${encodeURIComponent(part)}" target="_blank" rel="noopener">`
-      + `${t('Open Part', 'افتح الجزء')} <bdi dir="ltr" lang="en">${esc(part)}</bdi> ↗</a>`;
-    btns += `<a class="vbtn" href="https://gaca.gov.sa" target="_blank" rel="noopener">${t('Check GACA', 'راجع الهيئة')} ↗</a>`;
-    return `<div class="verify-actions">${btns}</div>`;
   }
 
   function stamp(data) {
@@ -259,7 +174,7 @@
   /* Build the inner HTML of a finalised Adel bubble from the grounding data. */
   function adelBubbleHtml(answerText, data) {
     let html = '';
-    if (data) html += groundingBadge(data);
+    if (data) html += core.badgeHtml(data);
     html += `<div class="msg-prose">${md(answerText)}</div>`;
     if (data) {
       html += verifyActions(data);
@@ -446,41 +361,15 @@
     } catch (_) { return {}; }
   }
 
-  /* ---- backend (streaming) ---- */
+  /* ---- backend (streaming; transport lives in chat-core) ---- */
   async function* askStream(message) {
-    const res = await fetch(ENDPOINT + '?stream=1', {
-      method: 'POST',
-      headers: Object.assign(
-        { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
-        await authHeader()),
-      body: JSON.stringify({
-        message, history, session: sessionId(), provider: 'auto',
-        mode: examMode ? 'exam' : undefined,
-      }),
-    });
-    if (res.status === 429) throw new Error('rate_limited');
-    if (res.status === 402) throw new Error('quota_exceeded');
-    if (!res.ok || !res.body) throw new Error('backend');
+    const res = await core.postChat(ENDPOINT, {
+      message, history, session: sessionId(), provider: 'auto',
+      mode: examMode ? 'exam' : undefined,
+    }, await authHeader());
     const left = res.headers.get('X-Adel-Quota-Remaining');
     if (left != null) updateQuotaHint(parseInt(left, 10));
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buf = '';
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buf += decoder.decode(value, { stream: true });
-      let nl;
-      while ((nl = buf.indexOf('\n')) !== -1) {
-        const line = buf.slice(0, nl).trim();
-        buf = buf.slice(nl + 1);
-        if (!line.startsWith('data:')) continue;
-        const payload = line.slice(5).trim();
-        if (payload === '[DONE]') return;
-        try { yield JSON.parse(payload); } catch (_) {}
-      }
-    }
+    yield* core.sseEvents(res);
   }
 
   /* Animated-character hook: adel-character.js listens for these and reacts;
@@ -534,9 +423,9 @@
       if (sendBtn) sendBtn.disabled = false;
     })().catch((err) => {
       const code = err && err.message;
-      const reply = code === 'rate_limited' ? RATE_LIMITED
+      const reply = code === 'rate_limited' ? core.rateLimitedText()
         : code === 'quota_exceeded' ? QUOTA()
-          : ERROR;
+          : core.errorText();
       msg.remove();
       adelState('error');
       addError(reply);
