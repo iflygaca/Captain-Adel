@@ -150,6 +150,8 @@ test('splitClaims: symbolic threshold (≥/≤) is recognised as a claim', () =>
 test('splitClaims: added modal/unit phrasings are recognised', () => {
   assert.deepEqual(G.splitClaims('Carry no more than four passengers.'),
     ['Carry no more than four passengers.']);
+  assert.deepEqual(G.splitClaims('A bank not exceeding thirty in the turn.'),
+    ['A bank not exceeding thirty in the turn.']);
   assert.deepEqual(G.splitClaims('Maintain a 5% safety margin.'),
     ['Maintain a 5% safety margin.']);
   assert.deepEqual(G.splitClaims('Hold 500 fpm on the climb.'),
@@ -308,4 +310,14 @@ test('decorate: missing/!array sources is tolerated', async () => {
   const out = await G.decorate({ answer: 'Hello, Captain.' }, {});
   assert.deepEqual(out.sources, []);
   assert.equal(out.kind, 'na');
+});
+
+test('decorate: derivation reads all sources but the UI gets at most MAX_SOURCES', async () => {
+  const manySrc = ['91.155', '91.157', '91.159', '91.161', '91.163'].map((sec) =>
+    G.makeSource(`GACAR Part 91, §${sec}`, `library.html#${sec}`, 'passage for ' + sec));
+  const out = await G.decorate(
+    { answer: 'VFR minima vary by airspace and altitude (§91.155).', sources: manySrc }, {});
+  assert.equal(out.sources.length, 3, 'default ADEL_MAX_SOURCES cap is 3');
+  assert.equal(out.sources[0].section, '91.155', 'cap keeps retrieval order');
+  assert.equal(out.kind, 'grounded', 'the cap must not blunt grounding derivation');
 });
