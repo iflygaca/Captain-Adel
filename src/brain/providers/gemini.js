@@ -19,13 +19,19 @@
 const { GoogleGenAI } = require('@google/genai');
 const bm25 = require('../bm25');
 const computeTools = require('../tools');
-const { makeSource } = require('../grounding');
+const { pushSource } = require('../grounding');
 const { composeSystemInstruction } = require('../system-prompt');
+const { normalizeHistory } = require('../history');
+const { MAX_MESSAGE_CHARS } = require('../guards');
 
 const DEFAULT_MODEL = process.env.CAPTAIN_ADEL_MODEL || 'gemini-2.5-flash';
 const MAX_TOOL_ROUNDS = 5;
-const MAX_HISTORY_TURNS = 12;
-const MAX_MESSAGE_CHARS = 4000;
+
+const EMPTY_ANSWER = 'Say again — I did not catch a question there, Captain.';
+const LOOKUP_LIMIT_FALLBACK =
+  'I had to dig through several sections and ran past my lookup limit for ' +
+  'this turn. Ask me again, a little more specifically, and I will pull the ' +
+  'exact citation.';
 
 const TOOL_DECLARATIONS = [
   {
@@ -94,16 +100,6 @@ const TOOL_DECLARATIONS = [
 // pure math from brain/tools; regulatory figures stay retrieval-sourced.
 TOOL_DECLARATIONS.push(...computeTools.DECLARATIONS);
 
-function pushSource(sources, seen, citation, url, text, version) {
-  if (!citation && !url) return;
-  let anchor = String(url || '');
-  if (anchor.includes('#')) anchor = anchor.replace(/-\d+$/, '');
-  const key = (citation ? citation.trim().toLowerCase() : '') + '|' + anchor;
-  if (seen.has(key)) return;
-  seen.add(key);
-  sources.push(makeSource(citation, url, text, version));
-}
-
 function runTool(name, args, sources, seen, toolLog) {
   try {
     // Compute tools: log every successful call so decorate() can surface the
@@ -135,51 +131,60 @@ function runTool(name, args, sources, seen, toolLog) {
 }
 
 function buildContents(message, history) {
-  const prior = Array.isArray(history) ? history.slice() : [];
-  const last = prior[prior.length - 1];
-  if (last && last.role === 'user' && String(last.text || '') === message) {
-    prior.pop();
-  }
-  const trimmed = prior.slice(-MAX_HISTORY_TURNS);
-
-  const contents = [];
-  for (const h of trimmed) {
-    const text = String((h && h.text) || '').trim();
-    if (!text) continue;
-    contents.push({
-      role: h.role === 'model' ? 'model' : 'user',
-      parts: [{ text }],
-    });
-  }
+  const contents = normalizeHistory(message, history)
+    .map((h) => ({ role: h.role, parts: [{ text: h.text }] }));
   contents.push({ role: 'user', parts: [{ text: message }] });
   return contents;
+}
+
+/* Shared setup for the agentic loop — answerAgentic() and its streaming twin
+ * must send byte-identical requests, so the client, contents and config are
+ * built in one place. opts._ai is a test-only injection seam; production
+ * always builds the client. */
+function initAgentic(message, history, opts) {
+  const apiKey = opts.apiKey || process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
+  return {
+    model: opts.model || DEFAULT_MODEL,
+    ai: opts._ai || new GoogleGenAI({ apiKey }),
+    contents: buildContents(message, history),
+    config: {
+      systemInstruction: composeSystemInstruction({
+        product: opts.product,
+        systemSuffix: opts.systemSuffix,
+        strategy: 'agentic',
+        mode: opts.mode,
+      }),
+      tools: [{ functionDeclarations: TOOL_DECLARATIONS }],
+      temperature: 0.3,
+      maxOutputTokens: 4096,
+    },
+  };
+}
+
+/* Shared setup for the tool-less read-mode completions (complete() and
+ * completeStream()). */
+function initComplete({ systemInstruction, contents, opts }) {
+  const apiKey = opts.apiKey || process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
+  return {
+    model: opts.model || DEFAULT_MODEL,
+    ai: new GoogleGenAI({ apiKey }),
+    contents: (contents || []).map((c) => ({
+      role: c.role === 'model' ? 'model' : 'user',
+      parts: [{ text: String(c.text || '') }],
+    })),
+    config: { systemInstruction, temperature: 0.2, maxOutputTokens: 2048 },
+  };
 }
 
 async function answerAgentic(message, history, opts = {}) {
   const msg = String(message || '').trim().slice(0, MAX_MESSAGE_CHARS);
   if (!msg) {
-    return { answer: 'Say again — I did not catch a question there, Captain.', sources: [] };
+    return { answer: EMPTY_ANSWER, sources: [] };
   }
 
-  const apiKey = opts.apiKey || process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
-  const model = opts.model || DEFAULT_MODEL;
-
-  // opts._ai is a test-only injection seam; production always builds the client.
-  const ai = opts._ai || new GoogleGenAI({ apiKey });
-  const contents = buildContents(msg, history);
-
-  const config = {
-    systemInstruction: composeSystemInstruction({
-      product: opts.product,
-      systemSuffix: opts.systemSuffix,
-      strategy: 'agentic',
-      mode: opts.mode,
-    }),
-    tools: [{ functionDeclarations: TOOL_DECLARATIONS }],
-    temperature: 0.3,
-    maxOutputTokens: 4096,
-  };
+  const { ai, model, contents, config } = initAgentic(msg, history, opts);
 
   const sources = [];
   const seen = new Set();
@@ -218,11 +223,7 @@ async function answerAgentic(message, history, opts = {}) {
     contents.push({ role: 'user', parts: responseParts });
   }
 
-  const fallback = lastText.trim() ||
-    'I had to dig through several sections and ran past my lookup limit for ' +
-    'this turn. Ask me again, a little more specifically, and I will pull the ' +
-    'exact citation.';
-  return { answer: fallback, sources, toolCalls: toolLog };
+  return { answer: lastText.trim() || LOOKUP_LIMIT_FALLBACK, sources, toolCalls: toolLog };
 }
 
 /* Streaming twin of answerAgentic(): yields uniform events
@@ -235,23 +236,10 @@ async function answerAgentic(message, history, opts = {}) {
 async function* answerAgenticStream(message, history, opts = {}) {
   const msg = String(message || '').trim().slice(0, MAX_MESSAGE_CHARS);
   if (!msg) {
-    yield { type: 'done', answer: 'Say again — I did not catch a question there, Captain.', sources: [] };
+    yield { type: 'done', answer: EMPTY_ANSWER, sources: [] };
     return;
   }
-  const apiKey = opts.apiKey || process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
-  const model = opts.model || DEFAULT_MODEL;
-  const ai = opts._ai || new GoogleGenAI({ apiKey });
-  const contents = buildContents(msg, history);
-  const config = {
-    systemInstruction: composeSystemInstruction({
-      product: opts.product, systemSuffix: opts.systemSuffix, strategy: 'agentic',
-      mode: opts.mode,
-    }),
-    tools: [{ functionDeclarations: TOOL_DECLARATIONS }],
-    temperature: 0.3,
-    maxOutputTokens: 4096,
-  };
+  const { ai, model, contents, config } = initAgentic(msg, history, opts);
 
   const sources = [];
   const seen = new Set();
@@ -292,27 +280,16 @@ async function* answerAgenticStream(message, history, opts = {}) {
     contents.push({ role: 'user', parts: responseParts });
   }
 
-  const fallback = lastText.trim() ||
-    'I had to dig through several sections and ran past my lookup limit for ' +
-    'this turn. Ask me again, a little more specifically, and I will pull the ' +
-    'exact citation.';
   if (!lastText.trim()) yield { type: 'reset' };
-  yield { type: 'done', answer: fallback, sources, toolCalls: toolLog };
+  yield { type: 'done', answer: lastText.trim() || LOOKUP_LIMIT_FALLBACK, sources, toolCalls: toolLog };
 }
 
 /* Streaming twin of complete() — plain, tool-less token stream (read strategy). */
 async function* completeStream({ systemInstruction, contents, opts = {} }) {
-  const apiKey = opts.apiKey || process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
-  const model = opts.model || DEFAULT_MODEL;
-  const ai = new GoogleGenAI({ apiKey });
-  const geminiContents = (contents || []).map((c) => ({
-    role: c.role === 'model' ? 'model' : 'user',
-    parts: [{ text: String(c.text || '') }],
-  }));
+  const { ai, model, contents: geminiContents, config } =
+    initComplete({ systemInstruction, contents, opts });
   const stream = await ai.models.generateContentStream({
-    model, contents: geminiContents,
-    config: { systemInstruction, temperature: 0.2, maxOutputTokens: 2048 },
+    model, contents: geminiContents, config,
   });
   for await (const chunk of stream) {
     const cand = chunk && chunk.candidates && chunk.candidates[0];
@@ -325,20 +302,10 @@ async function* completeStream({ systemInstruction, contents, opts = {} }) {
 
 /* Plain completion (no tools) — used by the retrieve-then-read strategy. */
 async function complete({ systemInstruction, contents, opts = {} }) {
-  const apiKey = opts.apiKey || process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
-  const model = opts.model || DEFAULT_MODEL;
-  const ai = new GoogleGenAI({ apiKey });
-
-  const geminiContents = (contents || []).map((c) => ({
-    role: c.role === 'model' ? 'model' : 'user',
-    parts: [{ text: String(c.text || '') }],
-  }));
-
+  const { ai, model, contents: geminiContents, config } =
+    initComplete({ systemInstruction, contents, opts });
   const resp = await ai.models.generateContent({
-    model,
-    contents: geminiContents,
-    config: { systemInstruction, temperature: 0.2, maxOutputTokens: 2048 },
+    model, contents: geminiContents, config,
   });
 
   const cand = resp && resp.candidates && resp.candidates[0];

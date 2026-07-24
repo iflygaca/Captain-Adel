@@ -62,6 +62,19 @@ function makeSource(citation, url, text, version) {
   };
 }
 
+/* Append a makeSource() result to `sources` unless the (citation, anchor) pair
+ * is already present. Chunk anchors like #91.155-2 dedupe to their section
+ * (#91.155), so two chunks of one section yield one source. */
+function pushSource(sources, seen, citation, url, text, version) {
+  if (!citation && !url) return;
+  let anchor = String(url || '');
+  if (anchor.includes('#')) anchor = anchor.replace(/-\d+$/, '');
+  const key = (citation ? citation.trim().toLowerCase() : '') + '|' + anchor;
+  if (seen.has(key)) return;
+  seen.add(key);
+  sources.push(makeSource(citation, url, text, version));
+}
+
 /* ----------------------------------------------------------------------------
  * Citation + claim extraction (self-contained; mirrors the well-tested regexes
  * in evals/checks/citation-faithfulness.js, kept here so brain has no eval dep).
@@ -330,6 +343,7 @@ async function decorate(raw, opts = {}) {
 
 module.exports = {
   makeSource,
+  pushSource,
   classifyRefusal,
   stripMetaTrailer,
   splitClaims,

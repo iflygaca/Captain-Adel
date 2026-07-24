@@ -33,11 +33,7 @@ function makeOpenAICompatibleProvider({ name, baseUrlEnv, modelEnv, apiKeyEnv, d
     return !!baseUrl();
   }
 
-  async function complete({ systemInstruction, contents, opts = {} }) {
-    const base = baseUrl();
-    if (!base) throw new Error(`${baseUrlEnv} is not configured`);
-    const model = opts.model || DEFAULT_MODEL;
-
+  function buildMessages(systemInstruction, contents) {
     const messages = [{ role: 'system', content: systemInstruction }];
     for (const c of contents || []) {
       messages.push({
@@ -45,28 +41,42 @@ function makeOpenAICompatibleProvider({ name, baseUrlEnv, modelEnv, apiKeyEnv, d
         content: String(c.text || ''),
       });
     }
+    return messages;
+  }
 
+  function buildHeaders() {
     const headers = { 'Content-Type': 'application/json' };
     const apiKey = apiKeyEnv && process.env[apiKeyEnv];
-    if (apiKey) {
-      headers.Authorization = `Bearer ${apiKey}`;
-    }
+    if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
+    return headers;
+  }
 
+  function requestBody(model, messages, opts, stream) {
+    return JSON.stringify({
+      model,
+      messages,
+      temperature: 0.2,
+      max_tokens: opts.maxTokens || 1024,
+      stream,
+    });
+  }
+
+  async function complete({ systemInstruction, contents, opts = {} }) {
+    const base = baseUrl();
+    if (!base) throw new Error(`${baseUrlEnv} is not configured`);
+    const model = opts.model || DEFAULT_MODEL;
+
+    // Note the timeout asymmetry with completeStream(): here the timer is
+    // cleared once headers arrive; the stream keeps it armed for the body too.
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), opts.timeoutMs || 60000);
     let resp;
     try {
       resp = await fetch(`${base}/chat/completions`, {
         method: 'POST',
-        headers,
+        headers: buildHeaders(),
         signal: ctrl.signal,
-        body: JSON.stringify({
-          model,
-          messages,
-          temperature: 0.2,
-          max_tokens: opts.maxTokens || 1024,
-          stream: false,
-        }),
+        body: requestBody(model, buildMessages(systemInstruction, contents), opts, false),
       });
     } finally {
       clearTimeout(timer);
@@ -91,29 +101,14 @@ function makeOpenAICompatibleProvider({ name, baseUrlEnv, modelEnv, apiKeyEnv, d
     if (!base) throw new Error(`${baseUrlEnv} is not configured`);
     const model = opts.model || DEFAULT_MODEL;
 
-    const messages = [{ role: 'system', content: systemInstruction }];
-    for (const c of contents || []) {
-      messages.push({
-        role: c.role === 'model' ? 'assistant' : 'user',
-        content: String(c.text || ''),
-      });
-    }
-
-    const headers = { 'Content-Type': 'application/json' };
-    const apiKey = apiKeyEnv && process.env[apiKeyEnv];
-    if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
-
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), opts.timeoutMs || 60000);
     try {
       const resp = await fetch(`${base}/chat/completions`, {
         method: 'POST',
-        headers,
+        headers: buildHeaders(),
         signal: ctrl.signal,
-        body: JSON.stringify({
-          model, messages, temperature: 0.2,
-          max_tokens: opts.maxTokens || 1024, stream: true,
-        }),
+        body: requestBody(model, buildMessages(systemInstruction, contents), opts, true),
       });
       if (!resp.ok || !resp.body) {
         const body = resp.ok ? '' : await resp.text().catch(() => '');

@@ -39,6 +39,42 @@ test('makeSource: caps verbatim at 600 chars', () => {
   assert.equal(s.verbatim.length, 600);
 });
 
+/* ---------------------------------------------------------------- pushSource */
+
+test('pushSource: dedupes on (citation, anchor) — chunk suffixes collapse', () => {
+  const sources = [];
+  const seen = new Set();
+  G.pushSource(sources, seen, 'GACAR Part 91, §91.155', 'library.html#91.155-1', 'a', 'v1');
+  G.pushSource(sources, seen, 'GACAR Part 91, §91.155', 'library.html#91.155-2', 'b', 'v1');
+  assert.equal(sources.length, 1, 'two chunks of one section yield one source');
+  assert.equal(sources[0].verbatim, 'a', 'first hit wins');
+});
+
+test('pushSource: citation case/whitespace does not defeat the dedupe key', () => {
+  const sources = [];
+  const seen = new Set();
+  G.pushSource(sources, seen, 'GACAR Part 61, §61.57', 'u#61.57', 'a', 'v1');
+  G.pushSource(sources, seen, '  gacar part 61, §61.57 ', 'u#61.57', 'b', 'v1');
+  assert.equal(sources.length, 1);
+});
+
+test('pushSource: distinct sections both land', () => {
+  const sources = [];
+  const seen = new Set();
+  G.pushSource(sources, seen, 'GACAR Part 91, §91.155', 'u#91.155', 'a', 'v1');
+  G.pushSource(sources, seen, 'GACAR Part 91, §91.157', 'u#91.157', 'b', 'v1');
+  assert.equal(sources.length, 2);
+});
+
+test('pushSource: no-op when both citation and url are falsy', () => {
+  const sources = [];
+  const seen = new Set();
+  G.pushSource(sources, seen, '', '', 'text', 'v1');
+  G.pushSource(sources, seen, null, undefined, 'text', 'v1');
+  assert.equal(sources.length, 0);
+  assert.equal(seen.size, 0);
+});
+
 test('makeSource: falls back to url for citation and tolerates no match', () => {
   const s = G.makeSource('', 'https://example.test/doc', null, null);
   assert.equal(s.citation, 'https://example.test/doc');
