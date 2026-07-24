@@ -273,3 +273,110 @@ test('decorate: missing/!array sources is tolerated', async () => {
   assert.deepEqual(out.sources, []);
   assert.equal(out.kind, 'na');
 });
+
+test('decorate: a markdown-wrapped trailer still parses and strips clean', async () => {
+  const src = [G.makeSource('GACAR Part 91, §91.155(a)', 'library.html#91.155', 'three statute miles …')];
+  const out = await G.decorate(
+    { answer: '3 SM visibility (§91.155(a)).\n`<<adel kind=grounded>>`', sources: src }, {});
+  assert.equal(out.kind, 'grounded');
+  assert.doesNotMatch(out.answer, /adel kind|`$/);
+});
+
+test('decorate: grounding weighs every source, but the UI set is capped in retrieval order', async () => {
+  const manySrc = ['91.155', '91.157', '91.159', '91.161', '91.163'].map((sec) =>
+    G.makeSource(`GACAR Part 91, §${sec}`, `library.html#${sec}`, 'passage for ' + sec));
+  const out = await G.decorate(
+    { answer: 'VFR minima vary by airspace and altitude (§91.155).', sources: manySrc }, {});
+  assert.equal(out.sources.length, 3, 'capped at the default ADEL_MAX_SOURCES');
+  assert.equal(out.sources[0].section, '91.155', 'cap keeps retrieval order');
+  assert.equal(out.kind, 'grounded', 'the cap does not blunt grounding');
+});
+
+/* ---------------------------------------- decorate (faithfulness judge path) */
+
+/* The judge module is required lazily inside grounding.js, so swapping the
+ * require-cache exports (assign-and-restore) injects a deterministic judge —
+ * no network, no API key. */
+const faithfulnessMod = require('../evals/checks/citation-faithfulness');
+const FAITHFULNESS_PATH = require.resolve('../evals/checks/citation-faithfulness');
+
+async function withJudge(scoreAnswer, fn) {
+  const savedExports = require.cache[FAITHFULNESS_PATH].exports;
+  require.cache[FAITHFULNESS_PATH].exports = Object.assign({}, faithfulnessMod, { scoreAnswer });
+  try { return await fn(); } finally {
+    require.cache[FAITHFULNESS_PATH].exports = savedExports;
+  }
+}
+
+const GROUNDED_RAW = {
+  answer: 'Below 10,000 ft, VFR requires 3 SM visibility (§91.155(a)).',
+  sources: [G.makeSource('GACAR Part 91, §91.155(a)', 'library.html#91.155', 'three statute miles …')],
+};
+
+test('decorate: faithfulness all-yes keeps grounded and surfaces the judge output', async () => {
+  await withJudge(async () => ({
+    score: 1,
+    claims: [{ claim: 'VFR requires 3 SM below 10,000 ft', verdict: 'yes', extra: 'dropped' }],
+    evidence: { resolved: [{ part: '91', section: '91.155(a)' }], unresolved: [] },
+  }), async () => {
+    const out = await G.decorate(GROUNDED_RAW, { grounding: 'faithfulness', apiKey: 'k' });
+    assert.equal(out.kind, 'grounded');
+    assert.equal(out.grounding.mode, 'faithfulness');
+    assert.equal(out.grounding.score, 1);
+    assert.deepEqual(out.grounding.claims,
+      [{ claim: 'VFR requires 3 SM below 10,000 ft', verdict: 'yes' }]);
+  });
+});
+
+test('decorate: any non-yes judge verdict downgrades to partial (anti-overclaim)', async () => {
+  await withJudge(async () => ({
+    score: 0.5,
+    claims: [
+      { claim: 'supported claim', verdict: 'yes' },
+      { claim: 'shaky claim', verdict: 'partial' },
+    ],
+    evidence: { resolved: [], unresolved: [] },
+  }), async () => {
+    // Structural alone would say grounded; the judge's partial must win.
+    const out = await G.decorate(GROUNDED_RAW, { grounding: 'faithfulness', apiKey: 'k' });
+    assert.equal(out.kind, 'partial');
+    assert.equal(out.grounding.mode, 'faithfulness');
+  });
+});
+
+test('decorate: a failing judge leaves the structural verdict standing', async () => {
+  await withJudge(async () => { throw new Error('no key / rate limited'); }, async () => {
+    const out = await G.decorate(GROUNDED_RAW, { grounding: 'faithfulness', apiKey: 'k' });
+    assert.equal(out.kind, 'grounded');
+    assert.equal(out.grounding.mode, 'structural', 'judge failure never blocks the answer');
+  });
+});
+
+test('decorate: a null judge score (no claims to judge) stays structural', async () => {
+  await withJudge(async () => ({ score: null, claims: [], evidence: { resolved: [], unresolved: [] } }),
+    async () => {
+      const out = await G.decorate(GROUNDED_RAW, { grounding: 'faithfulness', apiKey: 'k' });
+      assert.equal(out.grounding.mode, 'structural');
+      assert.equal(out.grounding.score, null);
+    });
+});
+
+test('decorate: ADEL_GROUNDING=faithfulness enables the judge; explicit structural opts win', async () => {
+  let judged = 0;
+  await withJudge(async () => {
+    judged++;
+    return { score: 1, claims: [{ claim: 'c', verdict: 'yes' }], evidence: { resolved: [], unresolved: [] } };
+  }, async () => {
+    const prev = process.env.ADEL_GROUNDING;
+    process.env.ADEL_GROUNDING = 'faithfulness';
+    try {
+      await G.decorate(GROUNDED_RAW, {});                              // env turns it on
+      assert.equal(judged, 1);
+      await G.decorate(GROUNDED_RAW, { grounding: 'structural' });     // explicit opt-out wins
+      assert.equal(judged, 1, 'an explicit structural request bypasses the judge');
+    } finally {
+      if (prev === undefined) delete process.env.ADEL_GROUNDING;
+      else process.env.ADEL_GROUNDING = prev;
+    }
+  });
+});

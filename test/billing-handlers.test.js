@@ -153,7 +153,190 @@ test('config: reports the dark state when no Stripe/Firebase is configured', asy
   });
 });
 
+/* ---- Stripe-interaction paths (SDK swapped in the require cache) ----------*/
+
+/* routes.js resolves `require('stripe')` lazily on every call, so swapping the
+ * cached exports (assign-and-restore) injects a fake SDK factory — no network.
+ * Webhook tests keep the REAL signature verification by lending the fake the
+ * real Stripe instance's `webhooks`. */
+const STRIPE_PATH = require.resolve('stripe');
+async function withStripeSdk(factory, fn) {
+  const saved = require.cache[STRIPE_PATH].exports;
+  require.cache[STRIPE_PATH].exports = factory;
+  try { return await fn(); } finally { require.cache[STRIPE_PATH].exports = saved; }
+}
+
+const LIVE_CONFIG = {
+  stripeSecretKey: 'sk_test_dummy', stripeWebhookSecret: 'whsec_test_dummy',
+  stripePriceMonthly: 'price_m', stripePriceAnnual: 'price_a',
+  siteUrl: 'https://captadel.test',
+};
+
+test('checkout: a live monthly checkout stamps the uid and returns the session url', async () => {
+  let captured; let capturedKey;
+  const sdk = (key) => {
+    capturedKey = key;
+    return { checkout: { sessions: { create: async (p) => { captured = p; return { url: 'https://checkout.stripe.test/s1' }; } } } };
+  };
+  await withOverrides({ config: LIVE_CONFIG, available: true }, () =>
+    withStripeSdk(sdk, async () => {
+      const res = fakeRes();
+      await routes.checkoutHandler({ user: { uid: 'u1', email: 'a@x.com' }, body: { plan: 'monthly' } }, res);
+      assert.equal(res.statusCode, 200);
+      assert.equal(res.body.url, 'https://checkout.stripe.test/s1');
+      assert.equal(capturedKey, 'sk_test_dummy');
+      assert.equal(captured.line_items[0].price, 'price_m');
+      assert.equal(captured.client_reference_id, 'u1');
+      assert.equal(captured.customer_email, 'a@x.com');
+      // The uid rides BOTH the session and the subscription so renewal/cancel
+      // webhooks can map back to the Firebase user.
+      assert.equal(captured.metadata.firebaseUID, 'u1');
+      assert.equal(captured.subscription_data.metadata.firebaseUID, 'u1');
+      assert.ok(captured.success_url.startsWith('https://captadel.test/'));
+    }));
+});
+
+test('checkout: an unknown plan defaults to annual', async () => {
+  let captured;
+  const sdk = () => ({ checkout: { sessions: { create: async (p) => { captured = p; return { url: 'u' }; } } } });
+  await withOverrides({ config: LIVE_CONFIG, available: true }, () =>
+    withStripeSdk(sdk, async () => {
+      await routes.checkoutHandler({ user: { uid: 'u1' }, body: { plan: 'weekly' } }, fakeRes());
+      assert.equal(captured.line_items[0].price, 'price_a');
+    }));
+});
+
+test('checkout: a Stripe error surfaces as 502 checkout_failed', async () => {
+  const sdk = () => ({ checkout: { sessions: { create: async () => { throw new Error('stripe down'); } } } });
+  await withOverrides({ config: LIVE_CONFIG, available: true }, () =>
+    withStripeSdk(sdk, async () => {
+      const res = fakeRes();
+      await routes.checkoutHandler({ user: { uid: 'u1' }, body: {} }, res);
+      assert.equal(res.statusCode, 502);
+      assert.equal(res.body.error, 'checkout_failed');
+    }));
+});
+
+test('portal: a subscribed user gets a portal session for their Stripe customer', async () => {
+  let captured;
+  const sdk = () => ({ billingPortal: { sessions: { create: async (p) => { captured = p; return { url: 'https://portal.stripe.test/p1' }; } } } });
+  await withOverrides({
+    config: LIVE_CONFIG, available: true, db: dbWithUser({ stripeCustomerId: 'cus_1' }),
+  }, () => withStripeSdk(sdk, async () => {
+    const res = fakeRes();
+    await routes.portalHandler({ user: { uid: 'u1' } }, res);
+    assert.equal(res.body.url, 'https://portal.stripe.test/p1');
+    assert.equal(captured.customer, 'cus_1');
+    assert.equal(captured.return_url, 'https://captadel.test/account.html');
+  }));
+});
+
+test('portal: a Stripe error surfaces as 502 portal_failed', async () => {
+  const sdk = () => ({ billingPortal: { sessions: { create: async () => { throw new Error('stripe down'); } } } });
+  await withOverrides({
+    config: LIVE_CONFIG, available: true, db: dbWithUser({ stripeCustomerId: 'cus_1' }),
+  }, () => withStripeSdk(sdk, async () => {
+    const res = fakeRes();
+    await routes.portalHandler({ user: { uid: 'u1' } }, res);
+    assert.equal(res.statusCode, 502);
+    assert.equal(res.body.error, 'portal_failed');
+  }));
+});
+
 /* ---- webhook --------------------------------------------------------------*/
+
+/* A signed webhook request for the given event payload (real test-mode crypto). */
+function signedWebhookReq(payload) {
+  const body = JSON.stringify(payload);
+  const header = new Stripe('sk_test_dummy').webhooks.generateTestHeaderString({
+    payload: body, secret: 'whsec_test_dummy',
+  });
+  return { headers: { 'stripe-signature': header }, body: Buffer.from(body) };
+}
+
+test('webhook: checkout.session.completed retrieves the subscription and grants Pro', async () => {
+  let retrievedId; let applied;
+  const realWebhooks = new Stripe('sk_test_dummy').webhooks;
+  const sdk = () => ({
+    webhooks: realWebhooks,
+    subscriptions: {
+      retrieve: async (id) => {
+        retrievedId = id;
+        return {
+          start_date: 1700000000, current_period_end: 1900000000,
+          items: { data: [{ price: { recurring: { interval: 'month' } } }] },
+        };
+      },
+    },
+  });
+  let invalidatedUid;
+  await withOverrides({
+    config: LIVE_CONFIG,
+    applyEntitlement: async (uid, mutate, extra) => { applied = { uid, mutate, extra }; },
+    invalidate: (uid) => { invalidatedUid = uid; },
+  }, () => withStripeSdk(sdk, async () => {
+    const res = fakeRes();
+    await routes.webhookHandler(signedWebhookReq({
+      id: 'evt_co', object: 'event', type: 'checkout.session.completed',
+      data: { object: { metadata: { firebaseUID: 'uid-1' }, subscription: 'sub_1', customer: 'cus_9' } },
+    }), res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.body.received, true);
+    assert.equal(retrievedId, 'sub_1');
+    assert.equal(applied.uid, 'uid-1');
+    assert.equal(applied.mutate({}).source, 'monthly', 'the interval maps to the entitlement source');
+    assert.deepEqual(applied.extra, { stripeCustomerId: 'cus_9' }, 'the customer id is remembered for the portal');
+    assert.equal(invalidatedUid, 'uid-1', 'the buyer sees Pro immediately, not after the cache TTL');
+  }));
+});
+
+test('webhook: subscription.updated grants on active and revokes on unpaid', async () => {
+  const sdk = () => ({ webhooks: new Stripe('sk_test_dummy').webhooks });
+  const run = async (status) => {
+    const calls = [];
+    await withOverrides({
+      config: LIVE_CONFIG,
+      applyEntitlement: async (uid, mutate) => calls.push({ uid, next: mutate({}) }),
+      invalidate: () => {},
+    }, () => withStripeSdk(sdk, async () => {
+      const res = fakeRes();
+      await routes.webhookHandler(signedWebhookReq({
+        id: 'evt_up', object: 'event', type: 'customer.subscription.updated',
+        data: {
+          object: {
+            metadata: { firebaseUID: 'uid-2' }, status,
+            items: { data: [{ price: { recurring: { interval: 'year' } } }] },
+          },
+        },
+      }), res);
+      assert.equal(res.statusCode, 200);
+    }));
+    return calls;
+  };
+
+  const granted = await run('active');
+  assert.equal(granted[0].next.plan, 'pro');
+  const revoked = await run('unpaid');
+  assert.equal(revoked[0].next.plan, 'free');
+  const ignored = await run('incomplete');   // statusAction 'none'
+  assert.deepEqual(ignored, [], 'in-between statuses drive no entitlement change');
+});
+
+test('webhook: a handler failure returns 500 so Stripe retries the event', async () => {
+  const sdk = () => ({ webhooks: new Stripe('sk_test_dummy').webhooks });
+  await withOverrides({
+    config: LIVE_CONFIG,
+    applyEntitlement: async () => { throw new Error('firestore unavailable'); },
+  }, () => withStripeSdk(sdk, async () => {
+    const res = fakeRes();
+    await routes.webhookHandler(signedWebhookReq({
+      id: 'evt_x', object: 'event', type: 'customer.subscription.deleted',
+      data: { object: { metadata: { firebaseUID: 'uid-3' }, status: 'canceled' } },
+    }), res);
+    assert.equal(res.statusCode, 500);
+    assert.equal(res.sent, 'handler error');
+  }));
+});
 
 test('webhook: 503 when the Stripe secrets are not configured', async () => {
   await withOverrides({ config: { stripeSecretKey: '', stripeWebhookSecret: '' } }, async () => {

@@ -104,6 +104,69 @@ test('answerAgentic: missing API key throws (the seam still requires a key)', as
   }
 });
 
+/* ---- tool dispatch (via the agentic loop) ---------------------------------*/
+
+test('answerAgentic: a lookup_citation round resolves the exact section into sources', async () => {
+  const ai = fakeAi([
+    [{ functionCall: { name: 'lookup_citation', args: { part: '61', section: '61.57' } } }],
+    [{ text: 'Recent experience is governed by §61.57.' }],
+  ]);
+  const out = await gemini.answerAgentic('am I current?', [], { apiKey: 'k', _ai: ai });
+  assert.equal(out.sources.length, 1);
+  assert.equal(out.sources[0].citation, 'GACAR Part 61, §61.57');
+  assert.ok(out.sources[0].url, 'the source carries the corpus deep link');
+});
+
+test('answerAgentic: a failed lookup_citation pushes no source and the loop continues', async () => {
+  const ai = fakeAi([
+    [{ functionCall: { name: 'lookup_citation', args: { part: '91', section: '91.99999' } } }],
+    [{ text: 'I could not find that exact section, Captain.' }],
+  ]);
+  const out = await gemini.answerAgentic('what does §91.99999 say?', [], { apiKey: 'k', _ai: ai });
+  assert.deepEqual(out.sources, []);
+  assert.match(out.answer, /could not find/);
+});
+
+test('answerAgentic: a list_changes round surfaces change-history sources', async () => {
+  const ai = fakeAi([
+    [{ functionCall: { name: 'list_changes', args: { part: '1' } } }],
+    [{ text: 'Part 1 was last amended as listed above.' }],
+  ]);
+  const out = await gemini.answerAgentic('what changed in Part 1?', [], { apiKey: 'k', _ai: ai });
+  assert.ok(out.sources.length >= 1, 'change entries are pushed as sources');
+});
+
+test('answerAgentic: a compute-tool round is logged so the UI can render the worked steps', async () => {
+  const ai = fakeAi([
+    [{ functionCall: { name: 'compute_wind', args: { course_deg: 360, wind_dir_deg: 330, wind_speed_kt: 20 } } }],
+    [{ text: 'Crosswind is 10 kt from the left — inside limits.' }],
+  ]);
+  const out = await gemini.answerAgentic('crosswind for rwy 36?', [], { apiKey: 'k', _ai: ai });
+  assert.equal(out.toolCalls.length, 1);
+  assert.equal(out.toolCalls[0].name, 'compute_wind');
+  assert.ok(Array.isArray(out.toolCalls[0].result.steps), 'the worked steps ride along');
+  assert.deepEqual(out.sources, [], 'compute tools never fabricate citations');
+});
+
+test('answerAgentic: a compute-tool error is returned to the model, not logged as a worked call', async () => {
+  const ai = fakeAi([
+    [{ functionCall: { name: 'compute_wind', args: {} } }],   // missing required numbers
+    [{ text: 'Give me the runway heading and wind, Captain.' }],
+  ]);
+  const out = await gemini.answerAgentic('crosswind?', [], { apiKey: 'k', _ai: ai });
+  assert.deepEqual(out.toolCalls, [], 'errored calls are kept out of meta.toolCalls');
+});
+
+test('answerAgentic: an unknown tool name gets an error response and the loop recovers', async () => {
+  const ai = fakeAi([
+    [{ functionCall: { name: 'summon_dragon', args: {} } }],
+    [{ text: 'Negative on that one — back to the regulations.' }],
+  ]);
+  const out = await gemini.answerAgentic('q', [], { apiKey: 'k', _ai: ai });
+  assert.match(out.answer, /back to the regulations/);
+  assert.deepEqual(out.sources, []);
+});
+
 /* ---- answerAgenticStream --------------------------------------------------*/
 
 test('answerAgenticStream: empty message yields a single done event with the canned reply', async () => {

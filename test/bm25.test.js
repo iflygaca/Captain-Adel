@@ -64,3 +64,58 @@ test('searchLibrary: results are de-duplicated by section', () => {
   const keys = hits.map((h) => h.citation + '|' + (h.section_title || ''));
   assert.equal(new Set(keys).size, keys.length, 'no duplicate sections in the result set');
 });
+
+/* ---- lookupCitation (the exact Part+section fast path) --------------------*/
+
+test('lookupCitation: resolves a tagged section with the full concatenated text', () => {
+  const hit = bm25.lookupCitation('61', '61.57');
+  assert.equal(hit.found, true);
+  assert.equal(hit.citation, 'GACAR Part 61, §61.57');
+  assert.ok(hit.text.length > 0, 'carries the section text');
+  assert.ok(hit.page_url, 'carries a deep link');
+});
+
+test('lookupCitation: tolerates "§" prefixes, whitespace and a subsection suffix', () => {
+  const plain = bm25.lookupCitation('61', '61.57');
+  for (const variant of ['§61.57', ' 61.57 ', '61.57(b)']) {
+    const hit = bm25.lookupCitation('61', variant);
+    assert.equal(hit.found, true, `variant ${JSON.stringify(variant)} resolves`);
+    assert.equal(hit.citation, plain.citation);
+  }
+});
+
+test('lookupCitation: an unknown section returns found:false with an empty payload', () => {
+  const miss = bm25.lookupCitation('91', '91.99999');
+  assert.equal(miss.found, false);
+  assert.equal(miss.text, '');
+  assert.equal(miss.page_url, '');
+  assert.equal(miss.citation, 'GACAR Part 91, §91.99999', 'echoes the requested citation');
+});
+
+test('lookupCitation: the Part must match — a section number alone is not enough', () => {
+  assert.equal(bm25.lookupCitation('61', '61.57').found, true);
+  assert.equal(bm25.lookupCitation('999', '61.57').found, false);
+});
+
+/* ---- listChanges (Change_History entries for a Part) ----------------------*/
+
+test('listChanges: returns well-shaped change-history entries for a Part', () => {
+  const entries = bm25.listChanges('1');
+  assert.ok(entries.length >= 1, 'the corpus carries change history for Part 1');
+  for (const e of entries) {
+    assert.ok('version' in e && 'effective_date' in e && 'summary' in e && 'page_url' in e);
+    assert.ok(e.summary.length > 0);
+  }
+});
+
+test('listChanges: sinceVersion filters out entries at or below that version', () => {
+  const all = bm25.listChanges('1');
+  assert.ok(all.length >= 1);
+  const top = all.map((e) => e.version).filter(Boolean).sort().pop();
+  const after = bm25.listChanges('1', top);
+  assert.ok(after.length < all.length, 'entries <= sinceVersion are dropped');
+});
+
+test('listChanges: a Part without change history returns []', () => {
+  assert.deepEqual(bm25.listChanges('99999'), []);
+});
