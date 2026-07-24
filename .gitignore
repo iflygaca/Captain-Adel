@@ -9,5 +9,9 @@ evals/.cache/
 # Keep the example env tracked (the repo-root .gitignore excludes .env.*)
 !.env.example
 
+# Python bytecode (authoring/ reference scripts)
+__pycache__/
+*.pyc
+
 # macOS
 .DS_Store
