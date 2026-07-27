@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "description": "Captain Adel — independent AI flight instructor for Saudi civil aviation. Standalone RAG service and the brain Fly GACA plugs into.",
+  "author": "BDA Company International (شركة بدع الدولية)",
+  "license": "UNLICENSED",
   "main": "src/server.js",
   "engines": {
     "node": "20"

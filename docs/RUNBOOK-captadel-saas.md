@@ -93,6 +93,30 @@ flygaca.com chat still reaches the same brain.
 
 ## 3. Stripe
 
+**Merchant of record.** The Stripe account must be registered to the operating
+entity: **BDA Company International (شركة بدع الدولية)** — Saudi LLC,
+CR 7030976893, VAT 311415259500003, Riyadh 12965. Prices shown on captadel.com
+are SAR and VAT-inclusive; the public legal pages are `/terms` and `/privacy`
+(served from `public/`), and the site footer discloses the entity + CR + VAT.
+
+**Tax/compliance checklist (dashboard first, then code):** once the Stripe
+account carries the entity's KSA registration, in the Dashboard —
+
+1. Settings → Tax: register the KSA VAT number (311415259500003) and enable
+   **Stripe Tax** for SAR.
+2. Settings → Branding/Public details: legal name + support email
+   `hello@captadel.com`; set the Terms of Service URL to
+   `https://captadel.com/terms` and Privacy to `https://captadel.com/privacy`.
+3. Only **after** both are configured, extend the Checkout session in
+   `src/billing/routes.js` with `automatic_tax: { enabled: true }`,
+   `tax_id_collection: { enabled: true }`, and
+   `consent_collection: { terms_of_service: 'required' }` — enabling these
+   before the dashboard config exists makes session creation fail.
+4. ZATCA e-invoicing (Fatoora) mapping of Stripe receipts is tracked in the
+   internal Offfice repo (`03-finance/invoicing-and-vat-returns`).
+
+Then the product setup:
+
 1. Create a product **"Captain Adel Pro"** with two recurring prices:
    - **Annual** — SAR 299/yr (founding). (Regular SAR 349/yr — raise when ready.)
    - **Monthly** — SAR 35/mo.
