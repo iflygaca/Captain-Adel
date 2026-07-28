@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الدفع — كابتن عادل</title>
+  <meta name="description" content="إتمام الاشتراك في كابتن عادل برو — الدفع الآمن عبر ميسر (مدى، Apple Pay، STC Pay). · Captain Adel Pro checkout via Moyasar.">
+  <meta name="theme-color" content="#0A0E12">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/img/captain/avatar.png" type="image/png">
+  <link rel="canonical" href="https://captadel.com/checkout">
+
+  <link rel="stylesheet" href="assets/css/adel.css">
+  <script src="assets/js/footer.js" defer></script>
+  <script src="assets/js/i18n.js" defer></script>
+</head>
+<body>
+  <div class="disclaimer-strip">
+    <div class="container">
+      <span data-i18n-html
+        data-en='<strong>Independent educational reference.</strong> Not affiliated with GACA — always verify against the official source, <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.'>
+        <strong>مرجع تعليمي مستقل.</strong> غير تابع للهيئة العامة للطيران المدني —
+        تحقّق دائماً من المصدر الرسمي،
+        <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.</span>
+    </div>
+  </div>
+
+  <header class="site-nav">
+    <div class="container nav-inner">
+      <a class="lockup" href="/" aria-label="كابتن عادل — الرئيسية">
+        <img src="assets/img/captain/avatar.png" alt="" width="40" height="40">
+        <span>
+          <span class="wordmark" data-i18n-html
+            data-en='<span class="wm-capt">Captain</span> <span class="wm-adel">Adel</span>'><span class="wm-capt">كابتن</span> <span class="wm-adel">عادل</span></span>
+          <span class="lockup-sub" data-en="Saudi civil aviation">الطيران المدني السعودي</span>
+        </span>
+      </a>
+      <div class="nav-actions">
+        <button type="button" class="lang-toggle" lang="en">EN</button>
+        <a class="btn btn-ghost" href="account.html" data-en="Account">حسابي</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="container">
+      <section class="checkout-shell">
+        <h1 data-en="Complete your subscription">أكمل اشتراكك</h1>
+        <p class="checkout-summary" id="checkout-summary" hidden></p>
+
+        <p class="checkout-status" id="checkout-status" data-en="Preparing secure checkout…">جارٍ تجهيز الدفع الآمن…</p>
+
+        <div id="moyasar-checkout-form" class="checkout-form"></div>
+
+        <p class="checkout-note" data-i18n-html
+          data-en='Payments are processed securely by <strong>Moyasar</strong> — your card details never touch our servers. Prices are in Saudi riyals and include VAT. The seller of record is BDA Company International (شركة بدع الدولية).'>
+          تُعالَج المدفوعات بأمان عبر <strong>ميسر</strong> — ولا تصل بيانات بطاقتك إلى
+          خوادمنا أبداً. الأسعار بالريال السعودي وتشمل ضريبة القيمة المضافة. والبائع
+          المسجّل هو شركة بدع الدولية (BDA Company International).</p>
+      </section>
+    </div>
+  </main>
+
+  <div id="site-footer" data-compact></div>
+
+  <script type="module" src="assets/js/checkout.js"></script>
+</body>
+</html>

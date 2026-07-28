@@ -1,14 +1,15 @@
 /* ============================================================================
  * Captain Adel — Pro checkout (ES module).
  *
- * startProCheckout(plan) takes a signed-in pilot to Stripe Checkout:
- *   - signed out  → account.html?next=<here>#pricing so they sign in first.
- *   - signed in   → POST /v1/billing/checkout with their ID token, then redirect
- *                   to the Stripe-hosted page the service returns.
+ * startProCheckout(plan) takes a pilot to the in-site Moyasar checkout page:
+ *   - accounts disabled → bilingual "free during launch" notice.
+ *   - otherwise         → checkout.html?plan=…  (that page requires sign-in,
+ *                         prices server-side and mounts the Moyasar widget —
+ *                         card data goes browser -> Moyasar, PCI SAQ-A).
  *
- * Mirrors the Fly GACA web-billing flow, minus the callable (captadel speaks
- * plain HTTP to its own service). The button calling this lives on index.html's
- * pricing section and on account.html.
+ * Moyasar has no hosted customer portal — cancelAutoRenew() is our own: it
+ * stops future charges; access runs to the paid expiry. The
+ * buttons calling these live on index.html's pricing section and account.html.
  * ==========================================================================*/
 
 import { getIdToken, isEnabled } from './auth.js';
@@ -18,7 +19,7 @@ const API = (window.ADEL_API_BASE || '');
 function ar() { return document.documentElement.lang === 'ar'; }
 function t(en, arr) { return ar() ? arr : en; }
 
-export async function startProCheckout(plan) {
+export function startProCheckout(plan) {
   const wanted = plan === 'monthly' ? 'monthly' : 'annual';
 
   if (!isEnabled()) {
@@ -27,47 +28,33 @@ export async function startProCheckout(plan) {
     return;
   }
 
-  const token = await getIdToken().catch(() => null);
-  if (!token) {
-    const here = location.pathname.split('/').pop() + '#pricing';
-    location.href = 'account.html?next=' + encodeURIComponent(here);
-    return;
-  }
-
-  try {
-    const res = await fetch(API + '/v1/billing/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-      body: JSON.stringify({ plan: wanted }),
-    });
-    if (res.status === 503) {
-      alert(t('Billing isn\'t open yet — Captain Adel is free during launch.',
-              'الاشتراك غير مُفعّل بعد — كابتن عادل مجاني خلال الإطلاق.'));
-      return;
-    }
-    const data = await res.json().catch(() => ({}));
-    if (res.ok && data.url) { location.href = data.url; return; }
-    throw new Error(data.error || 'checkout_failed');
-  } catch (_) {
-    alert(t('Could not start checkout. Please try again in a moment.',
-            'تعذّر بدء الدفع. حاول مرة أخرى بعد قليل.'));
-  }
+  location.href = 'checkout.html?plan=' + wanted;
 }
 
-/* Open the Stripe customer portal (manage / cancel) for a signed-in subscriber. */
-export async function openBillingPortal() {
+/* Stop auto-renewal for a signed-in subscriber. The entitlement is untouched —
+ * access continues to the end of the already-paid period. */
+export async function cancelAutoRenew() {
   const token = await getIdToken().catch(() => null);
   if (!token) return;
+
+  const sure = confirm(t(
+    'Turn off auto-renewal? Your Pro access continues until the end of the paid period.',
+    'إيقاف التجديد التلقائي؟ يستمر وصولك إلى برو حتى نهاية الفترة المدفوعة.'));
+  if (!sure) return;
+
   try {
-    const res = await fetch(API + '/v1/billing/portal', {
+    const res = await fetch(API + '/v1/billing/cancel-auto-renew', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     });
-    const data = await res.json().catch(() => ({}));
-    if (res.ok && data.url) { location.href = data.url; return; }
+    if (res.ok) {
+      alert(t('Auto-renewal is off. Your access continues until the paid period ends.',
+              'تم إيقاف التجديد التلقائي. يستمر وصولك حتى نهاية الفترة المدفوعة.'));
+      return;
+    }
   } catch (_) { /* fall through */ }
-  alert(t('Could not open the billing portal. Please try again.',
-          'تعذّر فتح بوابة الاشتراك. حاول مرة أخرى.'));
+  alert(t('Could not update the subscription. Please try again.',
+          'تعذّر تحديث الاشتراك. حاول مرة أخرى.'));
 }
 
-window.CaptadelBilling = { startProCheckout, openBillingPortal };
+window.CaptadelBilling = { startProCheckout, cancelAutoRenew };
