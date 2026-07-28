@@ -106,7 +106,7 @@ src/
     tools/             Compute-only flight tools: wind, fuel, weightbalance, recency, density
     _chunks.json.gz    Bundled GACAR corpus (BM25 index source)
   quota/               Firestore-backed free-tier usage meter (fails open)
-  billing/             Stripe + Firebase SaaS layer (dark until env set)
+  billing/             Moyasar + Firebase SaaS layer (dark until env set)
 public/                Vanilla bilingual HTML/CSS/JS site (index/chat/account/console/exam)
 test/                  Unit tests ({component}.test.js, node --test)
 evals/                 Regression harness (cases.json, run.js, parity.js, lib.js, checks/)
@@ -143,7 +143,7 @@ All config comes from env (`.env`, copy from `.env.example`) via `src/config.js`
   `RERANK_BASE_URL` / `_MODEL` / `_API_KEY`.
 - **Security/abuse:** `ADEL_API_KEY` (trusted tier), `ALLOWED_ORIGINS`,
   `ADEL_RL_IP` / `ADEL_RL_BURST` / `ADEL_RL_SESSION`, `ADEL_MAX_SOURCES`.
-- **SaaS (dark by default):** `FIREBASE_PROJECT_ID`, `STRIPE_*`, `ADEL_DAILY_FREE`,
+- **SaaS (dark by default):** `FIREBASE_PROJECT_ID`, `MOYASAR_*`, `CRON_SECRET`, `ADEL_DAILY_FREE`,
   `ADEL_DAILY_ANON`, `ADEL_FREE_PERIOD`, `ADEL_LAUNCH_MODE`, `SITE_URL`.
 
 ## Deployment & CI
@@ -171,7 +171,7 @@ All config comes from env (`.env`, copy from `.env.example`) via `src/config.js`
 - **Soft injection handling:** suspicious turns are **flagged** (a hardening note
   is appended to the system instruction), not rejected. `/v1/chat` never 401s on
   bad auth — it downgrades to anonymous.
-- **Lazy-loaded SDKs:** `firebase-admin` and `stripe` are required only when used.
+- **Lazy-loaded SDKs:** `firebase-admin` is required only when used. Moyasar has no SDK — billing calls `https://api.moyasar.com/v1` with `fetch` + Basic auth.
 - **Keep prompts in sync:** `src/brain/system-prompt.js` (deployed) mirrors
   `authoring/captain_adel_system_prompt.md` (source of truth). `bm25.js` stopwords/
   synonyms should track `authoring/rag.py`.

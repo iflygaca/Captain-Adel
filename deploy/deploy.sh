@@ -32,12 +32,14 @@ MODEL_PROVIDER="${MODEL_PROVIDER:-auto}"
 ARABIC_PROVIDER="${ARABIC_PROVIDER:-allam}"
 
 # Every secret the service can consume. Required ones are checked below; the rest
-# are wired only if present, so the deploy degrades gracefully. The STRIPE_*
+# are wired only if present, so the deploy degrades gracefully. The MOYASAR_*
 # secrets power the SaaS layer (accounts/billing); without them billing endpoints
-# return 503 and the site shows its "free during launch" state.
+# return 503 and the site shows its "free during launch" state. CRON_SECRET
+# guards the renewals route (Cloud Scheduler sends it as X-Cron-Key).
 ALL_SECRETS=(GEMINI_API_KEY ADEL_API_KEY ALLAM_BASE_URL ALLAM_API_KEY \
              EMBEDDINGS_BASE_URL EMBEDDINGS_API_KEY RERANK_BASE_URL RERANK_API_KEY \
-             STRIPE_SECRET_KEY STRIPE_WEBHOOK_SECRET STRIPE_PRICE_MONTHLY STRIPE_PRICE_ANNUAL)
+             MOYASAR_SECRET_KEY MOYASAR_WEBHOOK_SECRET MOYASAR_PUBLISHABLE_KEY \
+             MOYASAR_PRICE_MONTHLY_SAR MOYASAR_PRICE_ANNUAL_SAR CRON_SECRET)
 REQUIRED_SECRETS=(GEMINI_API_KEY)
 
 say()  { printf '\033[1;36m▸ %s\033[0m\n' "$*"; }
@@ -99,7 +101,7 @@ ENV_ARGS="MODEL_PROVIDER=${MODEL_PROVIDER},ARABIC_PROVIDER=${ARABIC_PROVIDER}"
 
 # SaaS layer (non-secret) env. Ship dark with ADEL_LAUNCH_MODE=free; flip to
 # metered by unsetting it and setting the daily allowances. SITE_URL must be the
-# public origin so Stripe redirects land back on captadel.com.
+# public origin so the Moyasar checkout return lands back on captadel.com.
 [ -n "${ADEL_LAUNCH_MODE:-}" ] && ENV_ARGS+=",ADEL_LAUNCH_MODE=${ADEL_LAUNCH_MODE}"
 [ -n "${ADEL_DAILY_FREE:-}" ]  && ENV_ARGS+=",ADEL_DAILY_FREE=${ADEL_DAILY_FREE}"
 [ -n "${ADEL_DAILY_ANON:-}" ]  && ENV_ARGS+=",ADEL_DAILY_ANON=${ADEL_DAILY_ANON}"
