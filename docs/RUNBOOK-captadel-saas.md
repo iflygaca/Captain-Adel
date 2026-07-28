@@ -138,10 +138,19 @@ printf '%s' "whsec_…" | gcloud secrets create MOYASAR_WEBHOOK_SECRET --data-fi
 ### 3c. Apple Pay
 
 Dashboard → Apple Pay → add the domain, download the Merchant Domain Association
-file, and serve it byte-for-byte at
+file, and drop it byte-for-byte at
 `public/.well-known/apple-developer-merchantid-domain-association` (no
-extension), then **Validate** → **Register**. Requires an Apple Developer
-account + Merchant ID. STC Pay needs no extra integration.
+extension — see `public/.well-known/README.md`). The server already serves that
+dotfile directory as `text/plain` (`src/server.js`); after deploy, verify before
+you **Validate** → **Register**:
+
+```bash
+curl -i https://captadel.com/.well-known/apple-developer-merchantid-domain-association
+# → 200, Content-Type: text/plain, body == the downloaded file
+```
+
+Requires an Apple Developer account + Merchant ID. The file is a public domain
+token, not a secret. STC Pay needs no extra integration.
 
 ### 3d. Renewals (Cloud Scheduler)
 
