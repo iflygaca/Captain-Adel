@@ -39,7 +39,7 @@ const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', true);
 
-/* Stripe needs the raw request body to verify the webhook signature, so this
+/* Moyasar needs the raw request body to verify the webhook signature, so this
  * route is mounted with express.raw BEFORE the global express.json below —
  * ordering is load-bearing (a route-scoped express.raw after a global
  * express.json would never see the unparsed stream). */
@@ -62,14 +62,20 @@ app.use((req, res, next) => {
   // the SDK, the identitytoolkit/securetoken endpoints for sign-in, and a frame
   // for the popup helper. The client never opens Firestore — plan/quota come
   // from /v1/me — so no firestore.googleapis.com here.
+  // Moyasar's hosted payment widget is the one deliberate payments exception:
+  // cdn.moyasar.com serves the widget assets, api.moyasar.com receives the
+  // card data directly from the browser (PCI SAQ-A) and hosts 3-D Secure
+  // frames/redirects.
   res.set('Content-Security-Policy',
     "default-src 'self'; "
-    + "script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; "
-    + "style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.googleusercontent.com; "
+    + "script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.moyasar.com; "
+    + "style-src 'self' 'unsafe-inline' https://cdn.moyasar.com; "
+    + "img-src 'self' data: blob: https://*.googleusercontent.com https://cdn.moyasar.com; "
     + "font-src 'self'; "
-    + "connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; "
-    + "frame-src https://apis.google.com https://*.firebaseapp.com; "
-    + "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'");
+    + "connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.moyasar.com; "
+    + "frame-src https://apis.google.com https://*.firebaseapp.com https://api.moyasar.com; "
+    + "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; "
+    + "form-action 'self' https://api.moyasar.com");
   next();
 });
 
@@ -248,7 +254,7 @@ app.post('/v1/feedback', corsMiddleware, (req, res) => {
 
 /* Account & billing API: /v1/billing/checkout, /v1/billing/portal, /v1/me,
  * /v1/config. The webhook is mounted separately above (raw body). All ship dark
- * until the Stripe / Firebase env is set. */
+ * until the Moyasar / Firebase env is set. */
 app.use('/v1', corsMiddleware, billing.router);
 
 // CORS errors raised by express.json (e.g. body too large) -> clean 400.

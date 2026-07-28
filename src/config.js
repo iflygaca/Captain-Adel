@@ -45,7 +45,7 @@ module.exports = {
    * inert and the free quota is dormant (every caller is unmetered, exactly as
    * today). See office/RUNBOOK-captadel-saas.md. */
 
-  // Absolute site origin for Stripe redirect URLs (success/cancel).
+  // Absolute site origin for the Moyasar callback URL (checkout return leg).
   siteUrl: (process.env.SITE_URL || 'https://captadel.com').replace(/\/+$/, ''),
 
   // LAUNCH MODE — 'free' makes every caller read as Pro (quota dormant) while
@@ -56,11 +56,18 @@ module.exports = {
   // GOOGLE_CLOUD_PROJECT; override with FIREBASE_PROJECT_ID for local dev.
   firebaseProjectId: process.env.FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT || '',
 
-  // Stripe — empty = billing endpoints return 503 (the SaaS layer is dark).
-  stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
-  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
-  stripePriceMonthly: process.env.STRIPE_PRICE_MONTHLY || '',
-  stripePriceAnnual: process.env.STRIPE_PRICE_ANNUAL || '',
+  // Moyasar — empty = billing endpoints return 503 (the SaaS layer is dark).
+  // Prices are SAR strings (e.g. "35", "299"), converted to halalas in
+  // billing/moyasar-core.js; the browser never chooses an amount.
+  moyasarSecretKey: process.env.MOYASAR_SECRET_KEY || '',
+  moyasarPublishableKey: process.env.MOYASAR_PUBLISHABLE_KEY || '',
+  moyasarWebhookSecret: process.env.MOYASAR_WEBHOOK_SECRET || '',
+  moyasarPriceMonthlySar: process.env.MOYASAR_PRICE_MONTHLY_SAR || '',
+  moyasarPriceAnnualSar: process.env.MOYASAR_PRICE_ANNUAL_SAR || '',
+
+  // Shared secret for the renewals cron route (Cloud Scheduler sends it as
+  // X-Cron-Key). Empty = the route always 401s.
+  cronSecret: process.env.CRON_SECRET || '',
 
   // Free-tier metering. 0 = dormant (only the abuse rate limiter runs).
   freeDaily: intEnv('ADEL_DAILY_FREE', 0),     // free signed-in allowance / period

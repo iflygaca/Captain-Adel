@@ -6,7 +6,7 @@
  * current entitlement and applies a pure mutator from entitlements-core, so the
  * decision logic stays unit-testable without Firestore.
  *
- * Used by the Stripe webhook (billing/routes.js).
+ * Used by the Moyasar billing routes (billing/routes.js).
  * ==========================================================================*/
 
 'use strict';
