@@ -71,11 +71,11 @@ test('applyEntitlement: passes the normalized current entitlement to the mutator
   await withDb(db, () => ent.applyEntitlement('uid2', (cur) => {
     seenCurrent = cur;
     return { status: 'free' };
-  }, { stripeCustomerId: 'cus_123' }));
+  }, { moyasarCustomerId: 'mcus_123' }));
   assert.equal(seenCurrent.status, 'pro');         // current entitlement read in
   const saved = db.store.get('uid2');
   assert.equal(saved.entitlement.status, 'free');  // mutator result written
-  assert.equal(saved.stripeCustomerId, 'cus_123'); // extraFields merged
+  assert.equal(saved.moyasarCustomerId, 'mcus_123'); // extraFields merged
   assert.equal(saved.name, 'Adel');                // existing fields preserved (merge)
 });
 

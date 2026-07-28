@@ -17,7 +17,7 @@ import {
   isEnabled, watchUser, signIn, signUp, resetPassword, signInWithGoogle,
   signOutUser, getIdToken, friendlyError,
 } from './auth.js';
-import { startProCheckout, openBillingPortal } from './billing.js';
+import { startProCheckout, cancelAutoRenew } from './billing.js';
 
 const API = (window.ADEL_API_BASE || '');
 const card = document.getElementById('account-card');
@@ -191,7 +191,7 @@ async function renderSignedIn(user) {
     : '';
 
   const proAction = isPro
-    ? '<button type="button" class="btn btn-ghost" id="acct-portal" data-en="Manage subscription">إدارة الاشتراك</button>'
+    ? '<button type="button" class="btn btn-ghost" id="acct-portal" data-en="Turn off auto-renew">إيقاف التجديد التلقائي</button>'
     : '<button type="button" class="btn btn-primary" id="acct-upgrade" data-en="Go Pro">اشترك في برو</button>';
 
   const name = esc((user && (user.displayName || user.email)) || '');
@@ -213,7 +213,7 @@ async function renderSignedIn(user) {
   const up = document.getElementById('acct-upgrade');
   if (up) up.addEventListener('click', () => startProCheckout('annual'));
   const portal = document.getElementById('acct-portal');
-  if (portal) portal.addEventListener('click', () => openBillingPortal());
+  if (portal) portal.addEventListener('click', () => cancelAutoRenew());
   document.getElementById('acct-signout').addEventListener('click', async () => {
     await signOutUser();
     renderAuth();

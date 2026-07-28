@@ -12,7 +12,7 @@ everything below explains what it does and the manual steps around it.
 
 > **Accounts, billing & quota** (pilot subscriptions on captadel.com) are a
 > separate layer with their own setup — a dedicated Captadel Firebase project,
-> Stripe, and the GitHub Actions deploy. See **`RUNBOOK-captadel-saas.md`**. That
+> Moyasar, and the GitHub Actions deploy. See **`RUNBOOK-captadel-saas.md`**. That
 > layer ships dark, so this deploy works unchanged whether or not it is set up.
 > For `firebase-admin` to use ADC, deploy this service **into the same GCP project**
 > as the Captadel Firebase project.

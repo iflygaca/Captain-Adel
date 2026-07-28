@@ -1,21 +1,20 @@
-/* Unit tests — src/billing/routes.js handlers (the failure/edge branches).
+/* Unit tests — src/billing/routes.js handlers (Moyasar).
  *
- * The handlers are exported directly, so they're driven with fake req/res and
- * the Firebase/Stripe collaborators overridden (assign-and-restore). These
- * cover the branches that don't require a live Stripe call — the 401/503/409
- * guards, /v1/me shaping, /v1/config — plus a signature-verified webhook that
- * revokes (Stripe test-mode crypto, no network). */
+ * The handlers are exported directly, so they're driven with fake req/res, an
+ * in-memory Firestore, and the global fetch stubbed (the moyasarRequest seam).
+ * These cover the dark-gate guards, the settle trust model (server re-fetch,
+ * amount cross-check, ownership, idempotency ordering), the renewal engine's
+ * stored-price charging and failure ladder, and /v1/config shaping. */
 'use strict';
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const Stripe = require('stripe');
+const { createHmac } = require('node:crypto');
 
 const routes = require('../src/billing/routes');
 const config = require('../src/config');
 const firebase = require('../src/firebase');
 const ent = require('../src/billing/entitlements');
-const quota = require('../src/quota/quota');
 const authMiddleware = require('../src/middleware/auth');
 
 function fakeRes() {
@@ -27,7 +26,54 @@ function fakeRes() {
   };
 }
 
-/* Overlay config fields + collaborator methods, run fn(), then restore. */
+/* Minimal in-memory Firestore honouring the exact surface routes.js uses:
+ * doc().get()/set({merge})/create() and where()-chained collection queries. */
+function memDb() {
+  const store = new Map();   // 'col/id' -> plain object
+  function collection(col) {
+    return {
+      doc(id) {
+        const key = col + '/' + id;
+        return {
+          async get() { const d = store.get(key); return { exists: d !== undefined, data: () => d }; },
+          async set(data, opts) {
+            const cur = (opts && opts.merge && store.get(key)) || {};
+            store.set(key, { ...cur, ...data });
+          },
+          async create(data) {
+            if (store.has(key)) throw new Error('already-exists');
+            store.set(key, data);
+          },
+        };
+      },
+      where(f, o, v) {
+        const filters = [[f, o, v]];
+        const q = {
+          where(f2, o2, v2) { filters.push([f2, o2, v2]); return q; },
+          async get() {
+            const docs = [];
+            for (const [k, val] of store) {
+              if (!k.startsWith(col + '/')) continue;
+              const pass = filters.every(([field, op, want]) => {
+                const x = val[field];
+                if (op === '==') return x === want;
+                if (op === 'in') return want.includes(x);
+                if (op === '<=') return x <= want;
+                return false;
+              });
+              if (pass) docs.push({ id: k.slice(col.length + 1), data: () => val });
+            }
+            return { docs, size: docs.length };
+          },
+        };
+        return q;
+      },
+    };
+  }
+  return { db: () => ({ collection }), store };
+}
+
+/* Overlay config fields + collaborators + global fetch, run fn(), restore. */
 async function withOverrides(over, fn) {
   const savedConfig = {};
   for (const k of Object.keys(over.config || {})) {
@@ -35,33 +81,57 @@ async function withOverrides(over, fn) {
     config[k] = over.config[k];
   }
   const saved = {
-    available: firebase.available, db: firebase.db,
-    applyEntitlement: ent.applyEntitlement, revoke: ent.revoke,
-    peek: quota.peek, invalidate: authMiddleware.invalidate,
+    available: firebase.available, db: firebase.db, serverTimestamp: firebase.serverTimestamp,
+    applyEntitlement: ent.applyEntitlement, readEntitlement: ent.readEntitlement,
+    invalidate: authMiddleware.invalidate, fetch: global.fetch,
   };
   if (over.available !== undefined) firebase.available = () => over.available;
   if (over.db) firebase.db = over.db;
+  firebase.serverTimestamp = () => 'ts';
   if (over.applyEntitlement) ent.applyEntitlement = over.applyEntitlement;
-  if (over.peek) quota.peek = over.peek;
-  if (over.invalidate) authMiddleware.invalidate = over.invalidate;
+  if (over.readEntitlement) ent.readEntitlement = over.readEntitlement;
+  authMiddleware.invalidate = over.invalidate || (() => {});
+  if (over.fetch) global.fetch = over.fetch;
   try { return await fn(); } finally {
     for (const k of Object.keys(savedConfig)) config[k] = savedConfig[k];
-    Object.assign(firebase, { available: saved.available, db: saved.db });
-    Object.assign(ent, { applyEntitlement: saved.applyEntitlement, revoke: saved.revoke });
-    quota.peek = saved.peek;
+    Object.assign(firebase, {
+      available: saved.available, db: saved.db, serverTimestamp: saved.serverTimestamp,
+    });
+    Object.assign(ent, {
+      applyEntitlement: saved.applyEntitlement, readEntitlement: saved.readEntitlement,
+    });
     authMiddleware.invalidate = saved.invalidate;
+    global.fetch = saved.fetch;
   }
 }
 
-/* A firebase.db() whose users/{uid} doc returns the given data. */
-function dbWithUser(data) {
-  return () => ({ collection() { return { doc() { return { async get() { return { exists: data !== undefined, data: () => data }; } }; } }; } });
+const LIVE = {
+  moyasarSecretKey: 'sk_test_x', moyasarWebhookSecret: 'whsec_x',
+  moyasarPublishableKey: 'pk_test_x',
+  moyasarPriceMonthlySar: '35', moyasarPriceAnnualSar: '299',
+  siteUrl: 'https://captadel.com',
+};
+
+/* A fetch stub serving GET /payments/{id} from a map and recording POSTs. */
+function moyasarFetch(payments, posts) {
+  return async (url, init) => {
+    const method = (init && init.method) || 'GET';
+    if (method === 'POST') {
+      if (posts) posts.push(JSON.parse(init.body));
+      const reply = payments.__postReply || { status: 'paid', amount: 0, currency: 'SAR' };
+      return { ok: true, json: async () => reply };
+    }
+    const id = decodeURIComponent(url.split('/payments/')[1]);
+    const p = payments[id];
+    if (!p) return { ok: false, status: 404 };
+    return { ok: true, json: async () => p };
+  };
 }
 
 /* ---- checkout -------------------------------------------------------------*/
 
 test('checkout: 503 when billing is dark', async () => {
-  await withOverrides({ config: { stripeSecretKey: '' }, available: false }, async () => {
+  await withOverrides({ config: { moyasarSecretKey: '' }, available: false }, async () => {
     const res = fakeRes();
     await routes.checkoutHandler({ user: { uid: 'u' } }, res);
     assert.equal(res.statusCode, 503);
@@ -70,7 +140,7 @@ test('checkout: 503 when billing is dark', async () => {
 });
 
 test('checkout: 401 when billing is live but the caller is anonymous', async () => {
-  await withOverrides({ config: { stripeSecretKey: 'sk_test' }, available: true }, async () => {
+  await withOverrides({ config: LIVE, available: true }, async () => {
     const res = fakeRes();
     await routes.checkoutHandler({ user: { uid: '' } }, res);
     assert.equal(res.statusCode, 401);
@@ -78,8 +148,10 @@ test('checkout: 401 when billing is live but the caller is anonymous', async () 
   });
 });
 
-test('checkout: 503 price_unconfigured when the plan has no Stripe price id', async () => {
-  await withOverrides({ config: { stripeSecretKey: 'sk_test', stripePriceAnnual: '' }, available: true }, async () => {
+test('checkout: 503 price_unconfigured when the plan has no SAR price', async () => {
+  await withOverrides({
+    config: { ...LIVE, moyasarPriceAnnualSar: '' }, available: true,
+  }, async () => {
     const res = fakeRes();
     await routes.checkoutHandler({ user: { uid: 'u' }, body: { plan: 'annual' } }, res);
     assert.equal(res.statusCode, 503);
@@ -87,301 +159,301 @@ test('checkout: 503 price_unconfigured when the plan has no Stripe price id', as
   });
 });
 
-/* ---- portal ---------------------------------------------------------------*/
-
-test('portal: 401 when anonymous', async () => {
-  await withOverrides({ config: { stripeSecretKey: 'sk_test' }, available: true }, async () => {
+test('checkout: prices server-side, persists the intent, returns an opaque id', async () => {
+  const mem = memDb();
+  await withOverrides({ config: LIVE, available: true, db: mem.db }, async () => {
     const res = fakeRes();
-    await routes.portalHandler({ user: { uid: '' } }, res);
+    await routes.checkoutHandler({ user: { uid: 'u1' }, body: { plan: 'monthly' } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.body.amount, 3500);
+    assert.equal(res.body.currency, 'SAR');
+    assert.equal(res.body.saveCard, true);
+    assert.equal(res.body.publishableKey, 'pk_test_x');
+    assert.ok(res.body.checkoutId);
+    assert.equal(res.body.uid, undefined);   // uid never leaves the server
+    const intent = mem.store.get('checkoutIntents/' + res.body.checkoutId);
+    assert.equal(intent.uid, 'u1');
+    assert.equal(intent.amountHalalas, 3500);
+    assert.equal(intent.status, 'pending');
+  });
+});
+
+/* ---- confirm / settle -----------------------------------------------------*/
+
+function seedIntent(mem, id, over) {
+  mem.store.set('checkoutIntents/' + id, {
+    uid: 'u1', plan: 'annual', cadence: 'annual',
+    amountHalalas: 29900, currency: 'SAR', status: 'pending', ...over,
+  });
+}
+
+test('confirm: happy path grants, saves token, writes subscription at the sold price', async () => {
+  const mem = memDb();
+  seedIntent(mem, 'ci1');
+  const grants = [];
+  const payments = {
+    pay_1: {
+      id: 'pay_1', status: 'paid', amount: 29900, currency: 'SAR',
+      metadata: { checkoutId: 'ci1' },
+      source: { type: 'creditcard', token: 'tok_9', company: 'mada', last_four: '1111' },
+    },
+  };
+  await withOverrides({
+    config: LIVE, available: true, db: mem.db, fetch: moyasarFetch(payments),
+    applyEntitlement: async (uid, mutate) => grants.push({ uid, next: mutate({}) }),
+  }, async () => {
+    const res = fakeRes();
+    await routes.confirmHandler({ user: { uid: 'u1' }, body: { paymentId: 'pay_1' } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(grants.length, 1);
+    assert.equal(grants[0].uid, 'u1');
+    assert.equal(grants[0].next.plan, 'pro');
+    assert.equal(grants[0].next.store, 'MOYASAR');
+    assert.equal(mem.store.get('moyasarCustomers/u1').token, 'tok_9');
+    const sub = mem.store.get('subscriptions/u1');
+    assert.equal(sub.amountHalalas, 29900);
+    assert.equal(sub.cadence, 'annual');
+    assert.equal(sub.autoRenew, true);
+    assert.equal(mem.store.get('checkoutIntents/ci1').status, 'fulfilled');
+    assert.ok(mem.store.has('moyasarPayments/pay_1'));
+  });
+});
+
+test('confirm: a not-yet-paid payment does NOT claim the marker — the later webhook still grants', async () => {
+  const mem = memDb();
+  seedIntent(mem, 'ci2');
+  const grants = [];
+  const payments = {
+    pay_2: { id: 'pay_2', status: 'initiated', amount: 29900, currency: 'SAR', metadata: { checkoutId: 'ci2' } },
+  };
+  await withOverrides({
+    config: LIVE, available: true, db: mem.db, fetch: moyasarFetch(payments),
+    applyEntitlement: async (uid, mutate) => grants.push({ uid, next: mutate({}) }),
+  }, async () => {
+    const res = fakeRes();
+    await routes.confirmHandler({ user: { uid: 'u1' }, body: { paymentId: 'pay_2' } }, res);
+    assert.equal(res.statusCode, 409);
+    assert.equal(res.body.error, 'payment_not_settled');
+    assert.equal(mem.store.has('moyasarPayments/pay_2'), false);   // marker untouched
+    assert.equal(grants.length, 0);
+
+    // 3DS completes; the webhook observes the paid payment and must grant.
+    payments.pay_2.status = 'paid';
+    const out = await routes.settlePayment('pay_2');
+    assert.equal(out.ok, true);
+    assert.equal(grants.length, 1);
+  });
+});
+
+test('confirm: amount mismatch is rejected without granting', async () => {
+  const mem = memDb();
+  seedIntent(mem, 'ci3');
+  const grants = [];
+  const payments = {
+    pay_3: { id: 'pay_3', status: 'paid', amount: 100, currency: 'SAR', metadata: { checkoutId: 'ci3' } },
+  };
+  await withOverrides({
+    config: LIVE, available: true, db: mem.db, fetch: moyasarFetch(payments),
+    applyEntitlement: async () => grants.push(1),
+  }, async () => {
+    const res = fakeRes();
+    await routes.confirmHandler({ user: { uid: 'u1' }, body: { paymentId: 'pay_3' } }, res);
+    assert.equal(res.statusCode, 409);
+    assert.equal(grants.length, 0);
+    assert.equal(mem.store.has('moyasarPayments/pay_3'), false);
+  });
+});
+
+test('confirm: 403 when the payment belongs to another account', async () => {
+  const mem = memDb();
+  seedIntent(mem, 'ci4', { uid: 'someone-else' });
+  const payments = {
+    pay_4: { id: 'pay_4', status: 'paid', amount: 29900, currency: 'SAR', metadata: { checkoutId: 'ci4' } },
+  };
+  await withOverrides({
+    config: LIVE, available: true, db: mem.db, fetch: moyasarFetch(payments),
+    applyEntitlement: async () => { throw new Error('must not grant'); },
+  }, async () => {
+    const res = fakeRes();
+    await routes.confirmHandler({ user: { uid: 'u1' }, body: { paymentId: 'pay_4' } }, res);
+    assert.equal(res.statusCode, 403);
+    assert.equal(res.body.error, 'payment_not_yours');
+  });
+});
+
+test('settle: double-settle is idempotent — exactly one grant', async () => {
+  const mem = memDb();
+  seedIntent(mem, 'ci5');
+  const grants = [];
+  const payments = {
+    pay_5: { id: 'pay_5', status: 'paid', amount: 29900, currency: 'SAR', metadata: { checkoutId: 'ci5' } },
+  };
+  await withOverrides({
+    config: LIVE, available: true, db: mem.db, fetch: moyasarFetch(payments),
+    applyEntitlement: async () => grants.push(1),
+  }, async () => {
+    const a = await routes.settlePayment('pay_5');
+    const b = await routes.settlePayment('pay_5');
+    assert.equal(a.ok, true);
+    assert.equal(b.ok, true);
+    assert.equal(b.alreadySettled, true);
+    assert.equal(grants.length, 1);
+  });
+});
+
+/* ---- webhook --------------------------------------------------------------*/
+
+test('webhook: 503 without secrets, 400 on a bad signature', async () => {
+  await withOverrides({ config: { moyasarSecretKey: '', moyasarWebhookSecret: '' } }, async () => {
+    const res = fakeRes();
+    await routes.webhookHandler({ headers: {}, body: Buffer.from('{}') }, res);
+    assert.equal(res.statusCode, 503);
+  });
+  await withOverrides({ config: LIVE, available: true }, async () => {
+    const res = fakeRes();
+    await routes.webhookHandler({
+      headers: { 'x-moyasar-signature': 'bad' }, body: Buffer.from('{}'),
+    }, res);
+    assert.equal(res.statusCode, 400);
+  });
+});
+
+test('webhook: a correctly signed payment_paid settles', async () => {
+  const mem = memDb();
+  seedIntent(mem, 'ci6');
+  const grants = [];
+  const payments = {
+    pay_6: { id: 'pay_6', status: 'paid', amount: 29900, currency: 'SAR', metadata: { checkoutId: 'ci6' } },
+  };
+  const raw = Buffer.from(JSON.stringify({ type: 'payment_paid', data: { id: 'pay_6' } }), 'utf8');
+  const sig = createHmac('sha256', 'whsec_x').update(raw).digest('hex');
+  await withOverrides({
+    config: LIVE, available: true, db: mem.db, fetch: moyasarFetch(payments),
+    applyEntitlement: async () => grants.push(1),
+  }, async () => {
+    const res = fakeRes();
+    await routes.webhookHandler({ headers: { 'x-moyasar-signature': sig }, body: raw }, res);
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(res.body, { received: true });
+    assert.equal(grants.length, 1);
+  });
+});
+
+/* ---- cancel auto-renew ----------------------------------------------------*/
+
+test('cancel-auto-renew: flips the flag, leaves the entitlement alone', async () => {
+  const mem = memDb();
+  mem.store.set('subscriptions/u1', { autoRenew: true, status: 'active' });
+  await withOverrides({
+    config: LIVE, available: true, db: mem.db,
+    applyEntitlement: async () => { throw new Error('entitlement must not change'); },
+  }, async () => {
+    const res = fakeRes();
+    await routes.cancelAutoRenewHandler({ user: { uid: 'u1' } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(mem.store.get('subscriptions/u1').autoRenew, false);
+    assert.equal(mem.store.get('subscriptions/u1').status, 'active');
+  });
+});
+
+/* ---- renewals -------------------------------------------------------------*/
+
+test('renewals: 401 without the cron key', async () => {
+  await withOverrides({ config: { ...LIVE, cronSecret: 's3cret' } }, async () => {
+    const res = fakeRes();
+    await routes.renewalsHandler({ headers: {} }, res);
     assert.equal(res.statusCode, 401);
   });
 });
 
-test('portal: 409 no_subscription when the user has no stripeCustomerId', async () => {
+test('renewals: charges the STORED price, extends from expiry, resets attempts', async () => {
+  const mem = memDb();
+  const past = new Date(Date.now() - 1000).toISOString();
+  mem.store.set('subscriptions/u1', {
+    cadence: 'annual', amountHalalas: 12345,   // deliberately != env price
+    autoRenew: true, status: 'past_due', failedAttempts: 1, nextChargeAt: past,
+  });
+  mem.store.set('moyasarCustomers/u1', { token: 'tok_1' });
+  const posts = [];
+  const payments = { __postReply: { status: 'paid', amount: 12345, currency: 'SAR' } };
+  const grants = [];
+  const oldExpiry = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
   await withOverrides({
-    config: { stripeSecretKey: 'sk_test' }, available: true, db: dbWithUser({ name: 'Adel' }),
+    config: { ...LIVE, cronSecret: 's3cret' }, available: true, db: mem.db,
+    fetch: moyasarFetch(payments, posts),
+    readEntitlement: async () => ({ plan: 'pro', expiresAt: oldExpiry }),
+    applyEntitlement: async (uid, mutate) => grants.push(mutate({})),
   }, async () => {
     const res = fakeRes();
-    await routes.portalHandler({ user: { uid: 'u' } }, res);
-    assert.equal(res.statusCode, 409);
-    assert.equal(res.body.error, 'no_subscription');
+    await routes.renewalsHandler({ headers: { 'x-cron-key': 's3cret' } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.body.charged, 1);
+    assert.equal(posts.length, 1);
+    assert.equal(posts[0].amount, 12345);               // stored price, not env
+    assert.equal(posts[0].source.token, 'tok_1');
+    assert.equal(grants.length, 1);
+    const expected = Date.parse(oldExpiry) + 365 * 24 * 60 * 60 * 1000;
+    assert.equal(grants[0].expiresAt, new Date(expected).toISOString());
+    const sub = mem.store.get('subscriptions/u1');
+    assert.equal(sub.status, 'active');
+    assert.equal(sub.failedAttempts, 0);
   });
 });
 
-/* ---- /v1/me ---------------------------------------------------------------*/
-
-test('me: anonymous reports signedIn:false with the launch flag', async () => {
-  await withOverrides({ config: { launchMode: '' } }, async () => {
-    const res = fakeRes();
-    await routes.meHandler({ user: { uid: '' } }, res);
-    assert.equal(res.body.signedIn, false);
-    assert.equal(res.body.launchMode, false);
+test('renewals: failures walk past_due then cancel at the third attempt', async () => {
+  const mem = memDb();
+  const past = new Date(Date.now() - 1000).toISOString();
+  mem.store.set('subscriptions/u1', {
+    cadence: 'monthly', amountHalalas: 3500,
+    autoRenew: true, status: 'past_due', failedAttempts: 2, nextChargeAt: past,
   });
-});
-
-test('me: a Pro user reports plan "pro" and skips the quota peek', async () => {
-  let peeked = 0;
-  await withOverrides({ config: { launchMode: '' }, available: true, peek: async () => { peeked++; return {}; } }, async () => {
-    const res = fakeRes();
-    await routes.meHandler({ user: { uid: 'u', isPro: true, email: 'a@x.com' } }, res);
-    assert.equal(res.body.signedIn, true);
-    assert.equal(res.body.plan, 'pro');
-    assert.equal(peeked, 0);
-  });
-});
-
-test('me: a free user with metering on gets a quota panel from peek()', async () => {
+  mem.store.set('moyasarCustomers/u1', { token: 'tok_1' });
+  const payments = { __postReply: { status: 'failed' } };
   await withOverrides({
-    config: { launchMode: '', freeDaily: 10 }, available: true,
-    db: dbWithUser({}), peek: async () => ({ remaining: 7, limit: 10 }),
+    config: { ...LIVE, cronSecret: 's3cret' }, available: true, db: mem.db,
+    fetch: moyasarFetch(payments),
+    applyEntitlement: async () => { throw new Error('must not grant'); },
   }, async () => {
     const res = fakeRes();
-    await routes.meHandler({ user: { uid: 'u', isPro: false } }, res);
-    assert.equal(res.body.plan, 'free');
-    assert.deepEqual(res.body.quota, { remaining: 7, limit: 10 });
+    await routes.renewalsHandler({ headers: { 'x-cron-key': 's3cret' } }, res);
+    assert.equal(res.body.canceled, 1);
+    const sub = mem.store.get('subscriptions/u1');
+    assert.equal(sub.status, 'canceled');
+    assert.equal(sub.autoRenew, false);
+    assert.equal(sub.failedAttempts, 3);
+  });
+});
+
+test('renewals: a tokenless subscription goes past_due (Apple Pay / STC purchases)', async () => {
+  const mem = memDb();
+  const past = new Date(Date.now() - 1000).toISOString();
+  mem.store.set('subscriptions/u1', {
+    cadence: 'monthly', amountHalalas: 3500,
+    autoRenew: true, status: 'active', failedAttempts: 0, nextChargeAt: past,
+  });
+  await withOverrides({
+    config: { ...LIVE, cronSecret: 's3cret' }, available: true, db: mem.db,
+    fetch: async () => { throw new Error('must not call moyasar'); },
+  }, async () => {
+    const res = fakeRes();
+    await routes.renewalsHandler({ headers: { 'x-cron-key': 's3cret' } }, res);
+    assert.equal(res.body.pastDue, 1);
+    assert.equal(mem.store.get('subscriptions/u1').status, 'past_due');
   });
 });
 
 /* ---- /v1/config -----------------------------------------------------------*/
 
-test('config: reports the dark state when no Stripe/Firebase is configured', async () => {
-  await withOverrides({ config: { stripeSecretKey: '', launchMode: '' }, available: false }, async () => {
+test('config: exposes the publishable key only when set', async () => {
+  await withOverrides({ config: LIVE, available: true }, async () => {
     const res = fakeRes();
     routes.configHandler({}, res);
-    assert.equal(res.body.billingEnabled, false);
-    assert.equal(res.body.authEnabled, false);
+    assert.equal(res.body.billingEnabled, true);
+    assert.equal(res.body.moyasarPublishableKey, 'pk_test_x');
   });
-});
-
-/* ---- Stripe-interaction paths (SDK swapped in the require cache) ----------*/
-
-/* routes.js resolves `require('stripe')` lazily on every call, so swapping the
- * cached exports (assign-and-restore) injects a fake SDK factory — no network.
- * Webhook tests keep the REAL signature verification by lending the fake the
- * real Stripe instance's `webhooks`. */
-const STRIPE_PATH = require.resolve('stripe');
-async function withStripeSdk(factory, fn) {
-  const saved = require.cache[STRIPE_PATH].exports;
-  require.cache[STRIPE_PATH].exports = factory;
-  try { return await fn(); } finally { require.cache[STRIPE_PATH].exports = saved; }
-}
-
-const LIVE_CONFIG = {
-  stripeSecretKey: 'sk_test_dummy', stripeWebhookSecret: 'whsec_test_dummy',
-  stripePriceMonthly: 'price_m', stripePriceAnnual: 'price_a',
-  siteUrl: 'https://captadel.test',
-};
-
-test('checkout: a live monthly checkout stamps the uid and returns the session url', async () => {
-  let captured; let capturedKey;
-  const sdk = (key) => {
-    capturedKey = key;
-    return { checkout: { sessions: { create: async (p) => { captured = p; return { url: 'https://checkout.stripe.test/s1' }; } } } };
-  };
-  await withOverrides({ config: LIVE_CONFIG, available: true }, () =>
-    withStripeSdk(sdk, async () => {
-      const res = fakeRes();
-      await routes.checkoutHandler({ user: { uid: 'u1', email: 'a@x.com' }, body: { plan: 'monthly' } }, res);
-      assert.equal(res.statusCode, 200);
-      assert.equal(res.body.url, 'https://checkout.stripe.test/s1');
-      assert.equal(capturedKey, 'sk_test_dummy');
-      assert.equal(captured.line_items[0].price, 'price_m');
-      assert.equal(captured.client_reference_id, 'u1');
-      assert.equal(captured.customer_email, 'a@x.com');
-      // The uid rides BOTH the session and the subscription so renewal/cancel
-      // webhooks can map back to the Firebase user.
-      assert.equal(captured.metadata.firebaseUID, 'u1');
-      assert.equal(captured.subscription_data.metadata.firebaseUID, 'u1');
-      assert.ok(captured.success_url.startsWith('https://captadel.test/'));
-    }));
-});
-
-test('checkout: an unknown plan defaults to annual', async () => {
-  let captured;
-  const sdk = () => ({ checkout: { sessions: { create: async (p) => { captured = p; return { url: 'u' }; } } } });
-  await withOverrides({ config: LIVE_CONFIG, available: true }, () =>
-    withStripeSdk(sdk, async () => {
-      await routes.checkoutHandler({ user: { uid: 'u1' }, body: { plan: 'weekly' } }, fakeRes());
-      assert.equal(captured.line_items[0].price, 'price_a');
-    }));
-});
-
-test('checkout: a Stripe error surfaces as 502 checkout_failed', async () => {
-  const sdk = () => ({ checkout: { sessions: { create: async () => { throw new Error('stripe down'); } } } });
-  await withOverrides({ config: LIVE_CONFIG, available: true }, () =>
-    withStripeSdk(sdk, async () => {
-      const res = fakeRes();
-      await routes.checkoutHandler({ user: { uid: 'u1' }, body: {} }, res);
-      assert.equal(res.statusCode, 502);
-      assert.equal(res.body.error, 'checkout_failed');
-    }));
-});
-
-test('portal: a subscribed user gets a portal session for their Stripe customer', async () => {
-  let captured;
-  const sdk = () => ({ billingPortal: { sessions: { create: async (p) => { captured = p; return { url: 'https://portal.stripe.test/p1' }; } } } });
-  await withOverrides({
-    config: LIVE_CONFIG, available: true, db: dbWithUser({ stripeCustomerId: 'cus_1' }),
-  }, () => withStripeSdk(sdk, async () => {
+  await withOverrides({ config: { ...LIVE, moyasarPublishableKey: '' } }, async () => {
     const res = fakeRes();
-    await routes.portalHandler({ user: { uid: 'u1' } }, res);
-    assert.equal(res.body.url, 'https://portal.stripe.test/p1');
-    assert.equal(captured.customer, 'cus_1');
-    assert.equal(captured.return_url, 'https://captadel.test/account.html');
-  }));
-});
-
-test('portal: a Stripe error surfaces as 502 portal_failed', async () => {
-  const sdk = () => ({ billingPortal: { sessions: { create: async () => { throw new Error('stripe down'); } } } });
-  await withOverrides({
-    config: LIVE_CONFIG, available: true, db: dbWithUser({ stripeCustomerId: 'cus_1' }),
-  }, () => withStripeSdk(sdk, async () => {
-    const res = fakeRes();
-    await routes.portalHandler({ user: { uid: 'u1' } }, res);
-    assert.equal(res.statusCode, 502);
-    assert.equal(res.body.error, 'portal_failed');
-  }));
-});
-
-/* ---- webhook --------------------------------------------------------------*/
-
-/* A signed webhook request for the given event payload (real test-mode crypto). */
-function signedWebhookReq(payload) {
-  const body = JSON.stringify(payload);
-  const header = new Stripe('sk_test_dummy').webhooks.generateTestHeaderString({
-    payload: body, secret: 'whsec_test_dummy',
-  });
-  return { headers: { 'stripe-signature': header }, body: Buffer.from(body) };
-}
-
-test('webhook: checkout.session.completed retrieves the subscription and grants Pro', async () => {
-  let retrievedId; let applied;
-  const realWebhooks = new Stripe('sk_test_dummy').webhooks;
-  const sdk = () => ({
-    webhooks: realWebhooks,
-    subscriptions: {
-      retrieve: async (id) => {
-        retrievedId = id;
-        return {
-          start_date: 1700000000, current_period_end: 1900000000,
-          items: { data: [{ price: { recurring: { interval: 'month' } } }] },
-        };
-      },
-    },
-  });
-  let invalidatedUid;
-  await withOverrides({
-    config: LIVE_CONFIG,
-    applyEntitlement: async (uid, mutate, extra) => { applied = { uid, mutate, extra }; },
-    invalidate: (uid) => { invalidatedUid = uid; },
-  }, () => withStripeSdk(sdk, async () => {
-    const res = fakeRes();
-    await routes.webhookHandler(signedWebhookReq({
-      id: 'evt_co', object: 'event', type: 'checkout.session.completed',
-      data: { object: { metadata: { firebaseUID: 'uid-1' }, subscription: 'sub_1', customer: 'cus_9' } },
-    }), res);
-    assert.equal(res.statusCode, 200);
-    assert.equal(res.body.received, true);
-    assert.equal(retrievedId, 'sub_1');
-    assert.equal(applied.uid, 'uid-1');
-    assert.equal(applied.mutate({}).source, 'monthly', 'the interval maps to the entitlement source');
-    assert.deepEqual(applied.extra, { stripeCustomerId: 'cus_9' }, 'the customer id is remembered for the portal');
-    assert.equal(invalidatedUid, 'uid-1', 'the buyer sees Pro immediately, not after the cache TTL');
-  }));
-});
-
-test('webhook: subscription.updated grants on active and revokes on unpaid', async () => {
-  const sdk = () => ({ webhooks: new Stripe('sk_test_dummy').webhooks });
-  const run = async (status) => {
-    const calls = [];
-    await withOverrides({
-      config: LIVE_CONFIG,
-      applyEntitlement: async (uid, mutate) => calls.push({ uid, next: mutate({}) }),
-      invalidate: () => {},
-    }, () => withStripeSdk(sdk, async () => {
-      const res = fakeRes();
-      await routes.webhookHandler(signedWebhookReq({
-        id: 'evt_up', object: 'event', type: 'customer.subscription.updated',
-        data: {
-          object: {
-            metadata: { firebaseUID: 'uid-2' }, status,
-            items: { data: [{ price: { recurring: { interval: 'year' } } }] },
-          },
-        },
-      }), res);
-      assert.equal(res.statusCode, 200);
-    }));
-    return calls;
-  };
-
-  const granted = await run('active');
-  assert.equal(granted[0].next.plan, 'pro');
-  const revoked = await run('unpaid');
-  assert.equal(revoked[0].next.plan, 'free');
-  const ignored = await run('incomplete');   // statusAction 'none'
-  assert.deepEqual(ignored, [], 'in-between statuses drive no entitlement change');
-});
-
-test('webhook: a handler failure returns 500 so Stripe retries the event', async () => {
-  const sdk = () => ({ webhooks: new Stripe('sk_test_dummy').webhooks });
-  await withOverrides({
-    config: LIVE_CONFIG,
-    applyEntitlement: async () => { throw new Error('firestore unavailable'); },
-  }, () => withStripeSdk(sdk, async () => {
-    const res = fakeRes();
-    await routes.webhookHandler(signedWebhookReq({
-      id: 'evt_x', object: 'event', type: 'customer.subscription.deleted',
-      data: { object: { metadata: { firebaseUID: 'uid-3' }, status: 'canceled' } },
-    }), res);
-    assert.equal(res.statusCode, 500);
-    assert.equal(res.sent, 'handler error');
-  }));
-});
-
-test('webhook: 503 when the Stripe secrets are not configured', async () => {
-  await withOverrides({ config: { stripeSecretKey: '', stripeWebhookSecret: '' } }, async () => {
-    const res = fakeRes();
-    await routes.webhookHandler({ headers: {}, body: Buffer.from('{}') }, res);
-    assert.equal(res.statusCode, 503);
-  });
-});
-
-test('webhook: a signed subscription.deleted revokes the entitlement and invalidates the cache', async () => {
-  let revokedUid; let invalidatedUid; let revokeBuilt = false;
-  await withOverrides({
-    config: { stripeSecretKey: 'sk_test_dummy', stripeWebhookSecret: 'whsec_test_dummy' },
-    applyEntitlement: async (uid) => { revokedUid = uid; },
-    invalidate: (uid) => { invalidatedUid = uid; },
-  }, async () => {
-    // ent.revoke() is the pure mutator the handler passes to applyEntitlement.
-    const savedRevoke = ent.revoke;
-    ent.revoke = () => { revokeBuilt = true; return savedRevoke(); };
-    try {
-      const payload = JSON.stringify({
-        id: 'evt_del', object: 'event', type: 'customer.subscription.deleted',
-        data: { object: { metadata: { firebaseUID: 'uid-99' }, status: 'canceled' } },
-      });
-      const header = new Stripe('sk_test_dummy').webhooks.generateTestHeaderString({
-        payload, secret: 'whsec_test_dummy',
-      });
-      const res = fakeRes();
-      await routes.webhookHandler(
-        { headers: { 'stripe-signature': header }, body: Buffer.from(payload) }, res);
-      assert.equal(res.statusCode, 200);
-      assert.equal(res.body.received, true);
-      assert.equal(revokedUid, 'uid-99');
-      assert.equal(invalidatedUid, 'uid-99');
-      assert.equal(revokeBuilt, true);
-    } finally {
-      ent.revoke = savedRevoke;
-    }
-  });
-});
-
-test('webhook: a bad signature is rejected with 400', async () => {
-  await withOverrides({ config: { stripeSecretKey: 'sk_test_dummy', stripeWebhookSecret: 'whsec_test_dummy' } }, async () => {
-    const res = fakeRes();
-    await routes.webhookHandler({ headers: { 'stripe-signature': 'nope' }, body: Buffer.from('{}') }, res);
-    assert.equal(res.statusCode, 400);
+    routes.configHandler({}, res);
+    assert.equal(res.body.moyasarPublishableKey, null);
   });
 });

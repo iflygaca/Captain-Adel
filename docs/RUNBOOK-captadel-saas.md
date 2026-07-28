@@ -5,7 +5,7 @@
 > `captadel/…` below now sits at that repo's root.
 
 Stand up the pilot-subscription layer on captadel.com: a **separate Captadel
-Firebase project** for accounts, Stripe for billing, and a free daily quota with
+Firebase project** for accounts, Moyasar for billing, and a free daily quota with
 a Pro unlimited tier. The code is already in `captadel/` and **ships dark** — with
 none of the steps below done, the site is exactly as it was (free for everyone,
 no sign-in, no paywall). Each step lights up one piece.
@@ -27,8 +27,8 @@ no sign-in, no paywall). Each step lights up one piece.
 
 | Piece | Path |
 |---|---|
-| Billing routes (checkout/webhook/portal/me/config) | `captadel/src/billing/routes.js` |
-| Entitlement writer + pure cores | `captadel/src/billing/entitlements*.js`, `stripe-core.js`, `tier-core.js` |
+| Billing routes (checkout/confirm/webhook/cancel/renewals/me/config) | `captadel/src/billing/routes.js` |
+| Entitlement writer + pure cores | `captadel/src/billing/entitlements*.js`, `moyasar-core.js`, `tier-core.js` |
 | Quota (Firestore) + calendar math | `captadel/src/quota/quota.js`, `quota-core.js` |
 | Admin SDK singleton | `captadel/src/firebase.js` |
 | Caller identity middleware (60s cache) | `captadel/src/middleware/auth.js` |
@@ -91,54 +91,76 @@ flygaca.com chat still reaches the same brain.
 
 ---
 
-## 3. Stripe
+## 3. Moyasar
 
-**Merchant of record.** The Stripe account must be registered to the operating
+Payments run through **Moyasar** (Saudi PSP: mada, credit cards, Apple Pay,
+STC Pay), mirroring Fly GACA. There is no Stripe. Moyasar has no subscription
+object — "recurring" means the saved card **token** is re-charged by the
+renewals route (§3d) before the entitlement expires.
+
+**Merchant of record.** The Moyasar account must be registered to the operating
 entity: **BDA Company International (شركة بدع الدولية)** — Saudi LLC,
 CR 7030976893, VAT 311415259500003, Riyadh 12965. Prices shown on captadel.com
 are SAR and VAT-inclusive; the public legal pages are `/terms` and `/privacy`
 (served from `public/`), and the site footer discloses the entity + CR + VAT.
+Confirm the Moyasar merchant profile carries the CR and the settlement IBAN.
 
-**Tax/compliance checklist (dashboard first, then code):** once the Stripe
-account carries the entity's KSA registration, in the Dashboard —
+### 3a. API keys → Secret Manager
 
-1. Settings → Tax: register the KSA VAT number (311415259500003) and enable
-   **Stripe Tax** for SAR.
-2. Settings → Branding/Public details: legal name + support email
-   `hello@captadel.com`; set the Terms of Service URL to
-   `https://captadel.com/terms` and Privacy to `https://captadel.com/privacy`.
-3. Only **after** both are configured, extend the Checkout session in
-   `src/billing/routes.js` with `automatic_tax: { enabled: true }`,
-   `tax_id_collection: { enabled: true }`, and
-   `consent_collection: { terms_of_service: 'required' }` — enabling these
-   before the dashboard config exists makes session creation fail.
-4. ZATCA e-invoicing (Fatoora) mapping of Stripe receipts is tracked in the
-   internal Offfice repo (`03-finance/invoicing-and-vat-returns`).
+Dashboard → Developers → API keys. The **secret** key authenticates our
+server-to-server calls; the **publishable** key is public (served to the browser
+via `GET /v1/config`) and is charge-only. Prices are SAR strings, not price IDs.
 
-Then the product setup:
+```bash
+printf '%s' "sk_live_…" | gcloud secrets create MOYASAR_SECRET_KEY      --data-file=-
+printf '%s' "pk_live_…" | gcloud secrets create MOYASAR_PUBLISHABLE_KEY --data-file=-
+printf '%s' "35"        | gcloud secrets create MOYASAR_PRICE_MONTHLY_SAR --data-file=-
+printf '%s' "299"       | gcloud secrets create MOYASAR_PRICE_ANNUAL_SAR  --data-file=-
+```
+Founding annual is SAR 299/yr (raise to 349 when ready). The static pricing copy
+in `index.html` must match these numbers.
 
-1. Create a product **"Captain Adel Pro"** with two recurring prices:
-   - **Annual** — SAR 299/yr (founding). (Regular SAR 349/yr — raise when ready.)
-   - **Monthly** — SAR 35/mo.
-   The static pricing copy in `index.html` must match the dashboard numbers.
-2. Copy the price IDs and the secret key into Secret Manager:
-   ```bash
-   printf '%s' "sk_live_…"   | gcloud secrets create STRIPE_SECRET_KEY     --data-file=-
-   printf '%s' "price_…ann"  | gcloud secrets create STRIPE_PRICE_ANNUAL   --data-file=-
-   printf '%s' "price_…mon"  | gcloud secrets create STRIPE_PRICE_MONTHLY  --data-file=-
-   ```
-3. **Webhook**: Stripe dashboard → Developers → Webhooks → add endpoint
-   `https://captadel.com/v1/billing/webhook`, events:
-   `checkout.session.completed`, `customer.subscription.created`,
-   `customer.subscription.updated`, `customer.subscription.deleted`.
-   Copy the signing secret:
-   ```bash
-   printf '%s' "whsec_…" | gcloud secrets create STRIPE_WEBHOOK_SECRET --data-file=-
-   ```
-4. **Customer portal**: Stripe → Settings → Billing → Customer portal → activate
-   (lets pilots cancel/manage from `account.html`).
-5. Re-run `./deploy/deploy.sh` so the new secrets are wired. Checkout returns 503
-   until both `STRIPE_SECRET_KEY` and the project are present.
+### 3b. Webhook
+
+Dashboard → Developers → Webhooks → add endpoint
+`https://captadel.com/v1/billing/webhook`, subscribe **`payment_paid`**
+(optionally `payment_failed`), and set a **shared secret**:
+```bash
+printf '%s' "whsec_…" | gcloud secrets create MOYASAR_WEBHOOK_SECRET --data-file=-
+```
+> ⚠️ The webhook signature recipe (`verifyMoyasarSignature`, HMAC-SHA256 hex over
+> the raw body vs the `x-moyasar-signature` header) has **not** been validated
+> against live Moyasar docs — it is defence-in-depth only. The trusted
+> fulfilment path is the server-side payment re-fetch in `settlePayment`. Fire a
+> **dashboard test event** and confirm it verifies (200, not 400) before relying
+> on the webhook; if the header/format differs, fix `moyasar-core.js` to match.
+
+### 3c. Apple Pay
+
+Dashboard → Apple Pay → add the domain, download the Merchant Domain Association
+file, and serve it byte-for-byte at
+`public/.well-known/apple-developer-merchantid-domain-association` (no
+extension), then **Validate** → **Register**. Requires an Apple Developer
+account + Merchant ID. STC Pay needs no extra integration.
+
+### 3d. Renewals (Cloud Scheduler)
+
+Moyasar can't auto-renew, so a daily job charges due saved-card tokens:
+```bash
+printf '%s' "$(openssl rand -hex 32)" | gcloud secrets create CRON_SECRET --data-file=-
+# then a Cloud Scheduler HTTP job, daily:
+#   POST https://captadel.com/v1/billing/renewals/run
+#   header  X-Cron-Key: <CRON_SECRET value>
+```
+The route 401s without the header. It charges `subscriptions/{uid}.amountHalalas`
+(the price actually sold), extends the entitlement from its current expiry, and
+walks past_due → canceled after 3 failed attempts.
+
+### 3e. Deploy
+
+Re-run `./deploy/deploy.sh` so the new secrets are wired. Checkout returns 503
+until both `MOYASAR_SECRET_KEY` and the Firebase project are present; it returns
+`price_unconfigured` until the SAR prices are set.
 
 ---
 
@@ -170,11 +192,13 @@ paths `captadel/**`; or manual `workflow_dispatch`). It is inert until configure
 The layer ships **dark**. Bring it up deliberately:
 
 1. **Dark (default):** deploy with `ADEL_LAUNCH_MODE=free`. Everyone is unmetered;
-   sign-in works (once step 1 is done) but is optional; checkout 503s until Stripe
-   is wired. Good for soft-launching accounts without a paywall.
-2. **Billing test:** in Stripe **test mode**, run a checkout with card `4242 4242
-   4242 4242`; confirm `users/{uid}.entitlement.plan === 'pro'` and the account
-   page shows the Pro badge. Cancel in the dashboard → entitlement drops to free.
+   sign-in works (once step 1 is done) but is optional; checkout 503s until
+   Moyasar is wired. Good for soft-launching accounts without a paywall.
+2. **Billing test:** with Moyasar **test keys**, run a checkout with the Moyasar
+   test card `4111 1111 1111 1111`; confirm the return leg hits
+   `POST /v1/billing/confirm`, `users/{uid}.entitlement.plan === 'pro'`, and the
+   account page shows the Pro badge. "Turn off auto-renew" flips
+   `subscriptions/{uid}.autoRenew` — access runs to `expiresAt`.
 3. **Go live:** unset `ADEL_LAUNCH_MODE`, set the allowances, redeploy:
    ```bash
    ADEL_DAILY_FREE=5 ADEL_DAILY_ANON=5 ADEL_FREE_PERIOD=day \
@@ -191,8 +215,9 @@ The layer ships **dark**. Bring it up deliberately:
   quota goes dormant immediately, no code change.
 - **Code:** roll back the Cloud Run revision
   (`gcloud run services update-traffic captadel --to-revisions REV=100 …`).
-- **Billing only:** remove the `STRIPE_*` secrets and redeploy — checkout 503s and
-  the site reverts to its free-during-launch state; existing entitlements remain.
+- **Billing only:** remove the `MOYASAR_*` secrets and redeploy — checkout 503s
+  and the site reverts to its free-during-launch state; existing entitlements
+  remain.
 
 ---
 
@@ -203,14 +228,15 @@ cd captadel
 npm run test:unit        # cores + the raw-body webhook signature test
 npm run smoke            # loads with zero billing env (proves dark-launch safety)
 
-# Live billing loop (Stripe test mode):
+# Live billing loop (Moyasar test mode):
 export FIREBASE_PROJECT_ID=captadel-app
 gcloud auth application-default login
-export STRIPE_SECRET_KEY=sk_test_…  STRIPE_WEBHOOK_SECRET=whsec_…  \
-       STRIPE_PRICE_ANNUAL=price_…  SITE_URL=http://localhost:8787
+export MOYASAR_SECRET_KEY=sk_test_…  MOYASAR_PUBLISHABLE_KEY=pk_test_…  \
+       MOYASAR_WEBHOOK_SECRET=whsec_…  MOYASAR_PRICE_ANNUAL_SAR=299 \
+       SITE_URL=http://localhost:8787
 npm start &
-stripe listen --forward-to localhost:8787/v1/billing/webhook
-# → sign up on /account.html, checkout with 4242, watch the entitlement flip.
+# → sign up on /account.html, Go Pro → checkout.html, pay with the Moyasar test
+#   card 4111 1111 1111 1111, watch the entitlement flip on return.
 
 # Gateway contract unchanged (flygaca embed):
 curl -s -XPOST localhost:8787/v1/chat -H 'X-Adel-Api-Key: …' \

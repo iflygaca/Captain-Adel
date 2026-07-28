@@ -5,7 +5,7 @@ rules_version = '2';
 //
 // The browser NEVER opens a Firestore connection: a pilot's plan and remaining
 // quota are served by the Captain Adel service via GET /v1/me (Admin SDK), and
-// entitlements are written only by the Stripe webhook (Admin SDK). The Admin SDK
+// entitlements are written only by the Moyasar billing routes (Admin SDK). The Admin SDK
 // bypasses these rules, so the safest possible policy is to deny every direct
 // client read and write. There is nothing here a client is meant to reach.
 //

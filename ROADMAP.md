@@ -63,7 +63,7 @@ starting with Fly GACA — plug into.
 - [x] **Mock exam** (timed, cited) and the **GACAR console** two-pane lockstep surface
 - [x] 👍/👎 **feedback loop** (`/v1/feedback`, PDPL-safe) + context-aware follow-ups (`followups.js`)
 - [x] Browser-native **voice** (STT dictation + TTS read-aloud) as progressive enhancement
-- [x] **Accounts, billing & quota** (Firebase + Stripe; ships dark until env is set)
+- [x] **Accounts, billing & quota** (Firebase + Moyasar; ships dark until env is set)
 
 ---
 
