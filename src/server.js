@@ -270,6 +270,17 @@ app.use((err, req, res, next) => {
   next();
 });
 
+// Apple Pay domain verification. Moyasar's Apple Pay flow requires the
+// merchant to host Apple's domain-association file at
+// /.well-known/apple-developer-merchantid-domain-association. The default
+// static handler skips dotfile directories (dotfiles: 'ignore'), so serve
+// public/.well-known/ explicitly and return its extensionless files as plain
+// text. Mounted before the site static; both lose to /health and /v1/*.
+app.use('/.well-known', express.static(path.join(__dirname, '..', 'public', '.well-known'), {
+  dotfiles: 'allow',
+  setHeaders: (res) => res.type('text/plain'),
+}));
+
 // Static captadel.com site. Served last so /health and /v1/* win.
 app.use(express.static(path.join(__dirname, '..', 'public'), { extensions: ['html'] }));
 
