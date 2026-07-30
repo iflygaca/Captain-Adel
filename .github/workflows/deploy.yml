@@ -78,9 +78,18 @@ jobs:
 
       # Optional: post the deploy result to Slack. Gated on the SLACK_WEBHOOK_URL
       # secret (mapped to job env above) so it silently no-ops until configured.
+      # Interpolated GitHub context values pass through env vars (never inlined
+      # into the run script) to avoid expression injection.
       - name: Notify Slack (deploy result)
         if: ${{ always() && env.SLACK_WEBHOOK_URL != '' }}
+        env:
+          REPO: ${{ github.repository }}
+          REF_NAME: ${{ github.ref_name }}
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
+          payload=$(printf '{"text": "*%s* deploy on `%s` → *%s* (<%s|run>)"}' \
+            "$REPO" "$REF_NAME" "$JOB_STATUS" "$RUN_URL")
           curl -fsS -X POST "$SLACK_WEBHOOK_URL" \
             -H 'Content-Type: application/json' \
-            -d "{\"text\": \"*${{ github.repository }}* deploy on \`${{ github.ref_name }}\` → *${{ job.status }}* (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|run>)\"}"
+            -d "$payload"
