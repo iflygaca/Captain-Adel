@@ -19,7 +19,7 @@
 'use strict';
 
 const bm25 = require('./bm25');
-const { makeSource } = require('./grounding');
+const { pushSource } = require('./grounding');
 const embeddings = require('./embeddings');
 
 // "Part 91 §91.155" / "part 61, 61.57" — a directly named Part + section.
@@ -35,16 +35,6 @@ const PARENT_EXPAND_TOP = 3;     // expand this many leading hits
 const MAX_PARENT_CHARS = 4000;   // cap for an expanded section
 function parentChildEnabled() {
   return String(process.env.ADEL_PARENT_CHILD || 'on').toLowerCase() !== 'off';
-}
-
-function pushSource(sources, seen, citation, url, text, version) {
-  if (!citation && !url) return;
-  let anchor = String(url || '');
-  if (anchor.includes('#')) anchor = anchor.replace(/-\d+$/, '');
-  const key = (citation ? citation.trim().toLowerCase() : '') + '|' + anchor;
-  if (seen.has(key)) return;
-  seen.add(key);
-  sources.push(makeSource(citation, url, text, version));
 }
 
 /* Package an ordered list of hits into the { context, sources } the model and

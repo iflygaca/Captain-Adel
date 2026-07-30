@@ -21,28 +21,17 @@ const { retrieveSmart } = require('./retrieve');
 const { rewriteQuery } = require('./rewrite');
 const { decorate } = require('./grounding');
 const { composeSystemInstruction } = require('./system-prompt');
+const { normalizeHistory } = require('./history');
+const { MAX_MESSAGE_CHARS } = require('./guards');
 
-const MAX_MESSAGE_CHARS = 4000;
-const MAX_HISTORY_TURNS = 12;
 // Wrap the read-mode turn in Arabic once the question is Arabic-dominant — the
 // same 0.4 threshold the router uses to send the turn to an Arabic provider, so
 // the scaffolding language matches the model that answers it.
 const AR_WRAP_THRESHOLD = 0.4;
 
-/* Normalise history to [{ role, text }]; drop the duplicate trailing user turn
- * chat clients push before POSTing (the current message is passed separately). */
+/* Normalise history to [{ role, text }] — see history.js for the shared rules. */
 function buildContents(message, history) {
-  const prior = Array.isArray(history) ? history.slice() : [];
-  const last = prior[prior.length - 1];
-  if (last && last.role === 'user' && String(last.text || '') === message) prior.pop();
-
-  const out = [];
-  for (const h of prior.slice(-MAX_HISTORY_TURNS)) {
-    const text = String((h && h.text) || '').trim();
-    if (!text) continue;
-    out.push({ role: h.role === 'model' ? 'model' : 'user', text });
-  }
-  return out;
+  return normalizeHistory(message, history);
 }
 
 /* Wrap retrieved passages + the question into the read-mode user turn. Shared by
@@ -55,10 +44,12 @@ function readUserTurn(message, context, arabic) {
       context + '\n\n---\nQUESTION: ' + message;
 }
 
-async function answerRead(provider, message, history, opts) {
-  // The retrieval query may be rewritten (follow-up resolution, AR->EN
-  // glossary — rewrite.js); the message the model answers stays untouched.
-  // Recorded on the SHARED opts object so decorate() can surface it in meta.
+/* Retrieve-then-read setup shared by the buffered and streaming read paths, so
+ * their prompt is byte-identical.
+ * The retrieval query may be rewritten (follow-up resolution, AR->EN glossary —
+ * rewrite.js); the message the model answers stays untouched. The rewrite is
+ * recorded on the SHARED opts object so decorate() can surface it in meta. */
+async function prepareRead(message, history, opts) {
   const query = await rewriteQuery(message, history);
   if (query !== message) opts._rewrittenQuery = query;
   const { context, sources } = await retrieveSmart(query, { topK: opts.topK || 4 });
@@ -72,6 +63,11 @@ async function answerRead(provider, message, history, opts) {
   });
   const contents = buildContents(message, history)
     .concat([{ role: 'user', text: readUserTurn(message, context, arabic) }]);
+  return { systemInstruction, contents, sources };
+}
+
+async function answerRead(provider, message, history, opts) {
+  const { systemInstruction, contents, sources } = await prepareRead(message, history, opts);
   const answer = await provider.complete({ systemInstruction, contents, opts });
   return { answer: String(answer || '').trim(), sources };
 }
@@ -211,17 +207,7 @@ async function* runProviderStream(name, message, history, opts) {
     yield* provider.answerAgenticStream(message, history, opts);
     return;
   }
-  // Mirrors answerRead(): rewrite the retrieval query only.
-  const query = await rewriteQuery(message, history);
-  if (query !== message) opts._rewrittenQuery = query;
-  const { context, sources } = await retrieveSmart(query, { topK: opts.topK || 4 });
-  const arabic = arabicRatio(message) >= AR_WRAP_THRESHOLD;
-  const systemInstruction = composeSystemInstruction({
-    product: opts.product, systemSuffix: opts.systemSuffix,
-    strategy: 'read', lang: arabic ? 'ar' : undefined, mode: opts.mode,
-  });
-  const contents = buildContents(message, history)
-    .concat([{ role: 'user', text: readUserTurn(message, context, arabic) }]);
+  const { systemInstruction, contents, sources } = await prepareRead(message, history, opts);
   for await (const delta of provider.completeStream({ systemInstruction, contents, opts })) {
     yield { type: 'token', delta };
   }

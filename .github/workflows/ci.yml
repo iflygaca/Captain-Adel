@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm install
+      - run: npm ci
       - run: npm run smoke
       # Unit tests for the deterministic brain: guards, routing, rate limiter and
       # the BM25 retriever (runs against the bundled corpus — no API key needed).
@@ -42,7 +42,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm install
+      - run: npm ci
       - name: Live eval (only when GEMINI_API_KEY is set)
         if: ${{ env.GEMINI_API_KEY != '' }}
         run: npm run eval
