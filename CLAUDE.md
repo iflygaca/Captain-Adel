@@ -177,6 +177,17 @@ All config comes from env (`.env`, copy from `.env.example`) via `src/config.js`
   synonyms should track `authoring/rag.py`.
 - `.gitattributes` forces `src/brain/bm25.js` to diff as text (it embeds Arabic
   combining marks that trip Git's binary heuristic).
+- **Shared frontend core:** helpers used by both chat and console (safe markdown,
+  § cites, grounding badge, session id, bilingual error copy, SSE transport) live
+  in `public/assets/js/chat-core.js` — a classic script loaded with `defer`
+  **before** `chat.js`/`console.js`, tested by `test/chat-core.test.js`. Sitewide
+  chrome behaviour (mobile-nav disclosure, footer year) lives in
+  `public/assets/js/site.js`, loaded on every page.
+- **Page chrome is intentionally copy-pasted:** the disclaimer strip, header
+  (`.site-nav` incl. the `.nav-burger`), and footer are duplicated across the 5
+  `public/*.html` pages — there is no build step, and a JS include would flash
+  and break no-JS rendering of the disclaimer. An edit to any of these blocks
+  must be applied to **all five pages**.
 - **Naming:** lowercase-hyphen filenames, `camelCase` functions, `UPPER_SNAKE` env
   vars, `UPPER_CASE` module constants.
 

@@ -182,12 +182,33 @@ function glossaryTerms(message) {
 
 /* One small LLM rewrite (llm mode only). Any failure -> null, caller falls
  * back to the heuristic. Kept lazy so heuristic/off modes never load the SDK. */
+const LLM_REWRITE_TIMEOUT_MS = 5000;
+
+/* Race `promise` against a timeout, resolving null on timeout AND on rejection
+ * (early or late). A bare Promise.race leaves the losing promise dangling: a
+ * rejection that lands after the timeout wins would surface as an unhandled
+ * rejection, and the never-cleared timer would pin the event loop for its full
+ * duration even when the call settled instantly. The timer stays ref'd so the
+ * race always settles — even in a short-lived CLI (evals) with nothing else on
+ * the loop. */
+function raceNullOnTimeout(promise, ms) {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(null), ms);
+    promise.then(
+      (v) => { clearTimeout(timer); resolve(v); },
+      () => { clearTimeout(timer); resolve(null); }
+    );
+  });
+}
+
 async function llmRewrite(message, history) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
   try {
     const { GoogleGenAI } = require('@google/genai');
-    const ai = new GoogleGenAI({ apiKey });
+    // Match the request's own timeout to the race window so the abandoned
+    // request is actually torn down instead of running on unobserved.
+    const ai = new GoogleGenAI({ apiKey, httpOptions: { timeout: LLM_REWRITE_TIMEOUT_MS } });
     const thread = (Array.isArray(history) ? history : []).slice(-6)
       .map((h) => `${h.role === 'model' ? 'A' : 'Q'}: ${String(h.text || '').slice(0, 300)}`)
       .join('\n');
@@ -201,8 +222,7 @@ async function llmRewrite(message, history) {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       config: { temperature: 0, maxOutputTokens: 80 },
     });
-    const timeout = new Promise((resolve) => setTimeout(() => resolve(null), 5000));
-    const resp = await Promise.race([call, timeout]);
+    const resp = await raceNullOnTimeout(call, LLM_REWRITE_TIMEOUT_MS);
     const text = resp && resp.text ? String(resp.text).trim() : '';
     return text && text.length <= 300 ? text : null;
   } catch (_) {
@@ -234,4 +254,4 @@ async function rewriteQuery(message, history = []) {
   return msg + ' ' + extra.join(' ');
 }
 
-module.exports = { rewriteQuery, isFollowUp, harvestTerms, glossaryTerms };
+module.exports = { rewriteQuery, isFollowUp, harvestTerms, glossaryTerms, raceNullOnTimeout };

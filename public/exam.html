@@ -13,6 +13,7 @@
   <script src="assets/js/i18n.js" defer></script>
 </head>
 <body>
+  <a class="visually-hidden" href="#main" data-en="Skip to content">تخطَّ إلى المحتوى</a>
   <div class="disclaimer-strip">
     <div class="container">
       <span data-i18n-html
@@ -33,13 +34,14 @@
           <span class="lockup-sub" data-en="Saudi civil aviation">الطيران المدني السعودي</span>
         </span>
       </a>
-      <nav class="nav-links" aria-label="رئيسية">
+      <nav class="nav-links" id="site-menu" aria-label="رئيسية">
         <a href="/" data-en="Home">الرئيسية</a>
         <a href="chat.html" data-en="Ask">اسأل</a>
         <a href="exam.html" aria-current="page" data-en="Exam">الاختبار</a>
         <a href="https://gaca.gov.sa" target="_blank" rel="noopener" data-en="GACA ↗">الهيئة ↗</a>
       </nav>
       <div class="nav-actions">
+        <button type="button" class="nav-burger" aria-expanded="false" aria-controls="site-menu" aria-label="القائمة">☰</button>
         <button type="button" class="lang-toggle" lang="en">EN</button>
         <a class="btn btn-ghost" href="account.html" data-en="Account">حسابي</a>
         <a class="btn btn-primary" href="chat.html" data-en="Ask Captain Adel">اسأل كابتن عادل</a>
@@ -70,6 +72,7 @@
 
   <div id="site-footer"></div>
 
+  <script src="assets/js/site.js" defer></script>
   <script src="assets/js/exam.js" defer></script>
 </body>
 </html>

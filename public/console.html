@@ -11,13 +11,15 @@
   <link rel="stylesheet" href="assets/css/adel.css">
   <link rel="stylesheet" href="assets/css/console.css">
   <script src="assets/js/footer.js" defer></script>
+  <script src="assets/js/i18n.js" defer></script>
 </head>
 <body class="console-page">
-  <a class="visually-hidden" href="#main">Skip to content</a>
+  <a class="visually-hidden" href="#main" data-ar="تخطَّ إلى المحتوى">Skip to content</a>
 
   <div class="disclaimer-strip">
     <div class="container">
-      <span><strong>Independent educational reference.</strong> Not affiliated with GACA —
+      <span data-i18n-html
+        data-ar='<strong>مرجع تعليمي مستقل.</strong> غير تابع للهيئة العامة للطيران المدني — تحقّق دائماً من المصدر الرسمي، <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.'><strong>Independent educational reference.</strong> Not affiliated with GACA —
       always verify against the official source,
       <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.</span>
     </div>
@@ -28,20 +30,21 @@
       <a class="lockup" href="/" aria-label="Captain Adel — home">
         <img src="assets/img/captain/avatar.png" alt="" width="40" height="40">
         <span>
-          <span class="wordmark"><span class="wm-capt">Captain</span> <span class="wm-adel">Adel</span></span>
+          <span class="wordmark" data-i18n-html
+            data-ar='<span class="wm-capt">كابتن</span> <span class="wm-adel">عادل</span>'><span class="wm-capt">Captain</span> <span class="wm-adel">Adel</span></span>
           <span class="lockup-sub">GACAR.console</span>
         </span>
       </a>
-      <nav class="nav-links" aria-label="Primary">
-        <a href="/">Home</a>
-        <a href="chat.html">Ask</a>
-        <a href="console.html" aria-current="page">Console</a>
-        <a href="https://gaca.gov.sa" target="_blank" rel="noopener">GACA ↗</a>
-        <span class="lang-seg" role="group" aria-label="Language">
-          <button id="lang-en" type="button" aria-pressed="true">EN</button>
-          <button id="lang-ar" type="button" aria-pressed="false" lang="ar">ع</button>
-        </span>
+      <nav class="nav-links" id="site-menu" aria-label="Primary">
+        <a href="/" data-ar="الرئيسية">Home</a>
+        <a href="chat.html" data-ar="اسأل">Ask</a>
+        <a href="console.html" aria-current="page" data-ar="الكونسول">Console</a>
+        <a href="https://gaca.gov.sa" target="_blank" rel="noopener" data-ar="الهيئة ↗">GACA ↗</a>
       </nav>
+      <div class="nav-actions">
+        <button type="button" class="nav-burger" aria-expanded="false" aria-controls="site-menu" aria-label="Menu">☰</button>
+        <button type="button" class="lang-toggle" lang="ar">العربية</button>
+      </div>
     </div>
   </header>
 
@@ -52,8 +55,8 @@
         <span class="qbar-caret" aria-hidden="true">›</span>
         <label class="visually-hidden" for="q">Ask the GACAR</label>
         <input id="q" type="text"
-          data-en-ph="ask a question — or jump to a section like  91.155"
-          data-ar-ph="اسأل سؤالاً — أو انتقل إلى مادة مثل  91.155"
+          data-ph-en="ask a question — or jump to a section like  91.155"
+          data-ph-ar="اسأل سؤالاً — أو انتقل إلى مادة مثل  91.155"
           placeholder="ask a question — or jump to a section like  91.155"
           spellcheck="false">
         <kbd class="qbar-kbd">⌘K</kbd>
@@ -63,7 +66,7 @@
           </svg>
         </button>
       </form>
-      <p class="qbar-hint"
+      <p class="qbar-hint" data-i18n-html
          data-en="Press <b>⌘K</b> / <b>/</b> to focus. Use <b>↑ ↓</b> to walk citations — the Source pane snaps to each."
          data-ar="اضغط <b>⌘K</b> / <b>/</b> للتركيز. استخدم <b>↑ ↓</b> للتنقّل بين الاستشهادات — تنتقل لوحة المصدر إلى كلٍّ منها.">
         Press <b>⌘K</b> / <b>/</b> to focus. Use <b>↑ ↓</b> to walk citations — the Source pane snaps to each.
@@ -78,10 +81,16 @@
                data-ar="كل إجابة تبدأ بمدى استنادها إلى المصدر والمادة التي تقوم عليها — اقرأ النص الحاكم في اللوحة المجاورة.">
               Every answer leads with how grounded it is and the exact section it rests on — read the governing text in the pane beside it.</p>
             <div class="suggest" id="suggest">
-              <button type="button" data-q="What are the VFR weather minima in controlled airspace?">VFR weather minima</button>
-              <button type="button" data-q="What's required for a GACAR commercial pilot licence?">CPL requirements</button>
-              <button type="button" data-q="What are the fuel reserve requirements for a Part 121 flight?">Part 121 fuel reserves</button>
-              <button type="button" data-q="91.155">Jump to §91.155</button>
+              <button type="button" data-q="What are the VFR weather minima in controlled airspace?"
+                data-q-ar="ما هي حدود الطقس للطيران البصري VFR في المجال الجوي المراقب؟"
+                data-ar="حدود طقس الطيران البصري">VFR weather minima</button>
+              <button type="button" data-q="What's required for a GACAR commercial pilot licence?"
+                data-q-ar="ما متطلبات رخصة الطيار التجاري CPL وفق لوائح GACAR؟"
+                data-ar="متطلبات رخصة الطيار التجاري">CPL requirements</button>
+              <button type="button" data-q="What are the fuel reserve requirements for a Part 121 flight?"
+                data-q-ar="ما متطلبات احتياطي الوقود لرحلة وفق Part 121؟"
+                data-ar="احتياطي وقود Part 121">Part 121 fuel reserves</button>
+              <button type="button" data-q="91.155" data-ar="انتقل إلى §91.155">Jump to §91.155</button>
             </div>
           </div>
         </section>
@@ -116,6 +125,8 @@
 
   <div id="site-footer" data-compact></div>
 
+  <script src="assets/js/site.js" defer></script>
+  <script src="assets/js/chat-core.js" defer></script>
   <script src="assets/js/console.js" defer></script>
 </body>
 </html>

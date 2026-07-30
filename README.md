@@ -112,8 +112,10 @@ retrieval is pure BM25 and unchanged.
 npm run test:unit                                # node --test test/*.test.js, no key
 ```
 
-Fast, deterministic, dependency-free brain tests that gate every PR (CI runs
-them in the `eval` job after `npm ci`): `guards` (input cleaning + injection
+Fast, deterministic, dependency-free brain tests that gate every PR (ci.yml's
+`build` job runs them on every push/PR via `npm run test:coverage` — the same
+suite plus a report-only coverage table — and deploy.yml's `test` job runs
+`npm run test:unit`, both after `npm ci`): `guards` (input cleaning + injection
 hardening), `bm25` (retriever over the bundled corpus), `ratelimit`, `route`
 (language/provider routing), and `grounding` — the cite-or-refuse layer
 (`makeSource`, `extractCitations`, `splitClaims`, `classifyRefusal`,

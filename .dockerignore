@@ -6,4 +6,8 @@ npm-debug.log
 .github
 deploy
 evals
+test
+authoring
+scripts
+docs
 **/*.md

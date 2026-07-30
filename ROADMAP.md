@@ -76,7 +76,7 @@ starting with Fly GACA — plug into.
   Actions disabled), **not a code failure** — every CI step passes locally
   (`smoke` · `test:coverage` 295/295 · `eval:dry`). Fix in **Settings → Billing → Actions** and
   **Settings → Actions**, then re-run. *Nothing in the codebase needs to change to go green.*
-- [ ] **Pin the CI install** — `npm ci` (lockfile-exact), not `npm install`, so the structure
+- [x] **Pin the CI install** — `npm ci` (lockfile-exact), not `npm install`, so the structure
   check is deterministic.
 - [ ] **Live-eval as a gated check** — run the Gemini eval (and ALLaM when an endpoint exists)
   as a required PR check, not just `--dry` (already stubbed in `ci.yml` behind `GEMINI_API_KEY`).

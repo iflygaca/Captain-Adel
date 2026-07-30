@@ -19,13 +19,6 @@ body.console-page::after {
   mask: radial-gradient(120% 80% at 50% 10%, #000 30%, transparent 90%);
 }
 
-/* language toggle in the nav — segmented instrument switch */
-.lang-seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: var(--r-pill); overflow: hidden; box-shadow: var(--hair); }
-.lang-seg button { background: transparent; border: 0; color: var(--ink-dim); font: inherit; font-size: 13px; font-weight: 700; padding: 6px 12px; cursor: pointer; transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease); }
-.lang-seg button[aria-pressed="true"] { background: var(--panel-3); color: var(--ink); }
-.lang-seg button:hover { color: var(--gold-soft); }
-.lang-seg button + button { border-inline-start: 1px solid var(--line-2); }
-
 .console-main { padding: var(--s-5) 0 var(--s-6); }
 
 /* ---- command palette ---- */

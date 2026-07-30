@@ -51,3 +51,9 @@ test('the feature is dormant when ADEL_API_KEY is unset — even a blank provide
   assert.equal(run({ provided: '', configured: '' }).trusted, false);
   assert.equal(run({ provided: 'anything', configured: '' }).trusted, false);
 });
+
+test('a wrong key of a different length is untrusted and does not throw', () => {
+  const { trusted, nexted } = run({ provided: 'short', configured: 'a-much-longer-configured-secret' });
+  assert.equal(trusted, false);
+  assert.equal(nexted, true);
+});
