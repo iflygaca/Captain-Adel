@@ -40,6 +40,9 @@ jobs:
     env:
       GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
       REGION: ${{ github.event.inputs.region || vars.CAPTADEL_REGION || 'me-central2' }}
+      # Optional Slack deploy alerts (see Office/06-operations-it/slack-best-practices.md §8.1).
+      # No-op until the SLACK_WEBHOOK_URL secret is set in this repo's Actions secrets.
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -72,3 +75,21 @@ jobs:
           echo "Service URL: $URL"
           curl -fsS "$URL/health" | grep '"status":"ok"'
           echo "✅ Deployed and healthy: $URL" >> "$GITHUB_STEP_SUMMARY"
+
+      # Optional: post the deploy result to Slack. Gated on the SLACK_WEBHOOK_URL
+      # secret (mapped to job env above) so it silently no-ops until configured.
+      # Interpolated GitHub context values pass through env vars (never inlined
+      # into the run script) to avoid expression injection.
+      - name: Notify Slack (deploy result)
+        if: ${{ always() && env.SLACK_WEBHOOK_URL != '' }}
+        env:
+          REPO: ${{ github.repository }}
+          REF_NAME: ${{ github.ref_name }}
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          payload=$(printf '{"text": "*%s* deploy on `%s` → *%s* (<%s|run>)"}' \
+            "$REPO" "$REF_NAME" "$JOB_STATUS" "$RUN_URL")
+          curl -fsS -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d "$payload"
