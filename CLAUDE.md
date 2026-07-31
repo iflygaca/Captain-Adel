@@ -29,6 +29,7 @@ Node 20, npm (lockfile `package-lock.json`). All scripts live in `package.json`.
 | `npm start` | Run the server: `node src/server.js` (port `8787`). |
 | `npm run smoke` | Loads the server module (no keys) — fast sanity check. CI-safe. |
 | `npm run test:unit` | Unit tests: `node --test test/*.test.js`. Deterministic, **no API keys / no network**. |
+| `npm run test:coverage` | Same suite with `--experimental-test-coverage` (report-only, never fails the build). What `ci.yml`'s `build` job actually runs. |
 | `npm run eval:dry` | Validate `evals/cases.json` structure only, no model calls. CI-safe. |
 | `npm run eval` | Full regression suite against the live brain. Needs `GEMINI_API_KEY`. |
 | `npm run eval:allam` / `:jais` / `:fanar` / `:qwen` / `:commandr` | Eval a specific provider (needs that endpoint configured). |
@@ -40,7 +41,8 @@ There is **no eslint/prettier/editorconfig** — style is maintained by conventi
 and review only. Match the surrounding code.
 
 Before pushing: run `npm run smoke && npm run test:unit && npm run eval:dry`
-(the exact set CI runs without secrets).
+(what `deploy.yml`'s gate runs without secrets; `ci.yml`'s `build` job runs the
+same tests via `test:coverage` instead, for the report-only coverage table).
 
 ## Architecture
 
@@ -73,8 +75,11 @@ citations, detects unsupported claims, classifies refusals, and shapes `sources`
 per-claim LLM judge (opt-in).
 
 `POST /v1/chat` response shape:
-`{ answer, sources, kind, refusalClass, grounding, meta }`. Supports SSE streaming
-via `?stream=1` or `Accept: text/event-stream`. The contract version is echoed as
+`{ answer, sources, kind, refusalClass, grounding, suggestions, meta }` —
+`suggestions` (`src/brain/followups.js`) are the chat UI's "keep exploring"
+chips, derived from the Parts just cited (falling back to a curated generic
+set); pure/deterministic, no extra model call. Supports SSE streaming via
+`?stream=1` or `Accept: text/event-stream`. The contract version is echoed as
 `X-Adel-Api-Version` (currently `1`); bump only on a breaking shape change.
 
 ## Directory map
@@ -98,7 +103,9 @@ src/
     grounding.js       Cite-or-refuse: claims, refusal classes, source shaping
     guards.js          Input validation, size caps, soft injection detection
     ratelimit.js       In-memory sliding window (IP / burst / session)
-    rewrite.js         Query rewriting (follow-up resolution)
+    rewrite.js         Retrieval-query rewriting for follow-ups (ADEL_REWRITE)
+    followups.js       "Keep exploring" chip suggestions (Part-aware, pure)
+    history.js         Conversation-history normalization (shared leaf module)
     system-prompt.js   Composed system instruction (product-neutral core)
     tenants.js         Per-product framing (captadel vs flygaca)
     providers/         gemini.js (agentic) + openai-compatible.js factory for
@@ -107,7 +114,8 @@ src/
     _chunks.json.gz    Bundled GACAR corpus (BM25 index source)
   quota/               Firestore-backed free-tier usage meter (fails open)
   billing/             Moyasar + Firebase SaaS layer (dark until env set)
-public/                Vanilla bilingual HTML/CSS/JS site (index/chat/account/console/exam)
+public/                Vanilla bilingual HTML/CSS/JS site (index/chat/account/console/
+                       checkout/exam/privacy/terms — 8 pages)
 test/                  Unit tests ({component}.test.js, node --test)
 evals/                 Regression harness (cases.json, run.js, parity.js, lib.js, checks/)
 scripts/               One-off scripts (build-embeddings.js)
@@ -137,10 +145,14 @@ All config comes from env (`.env`, copy from `.env.example`) via `src/config.js`
 **No secrets in code.** Key groups:
 
 - **Provider:** `MODEL_PROVIDER` (`gemini|allam|jais|fanar|qwen|commandr|auto`),
-  `ARABIC_PROVIDER`, `GEMINI_API_KEY`, `CAPTAIN_ADEL_MODEL`, and per-provider
-  `<NAME>_BASE_URL` / `_MODEL` / `_API_KEY` (each OFF until its `_BASE_URL` is set).
+  `ARABIC_PROVIDER`, `GEMINI_API_KEY`, `CAPTAIN_ADEL_MODEL`, `ADEL_GEMINI_TIMEOUT_MS`
+  (default 60000), and per-provider `<NAME>_BASE_URL` / `_MODEL` / `_API_KEY`
+  (each OFF until its `_BASE_URL` is set).
 - **Retrieval (optional):** `EMBEDDINGS_BASE_URL` / `_MODEL` / `_API_KEY`,
-  `RERANK_BASE_URL` / `_MODEL` / `_API_KEY`.
+  `RERANK_BASE_URL` / `_MODEL` / `_API_KEY`, `ADEL_REWRITE`
+  (`heuristic|llm|off`, default `heuristic`) + `ADEL_REWRITE_MODEL` — retrieval-query
+  rewriting for follow-ups (`rewrite.js`); read directly from `process.env`, not
+  via `config.js`.
 - **Security/abuse:** `ADEL_API_KEY` (trusted tier), `ALLOWED_ORIGINS`,
   `ADEL_RL_IP` / `ADEL_RL_BURST` / `ADEL_RL_SESSION`, `ADEL_MAX_SOURCES`.
 - **SaaS (dark by default):** `FIREBASE_PROJECT_ID`, `MOYASAR_*`, `CRON_SECRET`, `ADEL_DAILY_FREE`,
@@ -156,10 +168,12 @@ All config comes from env (`.env`, copy from `.env.example`) via `src/config.js`
   `firestore.rules` is **blanket-deny** — the browser never opens Firestore
   directly; the Admin SDK (server) bypasses rules. Collections: `users/{uid}`
   (entitlements), `adelQuota/...` (TTL-purged usage).
-- **CI** (`.github/workflows/`): `ci.yml` runs `smoke` + `test:unit` + `eval:dry`
-  on push/PR (live `eval` only weekly/dispatch, gated on `GEMINI_API_KEY`).
-  `deploy.yml` deploys on push to `main`, gated on `GCP_SA_KEY`; health check hits
-  `/health`.
+- **CI** (`.github/workflows/`): `ci.yml`'s `build` job runs `smoke` + `test:coverage`
+  + `eval:dry` on push/PR (live `eval` only weekly/dispatch, gated on
+  `GEMINI_API_KEY`). `deploy.yml` re-runs `smoke` + `test:unit` + `eval:dry` as its
+  gate, then deploys on push to `main` (gated on `GCP_SA_KEY`), health-checks
+  `/health`, and optionally posts the result to Slack (`SLACK_WEBHOOK_URL`, dark
+  until set).
 
 ## Conventions & gotchas
 
@@ -183,11 +197,15 @@ All config comes from env (`.env`, copy from `.env.example`) via `src/config.js`
   **before** `chat.js`/`console.js`, tested by `test/chat-core.test.js`. Sitewide
   chrome behaviour (mobile-nav disclosure, footer year) lives in
   `public/assets/js/site.js`, loaded on every page.
-- **Page chrome is intentionally copy-pasted:** the disclaimer strip, header
-  (`.site-nav` incl. the `.nav-burger`), and footer are duplicated across the 5
-  `public/*.html` pages — there is no build step, and a JS include would flash
-  and break no-JS rendering of the disclaimer. An edit to any of these blocks
-  must be applied to **all five pages**.
+- **Page chrome — disclaimer strip and header are copy-pasted, footer is not:**
+  the `.disclaimer-strip` and header (`.site-nav` incl. the `.nav-burger`) are
+  hand-duplicated across all 8 `public/*.html` pages — there is no build step,
+  and a JS include would flash and break no-JS rendering of the disclaimer. An
+  edit to either block must be applied to **all eight pages**. The footer is the
+  one exception: `public/assets/js/footer.js` (loaded `defer`, before `i18n.js`)
+  renders the single canonical footer into `<div id="site-footer">` on every
+  page — edit it there, not per-page. Pages that are app surfaces mark the mount
+  `data-compact` for the short identity-only variant.
 - **Naming:** lowercase-hyphen filenames, `camelCase` functions, `UPPER_SNAKE` env
   vars, `UPPER_CASE` module constants.
 
