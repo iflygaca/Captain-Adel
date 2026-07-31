@@ -1,4 +1,16 @@
+<div align="center">
+
+<img src="public/assets/img/captain/avatar.png" alt="Captain Adel" width="140" />
+
 # Captain Adel
+
+<p>
+  <a href="https://github.com/FlyGACA/Captain-Adel/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/FlyGACA/Captain-Adel/ci.yml?style=for-the-badge&label=CI&labelColor=0a0e12&color=2d6e8a" alt="CI Status" /></a>
+  <a href="package.json"><img src="https://img.shields.io/badge/node-20-2d6e8a?style=for-the-badge&logo=node.js&logoColor=white&labelColor=0a0e12" alt="Node 20" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-8fc9a8?style=for-the-badge&labelColor=0a0e12" alt="License" /></a>
+</p>
+
+</div>
 
 **An independent AI flight instructor for Saudi civil aviation.** Captain Adel
 answers GACAR questions with the exact Part and section cited, and refuses
