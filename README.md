@@ -19,6 +19,9 @@ A single Node service that serves both the captadel.com site and the chat API:
 ```
 public/            the captadel.com site (landing + chat) — own brand
 src/server.js      Express: GET /health, POST /v1/chat, serves public/
+src/middleware/    CORS allowlist, Firebase auth, X-Adel-Api-Key check
+src/quota/         Firestore-backed free-tier usage meter (fails open)
+src/billing/       Moyasar + Firebase SaaS layer — entitlements, tiers, routes (dark until env set)
 src/brain/         THE BRAIN — single source of truth
   answer.js          orchestrator: pick provider + strategy
   retrieve.js        retrieve-then-read (BM25 in code)
@@ -32,6 +35,7 @@ src/brain/         THE BRAIN — single source of truth
   guards.js          input validation + soft injection hardening
   ratelimit.js       per IP / session abuse limiter
   _chunks.json.gz    the GACAR corpus
+test/              unit tests (node --test), one file per src/ module
 evals/             regression harness (run against either provider)
 deploy/            docker-compose + the ALLaM (vLLM) runbook
 ```
