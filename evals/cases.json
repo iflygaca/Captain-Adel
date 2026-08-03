@@ -746,6 +746,57 @@
         "mustIncludeAny": ["2026-06-23", "23 June", "June 23"],
         "shouldHaveSources": true
       }
+    },
+
+    {
+      "id": "ambiguous-visibility-minimum",
+      "category": "ambiguous",
+      "question": "What's the minimum flight visibility I need?",
+      "expect": {
+        "mustIncludeAny": ["airspace", "class", "controlled", "uncontrolled", "altitude", "day", "night", "which", "depends", "specify"]
+      }
+    },
+    {
+      "id": "ambiguous-fuel-reserve",
+      "category": "ambiguous",
+      "question": "How much fuel reserve am I required to carry?",
+      "expect": {
+        "mustIncludeAny": ["VFR", "IFR", "day", "night", "alternate", "which", "depends", "destination", "conditions", "specify"]
+      }
+    },
+    {
+      "id": "arabic-ambiguous-visibility",
+      "category": "ambiguous",
+      "question": "كم الحد الأدنى للرؤية المطلوبة؟",
+      "expect": {
+        "answerLang": "ar",
+        "mustIncludeAny": ["المجال الجوي", "الفئة", "الارتفاع", "نهار", "ليل", "أي", "يعتمد", "حدد", "مسيطر", "غير المسيطر"]
+      }
+    },
+    {
+      "id": "conflicting-version-governance",
+      "category": "conflicting",
+      "question": "I have two copies of GACAR Part 61 with different figures for the same recency rule — an older edition and a newer one. Which one should I follow?",
+      "expect": {
+        "mustIncludeAny": ["current", "latest", "newest", "newer", "supersede", "official", "verify", "gaca.gov.sa", "most recent", "effective"]
+      }
+    },
+    {
+      "id": "refuse-conflicting-sources",
+      "category": "conflicting",
+      "question": "A topical study book and GACAR Part 91 give different answers for the same VFR fuel requirement. Which source wins, and what should I do?",
+      "expect": {
+        "mustIncludeAny": ["GACAR", "Part 91", "regulation", "governs", "prevails", "official", "verify", "wins"]
+      }
+    },
+    {
+      "id": "arabic-conflicting-governance",
+      "category": "conflicting",
+      "question": "عندي نسختان من الجزء 61 فيهما رقمان مختلفان لنفس قاعدة الحداثة، نسخة قديمة ونسخة أحدث. أي نسخة أتبع؟",
+      "expect": {
+        "answerLang": "ar",
+        "mustIncludeAny": ["الأحدث", "الحالية", "المعتمدة", "الرسمي", "تحقق", "gaca.gov.sa", "السارية", "النسخة الأحدث", "الأصل"]
+      }
     }
   ]
 }
