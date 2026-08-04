@@ -1,0 +1,23 @@
+# Dependency update cadence. Grouped + weekly to keep PR noise low; security
+# updates still open individually as Dependabot sees fit. Mirrors the Fly GACA
+# monorepo's config (this service is one npm package at the repo root).
+version: 2
+updates:
+  # The service (root package.json — express, firebase-admin, @google/genai)
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  # Keep GitHub Actions pinned versions current (checkout, setup-node)
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
