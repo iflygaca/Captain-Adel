@@ -57,8 +57,9 @@ quota) → `src/brain/index.js` (`answer()` / `answerStream()` / `warmUp()`).
 The brain has **two answer strategies**, chosen by provider:
 
 1. **Agentic (Gemini, default English path):** the model drives its own tool
-   calls — `search_library`, `lookup_citation`, plus flight-computer tools in
-   `src/brain/tools/` — and is responsible for its own citations.
+   calls — `search_library`, `lookup_citation`, `list_changes`, plus
+   flight-computer tools in `src/brain/tools/` — and is responsible for its own
+   citations.
 2. **Retrieve-Then-Read (all Arabic providers; optional for Gemini):** BM25
    retrieval runs **in code** (`retrieve.js` + `bm25.js`); passages are handed to
    the model in a read-only prompt and it may cite **only** the retrieved text.
