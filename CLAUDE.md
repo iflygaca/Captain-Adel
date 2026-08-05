@@ -278,5 +278,7 @@ advanced switches (`ADEL_REWRITE*`, `ADEL_GROUNDING`, `ADEL_PARENT_CHILD`,
 
 ## Where to read more
 
+> 📖 **Family context:** [The Book of Fly GACA](https://github.com/ay2m/FlyGACA/blob/main/THE-BOOK-OF-FLY-GACA.md) is the whole-family reference — all ten repos, the shared tenets, and the glossary in one place.
+
 `README.md` (overview), `ROADMAP.md` (direction), `evals/README.md`, and
 `docs/` (`models.md`, `refusal-taxonomy.md`, `data-contract.md`, the RUNBOOKs).
