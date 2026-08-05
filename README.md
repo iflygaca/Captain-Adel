@@ -52,6 +52,10 @@ evals/             regression harness (run against either provider)
 deploy/            docker-compose + the ALLaM (vLLM) runbook
 ```
 
+## The Fly GACA family
+
+Captain Adel is one of ten repositories. [**The Book of Fly GACA**](https://github.com/ay2m/FlyGACA/blob/main/THE-BOOK-OF-FLY-GACA.md) is the whole-family reference — every repo, the shared principles, the data-parity contracts and the glossary in one place.
+
 ## The API
 
 `POST /v1/chat`
