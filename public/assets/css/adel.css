@@ -703,11 +703,86 @@ html[dir="rtl"] .cite, html[dir="rtl"] .src-cite { direction: ltr; unicode-bidi:
 .review-wrong-ans { color: var(--flag); font-size: 13.5px; }
 .review-explain { font-size: 13px; margin-top: var(--s-2); color: var(--ink); background: var(--night-2); padding: 11px 13px; border-radius: var(--r-sm); border-inline-start: 3px solid var(--gold); }
 .review-cite { font-size: 12px; color: var(--gold-soft); margin-top: 6px; }
+
+/* ---- start screen: avatar, mode switch, topic/size pickers, resume -------- */
+.exam-start-avatar { border-radius: 50%; box-shadow: 0 0 24px rgba(74, 156, 184, .18); margin-bottom: var(--s-4); }
+.exam-start-btn { font-size: 16px; padding: 14px 32px; cursor: pointer; }
+.exam-kbd-hint { font-size: 12px; color: var(--ink-faint); font-family: var(--mono); margin-top: var(--s-4); }
+
+.exam-mode-toggle { display: inline-flex; gap: 4px; padding: 4px; margin: 0 auto var(--s-5); background: var(--panel-2); border: 1px solid var(--line-2); border-radius: var(--r-pill); }
+.exam-mode-btn { font-size: 13.5px; font-weight: 700; padding: 9px 20px; border-radius: var(--r-pill); border: 0; background: transparent; color: var(--ink-dim); cursor: pointer; transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease); }
+.exam-mode-btn:hover { color: var(--ink); }
+.exam-mode-btn.on { background: var(--grad-gold); color: #1A1206; box-shadow: var(--glow-gold); }
+
+.exam-topic-picker { margin: 0 auto var(--s-4); max-width: 620px; }
+.exam-picker-label { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--ink-faint); margin: var(--s-4) 0 var(--s-2); text-align: start; }
+.exam-chips { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.exam-chips.center { justify-content: center; }
+.exam-chip { font-size: 13px; padding: 8px 15px; border-radius: var(--r-pill); border: 1px solid var(--line-2); background: var(--panel-2); color: var(--ink-dim); cursor: pointer; transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), background var(--dur-1) var(--ease); }
+.exam-chip:hover { border-color: var(--accent); color: var(--ink); }
+.exam-chip.on { border-color: var(--gold); background: rgba(200, 160, 74, .1); color: var(--gold-soft); }
+.exam-chip.gap { border-color: var(--flag); color: var(--flag); font-family: var(--mono); min-width: 40px; }
+.exam-chip.flag { border-color: var(--amber); color: var(--amber); font-family: var(--mono); min-width: 40px; }
+
+.exam-resume { margin: var(--s-4) auto 0; max-width: 460px; padding: var(--s-4); background: var(--panel-2); border: 1px solid var(--gold-deep); border-radius: var(--r); box-shadow: var(--hair); }
+.exam-resume p { margin: 0 0 var(--s-3); color: var(--ink); }
+.exam-resume-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: var(--s-4); }
+
+/* ---- in-exam HUD: count, palette navigator -------------------------------- */
+.exam-top-count { font-family: var(--mono); font-weight: 700; font-size: 13.5px; color: var(--ink-dim); }
+.exam-palette { display: flex; flex-wrap: wrap; gap: 6px; padding: var(--s-3) var(--s-6) 0; }
+.exam-cell { width: 30px; height: 30px; font-size: 12.5px; font-family: var(--mono); border-radius: var(--r-sm); border: 1px solid var(--line-2); background: var(--panel-2); color: var(--ink-faint); cursor: pointer; transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), background var(--dur-1) var(--ease); position: relative; }
+.exam-cell:hover { border-color: var(--accent); color: var(--ink); }
+.exam-cell.answered { background: rgba(200, 160, 74, .12); border-color: var(--gold-deep); color: var(--gold-soft); }
+.exam-cell.current { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); color: var(--ink); }
+.exam-cell.flagged::after { content: ""; position: absolute; top: 2px; inset-inline-end: 2px; width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
+
+.exam-nav-left { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.exam-nav-right { display: flex; gap: 10px; align-items: center; }
+.exam-finish-link { font-size: 12.5px; color: var(--ink-dim); background: transparent; border: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.exam-finish-link:hover { color: var(--gold-soft); }
+.exam-review-note { font-size: 13px; color: var(--flag); margin: var(--s-3) 0; }
+
+/* ---- result: topic breakdown bars ----------------------------------------- */
+.exam-section-h { text-align: start; margin: var(--s-6) 0 var(--s-3); font-size: 16px; }
+.exam-topicbars { display: flex; flex-direction: column; gap: var(--s-2); text-align: start; }
+.tb-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(90px, 160px) auto; align-items: center; gap: var(--s-3); }
+.tb-label { font-size: 13px; color: var(--ink-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tb-bar { height: 8px; background: var(--line); border-radius: var(--r-pill); overflow: hidden; }
+.tb-fill { height: 100%; background: var(--flag); border-radius: var(--r-pill); transition: width var(--dur-3) var(--ease); }
+.tb-fill.ok { background: var(--sage); }
+.tb-pct { font-family: var(--mono); font-size: 12.5px; color: var(--ink-faint); min-width: 42px; text-align: end; }
+
+/* ---- Ask Captain Adel (inline grounded answer in review/practice) --------- */
+.ask-adel { margin-top: var(--s-3); }
+.ask-adel-btn { font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: var(--r-pill); border: 1px solid var(--accent-2); background: rgba(74, 156, 184, .08); color: var(--accent); cursor: pointer; transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease); }
+.ask-adel-btn:hover:not(:disabled) { background: rgba(74, 156, 184, .16); border-color: var(--accent); }
+.ask-adel-btn:disabled { opacity: .6; cursor: default; }
+.ask-panel { margin-top: var(--s-3); padding: var(--s-4); background: var(--night-2); border: 1px solid var(--line-2); border-radius: var(--r); border-inline-start: 3px solid var(--accent-2); }
+.ask-head { display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-2); }
+.ask-head img { border-radius: 50%; box-shadow: 0 0 0 1px var(--line-2); }
+.ask-name { font-weight: 800; font-size: 13.5px; color: var(--gold-soft); }
+.ask-prose { font-size: 13.5px; line-height: 1.6; color: var(--ink); }
+.ask-prose p { margin: 0 0 var(--s-2); }
+.ask-prose p:last-child { margin-bottom: 0; }
+.ask-prose strong { color: var(--gold-soft); }
+.ask-prose ul { margin: 0 0 var(--s-2); padding-inline-start: 1.2em; }
+.ask-prose.streaming::after { content: "▋"; color: var(--accent); animation: blink 1s steps(2) infinite; }
+.ask-sources { margin-top: var(--s-3); display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); }
+.ask-sources .src-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--ink-faint); }
+.ask-src { font-size: 12px; font-family: var(--mono); color: var(--gold-soft); padding: 3px 9px; border-radius: var(--r-sm); background: var(--panel-2); border: 1px solid var(--line-2); }
+a.ask-src:hover { border-color: var(--gold); }
+.ask-continue { display: inline-block; margin-top: var(--s-3); font-size: 12.5px; color: var(--accent); }
+
 @media (max-width: 600px) {
   .exam-body { padding: var(--s-4) var(--s-4) var(--s-3); }
-  .exam-nav  { padding: var(--s-3) var(--s-4); }
+  .exam-nav  { padding: var(--s-3) var(--s-4); flex-direction: column; align-items: stretch; }
+  .exam-nav-left, .exam-nav-right { justify-content: space-between; }
+  .exam-palette { padding: var(--s-3) var(--s-4) 0; }
+  .exam-cell { width: 28px; height: 28px; }
   .exam-start, .exam-result { padding: var(--s-6) var(--s-4); }
   .exam-q { font-size: 16px; }
+  .tb-row { grid-template-columns: minmax(0, 1fr) minmax(70px, 1fr) auto; gap: var(--s-2); }
 }
 
 /* ============================================================================
@@ -784,7 +859,9 @@ html[dir="rtl"] .acct-plan-badge { text-transform: none; letter-spacing: normal;
   .hero-eyebrow .he-pip,
   .chat-mic.listening,
   .exam-timer.urgent,
+  .ask-prose.streaming::after,
   .msg, .chat-followups, .chat-welcome, .exam-explain.visible { animation: none !important; }
+  .tb-fill { transition: none; }
   .card:hover, .price-card:hover, .exam-opt:hover, .btn:hover, .chat-suggest button:hover { transform: none; }
   .nav-links { transition: none; }
 }

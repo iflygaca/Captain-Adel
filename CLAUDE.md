@@ -85,9 +85,22 @@ runs a per-claim LLM judge (opt-in).
 
 **Exam mode:** `POST /v1/chat` accepts `mode: 'exam'`, which swaps in
 `EXAM_MODE_NOTE` (`system-prompt.js`) so Captain Adel runs a GACA-style **oral
-checkride examination** (examiner/candidate framing). The frontend is
-`public/exam.html` + `assets/js/exam.js` (25 questions, 30-minute countdown,
-75% pass, bilingual, pure-DOM) over the bank at `public/assets/data/quiz.json`.
+checkride examination** (examiner/candidate framing) in the chat UI.
+
+**Mock-exam / practice page** (`public/exam.html`) is a separate surface over the
+static bank at `public/assets/data/quiz.json` (13 banks; exam length/time/pass
+mark come from the file's `exam` block). Its logic splits like the chat client:
+`assets/js/exam-core.js` is the DOM-free engine (question selection with seeded
+shuffles, option-order randomisation with answer remap, scoring, weakest-first
+topic breakdown, resume-snapshot validation, and the bilingual Captain-Adel
+prompt builders — unit-tested by `test/exam-core.test.js`, the second
+frontend file mapped outside `src/`), and `assets/js/exam.js` is the pure-DOM UI
+(timed **exam** mode + topic-filtered untimed **practice** mode, a question-
+palette navigator, flags, review-before-submit, sessionStorage resume, and a
+per-topic result breakdown). Every reviewed question can be handed to **Captain
+Adel** for a grounded explanation — `buildAskPrompt` → `/v1/chat` streamed
+inline through `chat-core.js` (so `exam.html` now loads `chat-core.js` before
+`exam-core.js`/`exam.js`) — plus a one-tap post-exam debrief to `chat.html?q=`.
 
 `POST /v1/chat` response shape:
 `{ answer, sources, kind, refusalClass, grounding, suggestions, meta }` —
@@ -137,9 +150,11 @@ src/
   quota/               Firestore-backed free-tier usage meter (fails open)
   billing/             Moyasar + Firebase SaaS layer (dark until env set)
 public/                Vanilla bilingual HTML/CSS/JS site (index/chat/account/console/
-                       checkout/exam/privacy/terms — 8 pages), plus assets/js (13 files),
-                       assets/css, assets/data/quiz.json (the exam bank),
-                       assets/img/captain/, and .well-known/ (Apple Pay)
+                       checkout/exam/privacy/terms — 8 pages), plus assets/js (14 files;
+                       exam.js + exam-core.js are the mock-exam pair, chat-core.js is
+                       shared by chat/console/exam), assets/css,
+                       assets/data/quiz.json (the exam bank), assets/img/captain/,
+                       and .well-known/ (Apple Pay)
 test/                  Unit tests ({component}.test.js, node --test)
 evals/                 Regression harness (cases.json, run.js, parity.js, lib.js, checks/)
 scripts/               One-off scripts (build-embeddings.js)
@@ -229,10 +244,11 @@ advanced switches (`ADEL_REWRITE*`, `ADEL_GROUNDING`, `ADEL_PARENT_CHILD`,
   synonyms should track `authoring/rag.py`.
 - `.gitattributes` forces `src/brain/bm25.js` to diff as text (it embeds Arabic
   combining marks that trip Git's binary heuristic).
-- **Shared frontend core:** helpers used by both chat and console (safe markdown,
-  § cites, grounding badge, session id, bilingual error copy, SSE transport) live
-  in `public/assets/js/chat-core.js` — a classic script loaded with `defer`
-  **before** `chat.js`/`console.js`, tested by `test/chat-core.test.js`. Chrome
+- **Shared frontend core:** helpers used by chat, console and the exam page (safe
+  markdown, § cites, grounding badge, session id, bilingual error copy, SSE
+  transport) live in `public/assets/js/chat-core.js` — a classic script loaded
+  with `defer` **before** `chat.js`/`console.js`/`exam.js`, tested by
+  `test/chat-core.test.js`. Chrome
   behaviour (mobile-nav disclosure, footer year) lives in
   `public/assets/js/site.js`, loaded on the five full-chrome pages
   (index/chat/console/account/exam) — checkout/privacy/terms omit it.
