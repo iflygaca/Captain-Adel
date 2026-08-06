@@ -1,0 +1,188 @@
+{
+  "generator": "scripts/record-sse-fixtures.js",
+  "apiVersion": "1",
+  "note": "Byte-exact /v1/chat?stream=1 captures from the real pipeline with stubbed providers. Regenerate with `npm run fixtures:sse` and review the diff; never regenerate in CI.",
+  "fixtures": [
+    {
+      "file": "grounded-long.sse",
+      "transport": "sse",
+      "request": {
+        "message": "What are the VFR weather minima in Class D airspace?",
+        "provider": "gemini"
+      },
+      "description": "long grounded answer: tokens stream past the 80-char hold, the control trailer never leaks",
+      "expect": {
+        "done": true,
+        "final": true,
+        "error": false,
+        "kind": "grounded",
+        "refusalClass": null,
+        "tokens": 5,
+        "resets": 0,
+        "reassemblyEqualsFinal": true,
+        "sources": 1,
+        "provider": "gemini"
+      }
+    },
+    {
+      "file": "short-remainder.sse",
+      "transport": "sse",
+      "request": {
+        "message": "hello",
+        "provider": "gemini"
+      },
+      "description": "answer under the 80-char hold: exactly one remainder token, then final",
+      "expect": {
+        "done": true,
+        "final": true,
+        "error": false,
+        "kind": "na",
+        "refusalClass": null,
+        "tokens": 1,
+        "resets": 0,
+        "reassemblyEqualsFinal": true,
+        "sources": 0,
+        "provider": "gemini"
+      }
+    },
+    {
+      "file": "partial.sse",
+      "transport": "sse",
+      "request": {
+        "message": "What are the medical certificate requirements?",
+        "provider": "allam"
+      },
+      "description": "read-strategy provider cites a section absent from retrieval → partial, with real BM25 sources",
+      "expect": {
+        "done": true,
+        "final": true,
+        "error": false,
+        "kind": "partial",
+        "refusalClass": null,
+        "tokens": 2,
+        "resets": 0,
+        "reassemblyEqualsFinal": true,
+        "sources": 3,
+        "provider": "allam"
+      }
+    },
+    {
+      "file": "refusal-1.1.sse",
+      "transport": "sse",
+      "request": {
+        "message": "What will the Class 1 medical renewal fee be next year?",
+        "provider": "gemini"
+      },
+      "description": "declared refusal with taxonomy class 1.1 (unverifiable figure)",
+      "expect": {
+        "done": true,
+        "final": true,
+        "error": false,
+        "kind": "refusal",
+        "refusalClass": "1.1",
+        "tokens": 4,
+        "resets": 0,
+        "reassemblyEqualsFinal": true,
+        "sources": 0,
+        "provider": "gemini"
+      }
+    },
+    {
+      "file": "na.sse",
+      "transport": "sse",
+      "request": {
+        "message": "thanks, that is all for today!",
+        "provider": "gemini"
+      },
+      "description": "pleasantry declared na: no badge, no refusal class",
+      "expect": {
+        "done": true,
+        "final": true,
+        "error": false,
+        "kind": "na",
+        "refusalClass": null,
+        "tokens": 1,
+        "resets": 0,
+        "reassemblyEqualsFinal": true,
+        "sources": 0,
+        "provider": "gemini"
+      }
+    },
+    {
+      "file": "reset-fallback.sse",
+      "transport": "sse",
+      "request": {
+        "message": "What are the VFR weather minima in Class D airspace?",
+        "provider": "gemini"
+      },
+      "description": "primary provider dies mid-stream → reset wipes streamed text, fallback re-drives",
+      "expect": {
+        "done": true,
+        "final": true,
+        "error": false,
+        "kind": "partial",
+        "refusalClass": null,
+        "tokens": 3,
+        "resets": 1,
+        "reassemblyEqualsFinal": true,
+        "sources": 3,
+        "provider": "allam"
+      }
+    },
+    {
+      "file": "reset-toolround.sse",
+      "transport": "sse",
+      "request": {
+        "message": "Runway 34, wind 290/15 — what is the crosswind component?",
+        "provider": "gemini"
+      },
+      "description": "agentic tool round: interim text is reset, final carries worked toolCalls",
+      "expect": {
+        "done": true,
+        "final": true,
+        "error": false,
+        "kind": "na",
+        "refusalClass": null,
+        "tokens": 4,
+        "resets": 1,
+        "reassemblyEqualsFinal": true,
+        "sources": 0,
+        "provider": "gemini"
+      }
+    },
+    {
+      "file": "error-midstream.sse",
+      "transport": "sse",
+      "request": {
+        "message": "hi",
+        "provider": "gemini"
+      },
+      "description": "brain dies after a token: error frame terminates the stream, no [DONE]",
+      "expect": {
+        "done": false,
+        "final": false,
+        "error": true,
+        "kind": null,
+        "refusalClass": null,
+        "tokens": 1,
+        "resets": 0,
+        "reassemblyEqualsFinal": false,
+        "sources": 0,
+        "provider": null
+      }
+    },
+    {
+      "file": "http-429.json",
+      "transport": "json",
+      "request": {
+        "message": "hi"
+      },
+      "description": "rate-limited before the stream opens: plain JSON 429 with Retry-After",
+      "expect": {
+        "status": 429,
+        "errorCode": "rate_limited",
+        "retryAfter": 7
+      }
+    }
+  ]
+}

@@ -135,6 +135,7 @@ that durable and measurable.
 - [ ] **Finish the identity pass** — extend the HUD/instrument signature and "command deck"
   language consistently; revisit the `library.html` deep-link the refusal path references.
 - [ ] **Installable PWA** — offline-friendly transcript + add-to-home-screen, within CSP.
+  *(complements — does not replace — the native app: see 📱 Mobile under Next)*
 
 ---
 
@@ -162,6 +163,28 @@ that durable and measurable.
   exam-mode seed already exists).
 - [ ] **"What changed" digests** — surface regulation changes proactively per Part / GACAR version.
 - [ ] **AIP-KSA + charts** in the corpus, with the same citation discipline.
+
+### 📱 Mobile — native iOS app  *(new track)*
+
+The plan is [`docs/ios-app-plan.md`](docs/ios-app-plan.md) (mockups:
+[`ios-chat.html`](docs/mockups/ios-chat.html) · [`ios-exam.html`](docs/mockups/ios-exam.html)).
+v1 is a pure client of the existing `/v1/*` API — **zero server changes**; the SwiftUI build
+happens in Xcode, in its own repo.
+
+- [x] **iOS app plan + mockups** — scope, SwiftUI architecture, API-binding tables and the
+  App Store gates in `docs/ios-app-plan.md`, with phone-frame mockups in `docs/mockups/`.
+- [ ] **Phase 0 spike** — a `URLSession` SSE parser for the POST `token/reset/final` frames
+  (`src/brain/answer.js`) + one streamed `/v1/chat` turn, on TestFlight.
+  *(in-repo half landed: the `ios/AdelCore` parser package + CI-verified wire fixtures;
+  the remaining leg is Xcode + TestFlight per `ios/README.md`)*
+- [ ] **v1 — chat + mock exam** — port `chat-core.js`/`exam-core.js` semantics to Swift
+  (allow-list markdown, `§` cite chips, grounding badge, shuffles, resume snapshots), bundle
+  `quiz.json` for offline exams; optional email sign-in honours web Pro read-only via `/v1/me`.
+- [ ] **v1.x — accounts** — Google + Sign in with Apple and in-app account creation, plus the
+  account-deletion endpoint Apple then requires (the one new backend route before billing).
+- [ ] **v2 — StoreKit 2 billing** — in-app subscription per guideline 3.1.1, settled by a new
+  server route writing the same entitlement shape as Moyasar (`store: 'APPSTORE'`,
+  `src/billing/entitlements-core.js`).
 
 ---
 

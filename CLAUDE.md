@@ -41,6 +41,7 @@ Node 20, npm (lockfile `package-lock.json`). All scripts live in `package.json`.
 | `npm run eval:parity` (vs. ALLaM) / `:jais` / `:fanar` / `:qwen` / `:commandr` | Compare Gemini vs. a candidate; **gates `MODEL_PROVIDER=auto`**. There is no `:allam` variant — bare `eval:parity` already defaults to ALLaM. |
 | `npm run provider:smoke`, `allam:smoke`, `jais:smoke` | One-turn connectivity checks for an endpoint. |
 | `npm run build:embeddings` | One-off: build the dense index. Needs `EMBEDDINGS_BASE_URL`. Writes `src/brain/_embeddings.json.gz`. Never run at request time or in CI. |
+| `npm run fixtures:sse` | One-off: regenerate the iOS SSE wire fixtures (in-process server + stubbed providers; deterministic, no keys/network). Committed output is guarded by `test/sse-fixtures.test.js`; never runs in CI. |
 
 There is **no eslint/prettier/editorconfig** — style is maintained by convention
 and review only. Match the surrounding code.
@@ -157,10 +158,13 @@ public/                Vanilla bilingual HTML/CSS/JS site (index/chat/account/co
                        and .well-known/ (Apple Pay)
 test/                  Unit tests ({component}.test.js, node --test)
 evals/                 Regression harness (cases.json, run.js, parity.js, lib.js, checks/)
-scripts/               One-off scripts (build-embeddings.js)
+scripts/               One-off scripts (build-embeddings.js, record-sse-fixtures.js)
 deploy/                docker-compose.yml, deploy.sh (Cloud Run), allam-vllm.md (vLLM GPU
                        endpoint runbook) — the Dockerfile itself lives at the repo root
-docs/                  models, refusal-taxonomy, data-contract, RUNBOOKs, mockups/
+docs/                  models, refusal-taxonomy, data-contract, ios-app-plan, RUNBOOKs, mockups/
+ios/                   AdelCore local Swift package (AdelAPI + AdelSSE) — the Phase-0 iOS spike;
+                       compile-unverified here (no Swift toolchain), see ios/README.md; wire
+                       fixtures live in AdelCore/Tests/AdelSSETests/Fixtures/
 authoring/             Source-of-truth system prompt + KB scope + Python reference (rag.py, captain_adel.py)
 ```
 
@@ -173,7 +177,7 @@ authoring/             Source-of-truth system prompt + KB scope + Python referen
   `embeddings-dense`, `providers-env-wiring`, `billing-handlers`), a few are
   behaviour-scoped (`server-chat`, `version-header`, `wellknown`), and a couple
   cover non-`src/` code (`chat-core` → `public/assets/js/chat-core.js`,
-  `evals-lib` → `evals/lib.js`).
+  `evals-lib` → `evals/lib.js`, `sse-fixtures` → the iOS wire fixtures under `ios/`).
 - **Evals** (`evals/`) are the regression gate. `cases.json` holds EN+AR cases with
   heuristic assertions; `lib.js` is shared scoring (kept identical between `run.js`
   and `parity.js` so verdicts never drift). `parity.js` gates `MODEL_PROVIDER=auto`.
@@ -243,7 +247,8 @@ advanced switches (`ADEL_REWRITE*`, `ADEL_GROUNDING`, `ADEL_PARENT_CHILD`,
   `authoring/captain_adel_system_prompt.md` (source of truth). `bm25.js` stopwords/
   synonyms should track `authoring/rag.py`.
 - `.gitattributes` forces `src/brain/bm25.js` to diff as text (it embeds Arabic
-  combining marks that trip Git's binary heuristic).
+  combining marks that trip Git's binary heuristic), and marks `*.sse` fixtures
+  `-text` so EOL conversion can never corrupt their byte-exact frame grammar.
 - **Shared frontend core:** helpers used by chat, console and the exam page (safe
   markdown, § cites, grounding badge, session id, bilingual error copy, SSE
   transport) live in `public/assets/js/chat-core.js` — a classic script loaded
@@ -297,4 +302,5 @@ advanced switches (`ADEL_REWRITE*`, `ADEL_GROUNDING`, `ADEL_PARENT_CHILD`,
 > 📖 **Family context:** [The Book of Fly GACA](https://github.com/ay2m/FlyGACA/blob/main/THE-BOOK-OF-FLY-GACA.md) is the whole-family reference — all ten repos, the shared tenets, and the glossary in one place.
 
 `README.md` (overview), `ROADMAP.md` (direction), `evals/README.md`, and
-`docs/` (`models.md`, `refusal-taxonomy.md`, `data-contract.md`, the RUNBOOKs).
+`docs/` (`models.md`, `refusal-taxonomy.md`, `data-contract.md`, `ios-app-plan.md`,
+the RUNBOOKs).

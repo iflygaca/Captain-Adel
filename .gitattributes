@@ -1,3 +1,7 @@
 # bm25.js embeds Arabic combining marks (the normalizeArabic fold table), which
 # trips gits binary-diff heuristic. Force it to diff as text so reviews work.
 src/brain/bm25.js text diff
+
+# SSE stream fixtures are byte-exact test vectors (test/sse-fixtures.test.js);
+# EOL conversion would corrupt the \n\n frame grammar. Still diffs as text.
+*.sse -text
