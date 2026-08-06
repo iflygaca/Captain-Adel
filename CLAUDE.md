@@ -14,7 +14,8 @@ It is one **Node.js 20 + Express** service that serves both:
 - the static **captadel.com** site (`public/`), and
 - the API: `GET /health`, `POST /v1/chat`, `POST /v1/feedback` (thumbs rating —
   logs only `{rating, turnId, provider, ts}`, never the question or answer), the
-  `/v1/me` + `/v1/config` + `/v1/billing/*` SaaS routes (the webhook mounts
+  `/v1/me` + `/v1/config` + `/v1/billing/*` SaaS routes plus
+  `POST /v1/account/delete` (the webhook mounts
   `express.raw` **before** the global `express.json` — ordering is load-bearing),
   and a `/.well-known` static mount (`dotfiles: 'allow'`) for Apple Pay domain
   verification.
@@ -224,7 +225,10 @@ advanced switches (`ADEL_REWRITE*`, `ADEL_GROUNDING`, `ADEL_PARENT_CHILD`,
 - **Firebase/Firestore:** `firebase.json`, `.firebaserc` (project `captadel-app`).
   `firestore.rules` is **blanket-deny** — the browser never opens Firestore
   directly; the Admin SDK (server) bypasses rules. Collections: `users/{uid}`
-  (entitlements), `adelQuota/...` (TTL-purged usage).
+  (entitlements), `subscriptions/{uid}` + `moyasarCustomers/{uid}` +
+  `checkoutIntents/{uuid}` + `moyasarPayments/{paymentId}` (billing), and
+  `adelQuota/...` (TTL-purged usage). `POST /v1/account/delete` erases the
+  uid-keyed set (payment markers are tombstoned, not deleted — webhook-replay guard).
 - **CI** (`.github/workflows/`): `ci.yml`'s `build` job runs `smoke` + `test:coverage`
   + `eval:dry` on push/PR (live `eval` only weekly/dispatch, gated on
   `GEMINI_API_KEY`). `deploy.yml` re-runs `smoke` + `test:unit` + `eval:dry` as its

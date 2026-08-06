@@ -10,7 +10,9 @@ rules_version = '2';
 // client read and write. There is nothing here a client is meant to reach.
 //
 // Collections written server-side: users/{uid} (profile + entitlement),
-// adelQuota/{period__key} (usage counters, TTL-purged on expireAt).
+// subscriptions/{uid}, moyasarCustomers/{uid}, checkoutIntents/{uuid},
+// moyasarPayments/{paymentId} (billing), and adelQuota/{period__key}
+// (usage counters, TTL-purged on expireAt).
 // ============================================================================
 
 service cloud.firestore {

@@ -29,7 +29,8 @@ code: for v1 the server already has everything.
 | Pro recognition without billing code | [`GET /v1/me`](../src/billing/routes.js#L346) returns `plan` for a Firebase Bearer token |
 
 **v1 requires zero server changes.** The one server route this whole track ever asks for
-before billing is an account-deletion endpoint, and that belongs to v1.x, not v1.
+before billing is an account-deletion endpoint — now landed as
+[`POST /v1/account/delete`](../src/billing/routes.js); the app *uses* it in v1.x, not v1.
 
 ---
 
@@ -48,7 +49,7 @@ before billing is an account-deletion endpoint, and that belongs to v1.x, not v1
 | In-app purchase / subscription | Apple 3.1.1: digital subscriptions must use StoreKit; Moyasar can never be used in-app for digital content → **v2** |
 | Google sign-in | offering any third-party login triggers Apple 4.8 (Sign in with Apple required) → both land together in **v1.x** |
 | Sign in with Apple | not required while no third-party login is offered; needs `apple.com` OAuth provider config in Firebase → **v1.x** |
-| In-app account creation | triggers Apple 5.1.1(v) (account deletion required) and the backend has **no delete endpoint** → **v1.x**, with that endpoint |
+| In-app account creation | triggers Apple 5.1.1(v) (account deletion required); the backend route (`POST /v1/account/delete`) is live — the *client* work lands in **v1.x** |
 | Push notifications, offline chat, Android | out of scope; no server support, no commitment |
 
 **The load-bearing call: v1 sign-in is email/password only, to accounts created on the
@@ -260,7 +261,7 @@ rules. `X-Adel-Quota-Remaining` appears only when the tier is metered and allowe
 |---|---|---|
 | 3.1.1 — digital subscriptions must use IAP | v1 sells nothing. 402 → a signpost sheet naming the web plans (SAR 35/mo · 299/yr as facts, no purchase link, no steering copy). Moyasar is web-only forever — the [`/.well-known` Apple Pay file](../public/.well-known/README.md) is Moyasar's *browser* domain verification, not StoreKit | **v2**: StoreKit 2 + a new server settle route (App Store Server API + server notifications) writing the same entitlement shape as Moyasar with `store:'APPSTORE'` ([`entitlements-core.js:5`](../src/billing/entitlements-core.js#L5)) |
 | 4.8 — Sign in with Apple | not triggered: v1 offers no third-party login (email/password only) | **v1.x**: Google + `apple.com` OAuth provider land together |
-| 5.1.1(v) — account deletion | not triggered: no in-app account creation in v1 | **v1.x**: in-app creation ships **with** the new authed delete endpoint — the backend has none today |
+| 5.1.1(v) — account deletion | not triggered: no in-app account creation in v1 | **v1.x**: in-app creation ships **with** the authed delete endpoint — **landed: [`POST /v1/account/delete`](../src/billing/routes.js)** purges Firestore + the Auth user |
 | PDPL / in-Kingdom inference | unchanged: the app calls the same KSA Cloud Run service ([`RUNBOOK-captadel-deploy.md`](RUNBOOK-captadel-deploy.md)); no new data residency surface | — |
 | App Privacy labels | honest and small: chat text is processed in-Kingdom and not used for tracking; feedback logs only `{rating, turnId, provider}` ([`server.js:244`](../src/server.js#L244)); no ads, no tracking → **no ATT prompt** | — |
 | `PrivacyInfo.xcprivacy` | required-reason entries for `UserDefaults`; list no tracking domains | — |
@@ -275,7 +276,7 @@ rules. `X-Adel-Quota-Remaining` appears only when the tier is metered and allowe
 |---|---|---|---|
 | **0 — spike** | the `AdelSSE` parser + one streamed grounded turn, on TestFlight | production `/v1/chat` | none |
 | **v1 — App Store** | chat + mock exam + optional email sign-in + paywall signpost | the API exactly as deployed today | **none** |
-| **v1.x — accounts** | Google + Sign in with Apple, in-app account creation | Firebase `apple.com` provider config | one authed **account-deletion route** |
+| **v1.x — accounts** | Google + Sign in with Apple, in-app account creation | Firebase `apple.com` provider config | **`POST /v1/account/delete`** (already landed) |
 | **v2 — billing** | StoreKit 2 subscription, purchase-restores, paywall that sells | App Store Server API | a settle route + server-notification handler writing `entitlement{store:'APPSTORE'}`; mind the ~60 s `/v1/me` entitlement cache in the post-purchase UX ([`auth.js:24`](../src/middleware/auth.js#L24)) |
 
 The degradation rule mirrors the data contract's: every phase renders only fields and
