@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Captain Adel iOS — mock exam (design concept)</title>
+<!--
+  Captain Adel · native iOS app — mock-exam surface. Static design concept.
+  Non-deployed mockup. Vanilla HTML/CSS/JS, no framework, no network.
+  Companion to ../ios-app-plan.md — bank content is drawn verbatim from
+  ../../public/assets/data/quiz.json (real titles, the real Class-D question,
+  the exam block's 25 q · 30 min · pass 75).
+
+  Design rules this concept obeys:
+    • The bank ships WITH the app: the whole exam works offline. Only
+      "Ask Captain Adel" and the debrief hand-off touch the network.
+    • Question text is English-only — a KNOWN bank gap (only bank titles carry
+      titleAr). The concept shows EN questions under bilingual chrome, exactly
+      like the web. No silent machine translation.
+    • cite is rendered as TEXT ONLY, never a link: quiz.json's citeUrl values
+      are Fly GACA app paths the exam never reads (the bank's own note).
+      "Ask Captain Adel" is the tap action instead.
+    • The topic breakdown is sorted weakest-first — the ordering IS the study
+      advice (exam-core.js).
+    • The inline "Ask Captain Adel" answer renders the same /v1/chat contract
+      as the chat surface (badge + cite chips + compact source) and is cached
+      per question so re-renders never re-spend quota.
+    • Options are shuffled per question with the answer index remapped
+      (anti-memorisation) — the letters here are one such shuffle.
+    • Every cite token is <bdi dir="ltr" lang="en"> so §91.165 never scrambles
+      in RTL. Teal stays the LINK/FOCUS colour only — never "verified".
+    • EN ⇄ العربية toggle flips dir and proves bidi cite rendering + RTL parity.
+    • Palette carried from gacar-console.html (the mockup family's :root);
+      the sans stack leads with -apple-system for the SF feel.
+-->
+<style>
+  :root{
+    /* Falcon palette — carried from docs/mockups/gacar-console.html */
+    --night:#0A0E12; --panel:#11161C; --panel-2:#161C24; --panel-3:#1A222C;
+    --line:#232C36; --line-2:#2C3743;
+    --ink:#E7ECF1; --ink-dim:#9AA7B4; --ink-faint:#6B7886;
+    --gold:#C8A04A; --gold-soft:#E0C079;
+    /* teal = links / focus ONLY (never "verified") */
+    --teal:#4A9CB8; --teal-bright:#5FB3CE;
+    /* grounding signals — green vs amber polarity */
+    --sage:#8FC9A8; --sage-bright:#62D39B; --sage-bg:rgba(98,211,155,.10);
+    --amber:#E0B341; --amber-bg:rgba(224,179,65,.10);
+    --flag:#E08A4A; --flag-bg:rgba(224,138,74,.12);   /* refusal / hold / flagged */
+    --urgent:#E0594A; --urgent-bg:rgba(224,89,74,.12);
+    --radius:12px;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --sans:-apple-system,"SF Pro Text",system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans Arabic",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--night);color:var(--ink);font:15px/1.55 var(--sans)}
+  bdi{unicode-bidi:isolate}
+
+  /* ---------- page chrome ---------- */
+  .page-head{max-width:1320px;margin:0 auto;padding:28px 24px 8px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .page-head h1{font-size:19px;margin:0;letter-spacing:.2px}
+  .page-head h1 .cap{color:var(--gold)}
+  .page-head .sub{color:var(--ink-dim);font-size:13px}
+  .lang{margin-inline-start:auto;display:flex;border:1px solid var(--line-2);border-radius:999px;overflow:hidden}
+  .lang button{background:var(--panel);color:var(--ink-dim);border:0;padding:6px 14px;font:600 13px var(--sans);cursor:pointer}
+  .lang button[aria-pressed="true"]{background:var(--panel-3);color:var(--gold-soft)}
+  .frames{max-width:1320px;margin:0 auto;padding:12px 24px 48px;display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+  .slot{display:flex;flex-direction:column;gap:10px}
+  .slot>.cap{color:var(--ink-dim);font-size:12.5px;max-width:390px}
+  .slot>.cap b{color:var(--ink)}
+
+  /* ---------- iPhone frame ---------- */
+  .phone{width:390px;height:844px;background:#05070a;border:1px solid var(--line-2);border-radius:54px;padding:10px;box-shadow:0 22px 60px rgba(0,0,0,.55)}
+  .screen{position:relative;height:100%;border-radius:44px;background:var(--night);overflow:hidden;display:flex;flex-direction:column}
+  .statusbar{flex:none;height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 26px 0;font:600 14px var(--sans)}
+  .island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:118px;height:32px;border-radius:18px;background:#000}
+  .sb-right{display:flex;gap:6px;align-items:center;color:var(--ink);font-size:12px;letter-spacing:1px}
+  .homebar{flex:none;height:22px;display:flex;align-items:center;justify-content:center}
+  .homebar i{display:block;width:130px;height:5px;border-radius:3px;background:var(--line-2)}
+  .appnav{flex:none;display:flex;align-items:center;gap:9px;padding:10px 16px;border-bottom:1px solid var(--line)}
+  .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(140deg,var(--panel-3),var(--panel));border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold);font:700 13px var(--mono)}
+  .appnav .t{font-weight:700;font-size:15px}
+  .appnav .t small{display:block;font:400 10.5px var(--sans);color:var(--ink-faint);letter-spacing:.4px}
+  .body{flex:1;overflow:hidden;padding:10px 16px 8px;display:flex;flex-direction:column;gap:9px}
+
+  /* ---------- frame 1 · home ---------- */
+  .seg{display:flex;border:1px solid var(--line-2);border-radius:12px;overflow:hidden}
+  .seg span{flex:1;text-align:center;padding:8px 0;font:600 13px var(--sans);color:var(--ink-dim);background:var(--panel)}
+  .seg .on{background:var(--panel-3);color:var(--gold-soft)}
+  .meta{display:flex;gap:8px}
+  .meta div{flex:1;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:9px 6px;text-align:center}
+  .meta b{display:block;font:700 17px var(--mono);color:var(--ink)}
+  .meta small{color:var(--ink-faint);font-size:10.5px;letter-spacing:.4px}
+  .resume{border:1px solid var(--gold);background:rgba(200,160,74,.08);border-radius:var(--radius);padding:10px 12px;font-size:13px}
+  .resume b{color:var(--gold-soft)}
+  .resume .row{display:flex;gap:10px;margin-top:8px}
+  .resume .row span{border:1px solid var(--line-2);border-radius:9px;background:var(--panel);padding:5px 12px;font:600 12px var(--sans);color:var(--ink)}
+  .resume .row .go{border-color:var(--gold);color:var(--gold-soft)}
+  .banks{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden}
+  .banks h4{margin:0;padding:9px 12px;border-bottom:1px solid var(--line);font:600 11px var(--sans);letter-spacing:.6px;text-transform:uppercase;color:var(--ink-dim)}
+  .bank{display:flex;align-items:center;gap:9px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:13px}
+  .bank:last-child{border-bottom:0}
+  .bank .n{color:var(--ink)}
+  .bank .n small{display:block;color:var(--ink-faint);font-size:11px}
+  .bank .ct{margin-inline-start:auto;font:600 11.5px var(--mono);color:var(--ink-faint)}
+  .bank.more{justify-content:center;color:var(--ink-faint);font-size:12px}
+  .offline{display:flex;gap:8px;align-items:center;color:var(--ink-dim);font-size:12px}
+  .offline i{width:8px;height:8px;border-radius:50%;background:var(--sage-bright)}
+  .cta{margin-top:auto;border:1px solid var(--gold);border-radius:14px;background:linear-gradient(140deg,rgba(200,160,74,.16),rgba(200,160,74,.05));color:var(--gold-soft);text-align:center;padding:12px;font:700 15px var(--sans)}
+
+  /* ---------- frame 2 · in question ---------- */
+  .exambar{display:flex;align-items:center;gap:8px}
+  .timer{border:1px solid var(--amber);background:var(--amber-bg);color:var(--amber);border-radius:999px;padding:4px 12px;font:700 13px var(--mono)}
+  .prog{color:var(--ink-dim);font-size:13px}
+  .flagbtn{margin-inline-start:auto;border:1px solid var(--flag);background:var(--flag-bg);color:var(--flag);border-radius:999px;padding:4px 12px;font:600 12px var(--sans)}
+  .qcard{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:13px 14px}
+  /* question text is English-only on purpose: the known bank gap */
+  .qcard .q{font-size:15px;font-weight:600}
+  .qcard .gap{margin-top:6px;font-size:11px;color:var(--ink-faint)}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{display:flex;gap:10px;align-items:center;border:1px solid var(--line-2);border-radius:12px;background:var(--panel);padding:10px 12px;font-size:14px}
+  .opt .k{flex:none;width:24px;height:24px;border-radius:50%;border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;font:700 12px var(--mono);color:var(--ink-dim)}
+  .opt.sel{border-color:var(--gold)}
+  .opt.sel .k{border-color:var(--gold);color:var(--gold-soft)}
+  .navrow{display:flex;gap:10px}
+  .navrow span{flex:1;text-align:center;border:1px solid var(--line-2);border-radius:11px;background:var(--panel);padding:9px 0;font:600 13px var(--sans);color:var(--ink)}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--panel-2);border:1px solid var(--line-2);border-bottom:0;border-radius:22px 22px 0 0;padding:8px 16px 18px;box-shadow:0 -18px 40px rgba(0,0,0,.5)}
+  .grab{width:42px;height:5px;border-radius:3px;background:var(--line-2);margin:4px auto 12px}
+  .sheet h3{margin:0 0 10px;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-dim)}
+  .pal{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+  .cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border:1px solid var(--line-2);border-radius:10px;background:var(--panel);font:600 12.5px var(--mono);color:var(--ink-dim);position:relative}
+  .cell.ans{border-color:var(--sage);color:var(--sage-bright)}
+  .cell.cur{border-color:var(--gold);color:var(--gold-soft);box-shadow:0 0 0 2px rgba(200,160,74,.25)}
+  .cell.flg::after{content:"";position:absolute;top:4px;inset-inline-end:4px;width:6px;height:6px;border-radius:50%;background:var(--flag)}
+  .cell.hot{box-shadow:0 0 0 3px rgba(95,179,206,.35)}
+  .legend{display:flex;gap:12px;margin-top:11px;font-size:11.5px;color:var(--ink-dim);flex-wrap:wrap}
+  .legend span{display:flex;gap:5px;align-items:center;cursor:pointer}
+  .legend i{width:10px;height:10px;border-radius:3px;border:1px solid var(--line-2)}
+  .legend .l-ans i{border-color:var(--sage)}
+  .legend .l-flg i{border-color:var(--flag);background:var(--flag-bg)}
+  .legend .l-cur i{border-color:var(--gold)}
+  .submit{margin-top:12px;text-align:center;border:1px solid var(--gold);border-radius:12px;padding:10px;color:var(--gold-soft);font:700 14px var(--sans);background:linear-gradient(140deg,rgba(200,160,74,.16),rgba(200,160,74,.05))}
+
+  /* ---------- frame 3 · results ---------- */
+  .verdict{display:flex;gap:12px;align-items:center}
+  .ring{flex:none;width:78px;height:78px;border-radius:50%;background:conic-gradient(var(--sage-bright) 0 76%, var(--line) 76% 100%);display:flex;align-items:center;justify-content:center}
+  .ring i{width:58px;height:58px;border-radius:50%;background:var(--night);display:flex;flex-direction:column;align-items:center;justify-content:center;font:700 17px var(--mono);color:var(--sage-bright)}
+  .ring i small{font:600 9.5px var(--sans);color:var(--ink-faint);letter-spacing:.6px}
+  .verdict .vt b{display:block;font-size:17px;color:var(--sage-bright)}
+  .verdict .vt span{color:var(--ink-dim);font-size:12.5px}
+  .stats{display:flex;gap:8px}
+  .stats div{flex:1;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:6px;text-align:center}
+  .stats b{display:block;font:700 15px var(--mono)}
+  .stats .ok b{color:var(--sage-bright)} .stats .no b{color:var(--flag)}
+  .stats small{color:var(--ink-faint);font-size:10.5px;line-height:1.3}
+  .topics{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:9px 12px}
+  .topics h4{margin:0 0 7px;font:600 11px var(--sans);letter-spacing:.6px;text-transform:uppercase;color:var(--ink-dim)}
+  .trow{display:flex;align-items:center;gap:8px;font-size:11.5px;line-height:1.3;margin-bottom:6px}
+  .trow:last-child{margin-bottom:0}
+  .trow .tn{flex:1;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .trow .bar{flex:1.2;height:7px;border-radius:4px;background:var(--panel-3);overflow:hidden}
+  .trow .bar i{display:block;height:100%;border-radius:4px;background:var(--sage-bright)}
+  .trow.weak .bar i{background:var(--flag)}
+  .trow .pc{width:58px;text-align:end;font:600 11.5px var(--mono);color:var(--ink-dim)}
+  .filters{display:flex;gap:7px}
+  .fchip{border:1px solid var(--line-2);border-radius:999px;background:var(--panel);padding:3px 11px;font:600 12px var(--sans);color:var(--ink-dim)}
+  .fchip.on{border-color:var(--gold);color:var(--gold-soft)}
+  .rev{border:1px solid var(--flag);border-radius:var(--radius);background:var(--panel);padding:10px 12px;font-size:12.5px;line-height:1.45}
+  .rev .q{font-weight:600;margin-bottom:6px}
+  .rev .ans{display:flex;gap:8px;margin-bottom:5px;font-size:12.5px}
+  .rev .ans .lbl{flex:none;width:76px;color:var(--ink-faint)}
+  .rev .bad{color:var(--flag)} .rev .good{color:var(--sage-bright)}
+  .rev .cite-line{margin-top:7px;font:600 12px var(--mono);color:var(--gold-soft)}
+  .rev .cite-line small{display:block;font:400 10.5px var(--sans);color:var(--ink-faint)}
+  .ask{margin-top:6px;border-top:1px dashed var(--line-2);padding-top:6px}
+  .askbtn{display:inline-block;border:1px solid var(--line-2);border-radius:9px;background:var(--panel-2);padding:5px 11px;font:600 12px var(--sans);color:var(--teal-bright)}
+  .mini{margin-top:8px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);padding:8px 11px;font-size:12px;line-height:1.45}
+  .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 9px;font:700 10.5px var(--sans);letter-spacing:.4px;background:var(--sage-bg);color:var(--sage-bright);margin-bottom:6px}
+  .badge i{width:6px;height:6px;border-radius:50%;background:var(--sage-bright)}
+  .mini p{margin:0 0 6px}
+  .mini .srcline{font:11px var(--mono);color:var(--ink-faint)}
+  .mini .cont{margin-top:4px;font:600 11.5px var(--sans);color:var(--teal-bright)}
+  .debrief{margin-top:auto;text-align:center;border:1px solid var(--gold);border-radius:14px;padding:9px;color:var(--gold-soft);font:700 14px var(--sans);background:linear-gradient(140deg,rgba(200,160,74,.16),rgba(200,160,74,.05))}
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <h1><span class="cap">Captain Adel</span> <span data-en="iOS — mock exam (design concept)" data-ar="iOS — الاختبار التجريبي (تصوّر تصميمي)">iOS — mock exam (design concept)</span></h1>
+  <span class="sub" data-en="Bank content verbatim from public/assets/data/quiz.json · see ../ios-app-plan.md"
+        data-ar="محتوى البنك حرفيًا من ‎public/assets/data/quiz.json‎ · انظر <bdi dir='ltr'>../ios-app-plan.md</bdi>">Bank content verbatim from public/assets/data/quiz.json · see ../ios-app-plan.md</span>
+  <div class="lang" role="group" aria-label="Language">
+    <button id="lang-en" aria-pressed="true">EN</button>
+    <button id="lang-ar" aria-pressed="false">العربية</button>
+  </div>
+</header>
+
+<main class="frames">
+
+  <!-- ════════ Frame 1 · exam home ════════ -->
+  <section class="slot">
+    <div class="cap" data-en="<b>1 · Home.</b> Timed mock (the quiz.json <code>exam</code> block: 25 q · 30 min · pass 75) vs untimed topic-filtered practice. The versioned resume snapshot offers to continue. The bank ships with the app — fully offline."
+         data-ar="<b>١ · الرئيسية.</b> اختبار موقوت (كتلة <code>exam</code> في quiz.json: ‏٢٥ سؤالًا · ٣٠ دقيقة · نجاح ٧٥) مقابل تدريب حر بحسب الموضوع. لقطة الاستئناف تعرض المتابعة. البنك مدمج في التطبيق — يعمل دون اتصال.">
+      <b>1 · Home.</b> Timed mock (the quiz.json <code>exam</code> block: 25 q · 30 min · pass 75) vs untimed topic-filtered practice. The versioned resume snapshot offers to continue. The bank ships with the app — fully offline.</div>
+    <div class="phone"><div class="screen">
+      <div class="island"></div>
+      <div class="statusbar"><span>9:41</span><span class="sb-right">●●● ⌁ ▮</span></div>
+      <div class="appnav">
+        <div class="avatar">CA</div>
+        <div class="t"><span data-en="GACAR Knowledge — Mock Exam" data-ar="اختبار معرفة GACAR التجريبي">GACAR Knowledge — Mock Exam</span>
+          <small data-en="Unofficial · educational" data-ar="غير رسمي · تعليمي">Unofficial · educational</small></div>
+      </div>
+      <div class="body">
+        <div class="seg"><span class="on" data-en="Mock exam" data-ar="اختبار تجريبي">Mock exam</span><span data-en="Practice" data-ar="تدريب">Practice</span></div>
+        <div class="meta">
+          <div><b>25</b><small data-en="questions" data-ar="سؤالًا">questions</small></div>
+          <div><b>30</b><small data-en="minutes" data-ar="دقيقة">minutes</small></div>
+          <div><b>75%</b><small data-en="pass mark" data-ar="حد النجاح">pass mark</small></div>
+        </div>
+        <div class="resume">
+          <b data-en="Resume your exam?" data-ar="أتستأنف اختبارك؟">Resume your exam?</b>
+          <span data-en=" 12/25 answered · 18:04 left" data-ar=" أجبت ١٢/٢٥ · بقي ١٨:٠٤"> 12/25 answered · 18:04 left</span>
+          <div class="row"><span class="go" data-en="Resume" data-ar="استئناف">Resume</span><span data-en="Discard" data-ar="تجاهل">Discard</span></div>
+        </div>
+        <div class="banks">
+          <h4 data-en="13 banks · 174 questions" data-ar="١٣ بنكًا · ١٧٤ سؤالًا">13 banks · 174 questions</h4>
+          <div class="bank"><span class="n">VFR &amp; Flight Rules<small>قواعد الطيران البصري VFR</small></span><span class="ct">18</span></div>
+          <div class="bank"><span class="n">Airspace &amp; Air Traffic<small>المجال الجوي والحركة الجوية</small></span><span class="ct">18</span></div>
+          <div class="bank"><span class="n">General Air Law<small>قانون الجو العام</small></span><span class="ct">18</span></div>
+          <div class="bank"><span class="n">Aviation Weather<small>الأرصاد الجوية للطيران</small></span><span class="ct">12</span></div>
+          <div class="bank more" data-en="+ 9 more banks" data-ar="+ ٩ بنوك أخرى">+ 9 more banks</div>
+        </div>
+        <div class="offline"><i></i><span data-en="Offline — the question bank ships with the app." data-ar="دون اتصال — بنك الأسئلة مدمج في التطبيق.">Offline — the question bank ships with the app.</span></div>
+        <div class="cta" data-en="Start the exam" data-ar="ابدأ الاختبار">Start the exam</div>
+      </div>
+      <div class="homebar"><i></i></div>
+    </div></div>
+  </section>
+
+  <!-- ════════ Frame 2 · in question + palette ════════ -->
+  <section class="slot">
+    <div class="cap" data-en="<b>2 · In question.</b> The real Class-D question from quiz.json (question text is English-only — the known bank gap; chrome stays bilingual). Timer in its ≤5-min warn state. The palette sheet: answered · flagged · current, with review-before-submit. Tap a legend entry → its cells glow."
+         data-ar="<b>٢ · داخل السؤال.</b> سؤال الفئة D الحقيقي من quiz.json (نص الأسئلة بالإنجليزية فقط — الفجوة المعروفة في البنك؛ وتبقى الواجهة ثنائية اللغة). المؤقّت في حالة التحذير (≤٥ دقائق). لوحة الأسئلة: مُجاب · مُعلَّم · حالي، مع المراجعة قبل التسليم. اضغط عنصرًا في المفتاح لتتوهج خلاياه.">
+      <b>2 · In question.</b> The real Class-D question from quiz.json (question text is English-only — the known bank gap; chrome stays bilingual). Timer in its ≤5-min warn state. The palette sheet: answered · flagged · current, with review-before-submit. Tap a legend entry → its cells glow.</div>
+    <div class="phone"><div class="screen">
+      <div class="island"></div>
+      <div class="statusbar"><span>9:41</span><span class="sb-right">●●● ⌁ ▮</span></div>
+      <div class="body">
+        <div class="exambar">
+          <span class="timer">04:58</span>
+          <span class="prog"><span data-en="Question" data-ar="السؤال">Question</span> <bdi dir="ltr">7 / 25</bdi></span>
+          <span class="flagbtn" data-en="⚑ Flagged" data-ar="⚑ مُعلَّم">⚑ Flagged</span>
+        </div>
+        <div class="qcard">
+          <!-- English-only on purpose: the bank has no qAr (known gap, see ../ios-app-plan.md) -->
+          <div class="q" dir="ltr" lang="en">What is the minimum flight visibility for VFR flight in Class D airspace?</div>
+          <div class="gap" data-en="Bank questions are authored in English." data-ar="أسئلة البنك مكتوبة بالإنجليزية.">Bank questions are authored in English.</div>
+        </div>
+        <div class="opts">
+          <div class="opt"><span class="k">A</span> <bdi dir="ltr" lang="en">3 km</bdi></div>
+          <div class="opt sel"><span class="k">B</span> <bdi dir="ltr" lang="en">5 km</bdi></div>
+          <div class="opt"><span class="k">C</span> <bdi dir="ltr" lang="en">8 km</bdi></div>
+          <div class="opt"><span class="k">D</span> <bdi dir="ltr" lang="en">1,500 m</bdi></div>
+        </div>
+        <div class="navrow"><span data-en="← Previous" data-ar="→ السابق">← Previous</span><span data-en="Next →" data-ar="التالي ←">Next →</span></div>
+      </div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3 data-en="Question palette" data-ar="لوحة الأسئلة">Question palette</h3>
+        <div class="pal" id="pal"></div>
+        <div class="legend">
+          <span class="l-ans"><i></i><span data-en="answered" data-ar="مُجاب">answered</span></span>
+          <span class="l-flg"><i></i><span data-en="flagged" data-ar="مُعلَّم">flagged</span></span>
+          <span class="l-cur"><i></i><span data-en="current" data-ar="حالي">current</span></span>
+        </div>
+        <div class="submit" data-en="Review &amp; submit — 6 answered · 2 flagged · 19 blank" data-ar="راجع وسلّم — ٦ مُجابة، ٢ مُعلَّمة، ١٩ بلا إجابة">Review &amp; submit — 6 answered · 2 flagged · 19 blank</div>
+      </div>
+      <div class="homebar"><i></i></div>
+    </div></div>
+  </section>
+
+  <!-- ════════ Frame 3 · results + inline Ask Captain Adel ════════ -->
+  <section class="slot">
+    <div class="cap" data-en="<b>3 · Results.</b> Weakest-first topic bars (the ordering IS the study advice). A missed question in review: cite as <b>text only</b> (citeUrl is never rendered), with the cached inline “Ask Captain Adel” answer and the ≤1800-char debrief hand-off into chat."
+         data-ar="<b>٣ · النتيجة.</b> أشرطة المواضيع من الأضعف أولًا (الترتيب هو نصيحة المذاكرة). سؤال خاطئ قيد المراجعة: الاستشهاد <b>نصًا فقط</b> (لا يُعرض citeUrl أبدًا)، مع إجابة «اسأل كابتن عادل» المخزَّنة والتسليم إلى المحادثة بموجز ≤١٨٠٠ حرف.">
+      <b>3 · Results.</b> Weakest-first topic bars (the ordering IS the study advice). A missed question in review: cite as <b>text only</b> (citeUrl is never rendered), with the cached inline “Ask Captain Adel” answer and the ≤1800-char debrief hand-off into chat.</div>
+    <div class="phone"><div class="screen">
+      <div class="island"></div>
+      <div class="statusbar"><span>9:41</span><span class="sb-right">●●● ⌁ ▮</span></div>
+      <div class="body">
+        <div class="verdict">
+          <div class="ring"><i>76%<small data-en="PASS ≥75" data-ar="نجاح ≥٧٥">PASS ≥75</small></i></div>
+          <div class="vt"><b data-en="Passed — well flown." data-ar="ناجح — أحسنت الطيران.">Passed — well flown.</b>
+            <span data-en="19 correct of 25 · pass mark 75%" data-ar="١٩ صحيحة من ٢٥ · حد النجاح ٧٥٪">19 correct of 25 · pass mark 75%</span></div>
+        </div>
+        <div class="stats">
+          <div class="ok"><b>19</b><small data-en="correct" data-ar="صحيحة">correct</small></div>
+          <div class="no"><b>6</b><small data-en="wrong / skipped" data-ar="خاطئة / متروكة">wrong / skipped</small></div>
+          <div><b>76%</b><small data-en="score" data-ar="النتيجة">score</small></div>
+        </div>
+        <div class="topics">
+          <h4 data-en="By topic — weakest first" data-ar="بحسب الموضوع — الأضعف أولًا">By topic — weakest first</h4>
+          <div class="trow weak"><span class="tn">Airspace &amp; Air Traffic</span><span class="bar"><i style="width:50%"></i></span><span class="pc">2/4 · 50%</span></div>
+          <div class="trow weak"><span class="tn">Aviation Weather</span><span class="bar"><i style="width:60%"></i></span><span class="pc">3/5 · 60%</span></div>
+          <div class="trow"><span class="tn">General Air Law</span><span class="bar"><i style="width:75%"></i></span><span class="pc">3/4 · 75%</span></div>
+          <div class="trow"><span class="tn">VFR &amp; Flight Rules</span><span class="bar"><i style="width:90%"></i></span><span class="pc">9/10 · 90%</span></div>
+          <div class="trow"><span class="tn">Human Factors</span><span class="bar"><i style="width:100%"></i></span><span class="pc">2/2 · 100%</span></div>
+        </div>
+        <div class="filters">
+          <span class="fchip" data-en="All" data-ar="الكل">All</span>
+          <span class="fchip on" data-en="Wrong &amp; skipped" data-ar="الخاطئة والمتروكة">Wrong &amp; skipped</span>
+          <span class="fchip" data-en="⚑ Flagged" data-ar="⚑ المُعلَّمة">⚑ Flagged</span>
+        </div>
+        <div class="rev">
+          <!-- English-only on purpose: the bank has no qAr (known gap) -->
+          <div class="q" dir="ltr" lang="en">What is the minimum flight visibility for VFR flight in Class D airspace?</div>
+          <div class="ans"><span class="lbl" data-en="You answered" data-ar="إجابتك">You answered</span><span class="bad"><bdi dir="ltr" lang="en">3 km</bdi> ✕</span></div>
+          <div class="ans"><span class="lbl" data-en="Correct" data-ar="الصحيحة">Correct</span><span class="good"><bdi dir="ltr" lang="en">5 km</bdi> ✓</span></div>
+          <div class="cite-line"><bdi dir="ltr" lang="en">GACAR Part 91, §91.165</bdi></div>
+          <div class="ask">
+            <span class="askbtn" data-en="Ask Captain Adel · answered ✓ (cached)" data-ar="اسأل كابتن عادل · تمت الإجابة ✓ (مخزَّنة)">Ask Captain Adel · answered ✓ (cached)</span>
+            <div class="mini">
+              <span class="badge"><i></i><span data-en="Grounded" data-ar="مُسند">Grounded</span></span>
+              <p data-en="<bdi dir='ltr' lang='en'>§91.165</bdi> sets <b>5 km</b> VFR visibility for Classes B–E — 3 km applies nowhere."
+                 data-ar="تحدد <bdi dir='ltr' lang='en'>§91.165</bdi> مدى رؤية <b>٥ كم</b> للفئات B–E — ولا موضع لـ٣ كم في الفئة D.">
+                 <bdi dir="ltr" lang="en">§91.165</bdi> sets <b>5 km</b> VFR visibility for Classes B–E — 3 km applies nowhere.</p>
+              <div class="srcline"><bdi dir="ltr" lang="en">GACAR Part 91, §91.165 · corpus AIRAC 2505</bdi></div>
+              <div class="cont" data-en="Continue in chat →" data-ar="أكمل في المحادثة ←">Continue in chat →</div>
+            </div>
+          </div>
+        </div>
+        <div class="debrief" data-en="Debrief with Captain Adel →" data-ar="جلسة مراجعة مع كابتن عادل ←">Debrief with Captain Adel →</div>
+      </div>
+      <div class="homebar"><i></i></div>
+    </div></div>
+  </section>
+
+</main>
+
+<script>
+(() => {
+  const $  = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+  /* ---------- build the 25-cell palette ---------- */
+  const pal = $('#pal');
+  const ANSWERED = new Set([1,2,3,4,5,6]);
+  const FLAGGED  = new Set([3,7]);
+  const CURRENT  = 7;
+  for (let n = 1; n <= 25; n++) {
+    const c = document.createElement('span');
+    c.className = 'cell'
+      + (ANSWERED.has(n) ? ' ans' : '')
+      + (FLAGGED.has(n)  ? ' flg' : '')
+      + (n === CURRENT   ? ' cur' : '');
+    c.textContent = n;
+    pal.appendChild(c);
+  }
+
+  /* ---------- legend ↔ palette flourish ---------- */
+  const MAP = { 'l-ans': '.cell.ans', 'l-flg': '.cell.flg', 'l-cur': '.cell.cur' };
+  Object.entries(MAP).forEach(([cls, sel]) => {
+    const leg = $('.legend .' + cls);
+    if (!leg) return;
+    leg.addEventListener('click', () => {
+      $$('.cell.hot').forEach(c => c.classList.remove('hot'));
+      $$(sel).forEach(c => c.classList.add('hot'));
+      setTimeout(() => $$('.cell.hot').forEach(c => c.classList.remove('hot')), 900);
+    });
+  });
+
+  /* ---------- EN ⇄ العربية : flip dir, swap copy, prove bidi ---------- */
+  const enBtn = $('#lang-en'), arBtn = $('#lang-ar');
+  function setLang(lang){
+    const ar = lang === 'ar';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = ar ? 'rtl' : 'ltr';
+    enBtn.setAttribute('aria-pressed', String(!ar));
+    arBtn.setAttribute('aria-pressed', String(ar));
+    $$('[data-en]').forEach(el => { el.innerHTML = ar ? el.dataset.ar : el.dataset.en; });
+  }
+  enBtn.addEventListener('click', () => setLang('en'));
+  arBtn.addEventListener('click', () => setLang('ar'));
+})();
+</script>
+</body>
+</html>
