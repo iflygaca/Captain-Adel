@@ -29,6 +29,7 @@
     "allam:smoke": "node evals/allam-smoke.js",
     "jais:smoke": "node evals/jais-smoke.js",
     "build:embeddings": "node scripts/build-embeddings.js",
+    "fixtures:sse": "node scripts/record-sse-fixtures.js",
     "smoke": "node -e \"require('./src/server'); console.log('server module loads OK')\""
   },
   "dependencies": {

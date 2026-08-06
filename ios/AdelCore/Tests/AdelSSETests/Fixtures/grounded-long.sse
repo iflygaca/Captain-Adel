@@ -1,0 +1,14 @@
+data: {"type":"token","delta":"In Class D airspace, VFR requires flight"}
+
+data: {"type":"token","delta":" visibility of 5 km and cloud clearance "}
+
+data: {"type":"token","delta":"of at least 1,500 m horizontally and 300"}
+
+data: {"type":"token","delta":" m vertically — see GACAR Part 91,"}
+
+data: {"type":"token","delta":" §91.155(a). Keep it VFR, Captain, and mind the ceilings."}
+
+data: {"type":"final","answer":"In Class D airspace, VFR requires flight visibility of 5 km and cloud clearance of at least 1,500 m horizontally and 300 m vertically — see GACAR Part 91, §91.155(a). Keep it VFR, Captain, and mind the ceilings.","kind":"grounded","refusalClass":null,"grounding":{"state":"grounded","score":null,"mode":"declared","claims":[{"claim":"In Class D airspace, VFR requires flight visibility of 5 km and cloud clearance of at least 1,500 m horizontally and 300 m vertically — see GACAR Part 91, §91.155(a).","verdict":null}],"resolved":["GACAR Part 91, §91.155(a)"],"unresolved":[]},"suggestions":[{"q":"What else does GACAR Part 91 cover?","qAr":"ماذا تغطي GACAR Part 91 أيضًا؟","en":"More of Part 91 — general operating rules","ar":"المزيد من Part 91 — قواعد التشغيل العامة"},{"q":"What recent changes were made to GACAR Part 91?","qAr":"ما التغييرات الحديثة على GACAR Part 91؟","en":"Recent changes to Part 91","ar":"تغييرات حديثة على Part 91"},{"q":"What are the VFR weather minima in controlled airspace?","qAr":"ما هي حدود الطقس للطيران البصري VFR في المجال الجوي المراقب؟","en":"VFR weather minima","ar":"حدود طقس الطيران البصري"}],"sources":[{"citation":"GACAR Part 91, §91.155(a)","url":"library.html#91.155","part":"91","section":"91.155(a)","sectionAnchor":"91.155","verbatim":"…no person may operate an aircraft under VFR when the flight visibility is less than 5 km, or at a distance from clouds of less than 1 500 m horizontally and 300 m vertically…","corpusVersion":"AIRAC 2505"}],"meta":{"provider":"gemini","model":null,"rewrittenQuery":null,"toolCalls":null}}
+
+data: [DONE]
+

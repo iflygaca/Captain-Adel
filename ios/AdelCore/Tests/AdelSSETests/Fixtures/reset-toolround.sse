@@ -1,0 +1,14 @@
+data: {"type":"token","delta":"Working the wind triangle for runway 34… Wo"}
+
+data: {"type":"reset"}
+
+data: {"type":"token","delta":"With wind 290° at 15 kt on runway 34, th"}
+
+data: {"type":"token","delta":"e crosswind component is about 11 kt"}
+
+data: {"type":"token","delta":" from the left — inside typical light-aircraft limits, Captain."}
+
+data: {"type":"final","answer":"With wind 290° at 15 kt on runway 34, the crosswind component is about 11 kt from the left — inside typical light-aircraft limits, Captain.","kind":"na","refusalClass":null,"grounding":{"state":"na","score":null,"mode":"declared","claims":[{"claim":"With wind 290° at 15 kt on runway 34, the crosswind component is about 11 kt from the left — inside typical light-aircraft limits, Captain.","verdict":null}],"resolved":[],"unresolved":[]},"suggestions":[{"q":"What are the VFR weather minima in controlled airspace?","qAr":"ما هي حدود الطقس للطيران البصري VFR في المجال الجوي المراقب؟","en":"VFR weather minima","ar":"حدود طقس الطيران البصري"},{"q":"What's required for a GACAR commercial pilot licence?","qAr":"ما متطلبات رخصة الطيار التجاري CPL وفق لوائح GACAR؟","en":"CPL requirements","ar":"متطلبات رخصة الطيار التجاري"},{"q":"What are the fuel reserve requirements for a Part 121 flight?","qAr":"ما متطلبات احتياطي الوقود لرحلة وفق Part 121؟","en":"Part 121 fuel reserves","ar":"احتياطي وقود Part 121"}],"sources":[],"meta":{"provider":"gemini","model":null,"rewrittenQuery":null,"toolCalls":[{"name":"compute_wind","args":{"runway":34,"windDir":290,"windSpeed":15},"result":{"inputs":{"runway":34,"windDir":290,"windSpeed":15},"steps":[{"label":"Angle off runway","expr":"|290 − 340|","value":50,"unit":"°"},{"label":"Crosswind","expr":"15 × sin(50°)","value":11.5,"unit":"kt"}],"result":{"crosswindKt":11.5,"headwindKt":9.6,"side":"left"}}}]}}
+
+data: [DONE]
+

@@ -1,0 +1,12 @@
+data: {"type":"token","delta":"I can't verify that figure, Captain — fu"}
+
+data: {"type":"token","delta":"ture fee schedules are not in the GACAR "}
+
+data: {"type":"token","delta":"corpus I cite fr"}
+
+data: {"type":"token","delta":"om. Check with GACA before you rely on a number."}
+
+data: {"type":"final","answer":"I can't verify that figure, Captain — future fee schedules are not in the GACAR corpus I cite from. Check with GACA before you rely on a number.","kind":"refusal","refusalClass":"1.1","grounding":{"state":"refusal","score":null,"mode":"declared","claims":[],"resolved":[],"unresolved":[]},"suggestions":[{"q":"What are the VFR weather minima in controlled airspace?","qAr":"ما هي حدود الطقس للطيران البصري VFR في المجال الجوي المراقب؟","en":"VFR weather minima","ar":"حدود طقس الطيران البصري"},{"q":"What's required for a GACAR commercial pilot licence?","qAr":"ما متطلبات رخصة الطيار التجاري CPL وفق لوائح GACAR؟","en":"CPL requirements","ar":"متطلبات رخصة الطيار التجاري"},{"q":"What are the fuel reserve requirements for a Part 121 flight?","qAr":"ما متطلبات احتياطي الوقود لرحلة وفق Part 121؟","en":"Part 121 fuel reserves","ar":"احتياطي وقود Part 121"}],"sources":[],"meta":{"provider":"gemini","model":null,"rewrittenQuery":null,"toolCalls":null}}
+
+data: [DONE]
+

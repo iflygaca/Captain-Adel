@@ -1,0 +1,6 @@
+data: {"type":"token","delta":"Roger — on the line, Captain."}
+
+data: {"type":"final","answer":"Roger — on the line, Captain.","kind":"na","refusalClass":null,"grounding":{"state":"na","score":null,"mode":"structural","claims":[],"resolved":[],"unresolved":[]},"suggestions":[{"q":"What are the VFR weather minima in controlled airspace?","qAr":"ما هي حدود الطقس للطيران البصري VFR في المجال الجوي المراقب؟","en":"VFR weather minima","ar":"حدود طقس الطيران البصري"},{"q":"What's required for a GACAR commercial pilot licence?","qAr":"ما متطلبات رخصة الطيار التجاري CPL وفق لوائح GACAR؟","en":"CPL requirements","ar":"متطلبات رخصة الطيار التجاري"},{"q":"What are the fuel reserve requirements for a Part 121 flight?","qAr":"ما متطلبات احتياطي الوقود لرحلة وفق Part 121؟","en":"Part 121 fuel reserves","ar":"احتياطي وقود Part 121"}],"sources":[],"meta":{"provider":"gemini","model":null,"rewrittenQuery":null,"toolCalls":null}}
+
+data: [DONE]
+

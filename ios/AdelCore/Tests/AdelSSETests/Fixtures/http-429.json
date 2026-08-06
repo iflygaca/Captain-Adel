@@ -1,0 +1,14 @@
+{
+  "status": 429,
+  "headers": {
+    "content-type": "application/json; charset=utf-8",
+    "retry-after": "7",
+    "x-adel-api-version": "1"
+  },
+  "body": {
+    "error": "rate_limited",
+    "scope": "ip",
+    "retryAfter": 7,
+    "message": "Ease off a moment, Captain — too many questions in a short span. Try again shortly."
+  }
+}
