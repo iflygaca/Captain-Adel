@@ -1,6 +1,6 @@
 {
-  "generated": "2026-05-24",
-  "note": "Practice questions authored by Fly GACA from the GACAR library for study. Not actual GACA exam questions. Every answer cites its source — verify against the official GACAR. citeUrl values are Fly GACA app paths (document.html/library.html) that do not exist on captadel.com; exam.js renders only the cite text and never reads citeUrl.",
+  "generated": "2026-08-06",
+  "note": "Practice questions authored by Fly GACA from the GACAR library for study. Not actual GACA exam questions. Every answer cites its source — verify against the official GACAR. citeUrl values are Fly GACA app paths (document.html/library.html) that do not exist on captadel.com; exam.js renders only the cite text and never reads citeUrl. Bank titleAr/descAr carry the Arabic topic labels for the bilingual exam UI.",
   "exam": {
     "title": "GACAR Knowledge — Mock Exam",
     "questions": 25,
@@ -248,7 +248,9 @@
           "cite": "GACAR Part 91, §91.65",
           "citeUrl": "../document.html?type=regulations&id=part-91#sec-bfxi91-65-aircraft-speed"
         }
-      ]
+      ],
+      "titleAr": "قواعد الطيران البصري VFR",
+      "descAr": "الحدود الدنيا للأحوال الجوية، ارتفاعات الطيران، الطيران البصري الخاص والليلي، ورموز جهاز الاستجابة."
     },
     {
       "id": "airspace",
@@ -490,7 +492,9 @@
           "cite": "GACAR Part 91, §91.135",
           "citeUrl": "../document.html?type=regulations&id=part-91#sec-mathbf-91-135-operations-in-class-a-airspace"
         }
-      ]
+      ],
+      "titleAr": "المجال الجوي والحركة الجوية",
+      "descAr": "تصنيفات إيكاو من A إلى G، إقليم معلومات طيران جدة، مناطق المراقبة، وحدود السرعة ومستويات الطيران."
     },
     {
       "id": "aip-ais",
@@ -654,7 +658,9 @@
           "cite": "ICAO Annex 15",
           "citeUrl": ""
         }
-      ]
+      ],
+      "titleAr": "دليل معلومات الطيران AIP",
+      "descAr": "بنية دليل الطيران AIP، دورة AIRAC، إشعارات NOTAM، وكيفية إدارة معلومات الطيران."
     },
     {
       "id": "radio-elpt",
@@ -818,7 +824,9 @@
           "cite": "ICAO Annex 10",
           "citeUrl": ""
         }
-      ]
+      ],
+      "titleAr": "الاتصالات اللاسلكية وإجادة الإنجليزية",
+      "descAr": "الأبجدية الصوتية لإيكاو، العبارات القياسية للاتصال، ومتطلب إجادة اللغة الإنجليزية."
     },
     {
       "id": "air-law",
@@ -1060,7 +1068,9 @@
           "cite": "GACAR Part 13, §13.103",
           "citeUrl": "../document.html?type=regulations&id=part-13#sec-13-103"
         }
-      ]
+      ],
+      "titleAr": "قانون الجو العام",
+      "descAr": "بنية لوائح GACAR، الهيئة المنظِّمة، وكيفية ترابط منظومة قانون الطيران المدني السعودي."
     },
     {
       "id": "pilot-licensing",
@@ -1224,7 +1234,9 @@
           "cite": "GACAR Part 61, §61.55",
           "citeUrl": "../document.html?type=regulations&id=part-61#sec-61-55"
         }
-      ]
+      ],
+      "titleAr": "إجازات الطيارين والأهليات",
+      "descAr": "أعمار الأهلية، الفئات الطبية، الصلاحية والمراجعات الدورية وحداثة الخبرة وفق الجزء 61."
     },
     {
       "id": "medical",
@@ -1388,7 +1400,9 @@
           "cite": "GACAR Part 67, §67.97",
           "citeUrl": "../document.html?type=regulations&id=part-67#sec-67-97"
         }
-      ]
+      ],
+      "titleAr": "اللياقة الطبية",
+      "descAr": "فئات الشهادات الطبية، معايير النظر والسمع، والإصدار الخاص وإجراءات الفاحص الطبي وفق الجزء 67."
     },
     {
       "id": "aircraft-equipment",
@@ -1552,7 +1566,9 @@
           "cite": "GACAR Part 43, §43.19",
           "citeUrl": "../document.html?type=regulations&id=part-43#sec-mathbf-43-19-performance-rules-general"
         }
-      ]
+      ],
+      "titleAr": "الطائرة والتجهيزات وصلاحية الطيران",
+      "descAr": "الأكسجين، أجهزة الاستجابة، فحوص الأجهزة، توجيهات صلاحية الطيران والصيانة وفق الأجزاء 91 و39 و43."
     },
     {
       "id": "weather",
@@ -1716,7 +1732,9 @@
           "cite": "FAA Aviation Weather Handbook",
           "citeUrl": "../document.html?type=reference&id=aviation-weather-handbook-faa-h-8083-28b"
         }
-      ]
+      ],
+      "titleAr": "الأرصاد الجوية للطيران",
+      "descAr": "الغلاف الجوي، السحب، الجبهات الهوائية، العواصف الرعدية، التجمّد ومخاطر الرؤية."
     },
     {
       "id": "aerodynamics",
@@ -1880,7 +1898,9 @@
           "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
           "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
         }
-      ]
+      ],
+      "titleAr": "الديناميكا الهوائية وأنظمة الطائرة",
+      "descAr": "قوى الطيران الأربع، فقدان الرفع (Stall)، معامل الحمل، السرعات المرجعية وأنظمة المحرك."
     },
     {
       "id": "human-factors",
@@ -2044,7 +2064,9 @@
           "cite": "FAA Risk Management Handbook",
           "citeUrl": "../document.html?type=reference&id=risk-management-handbook-faa-h-8083-2a"
         }
-      ]
+      ],
+      "titleAr": "العوامل البشرية وطب الطيران",
+      "descAr": "نقص الأكسجين، أول أكسيد الكربون، فقدان التوجّه المكاني، الإرهاق واتخاذ القرار في الطيران."
     },
     {
       "id": "navigation",
@@ -2207,6 +2229,174 @@
           "explain": "The FAA Pilot's Handbook of Aeronautical Knowledge defines groundspeed as the actual speed over the ground - true airspeed adjusted for wind; it decreases with a headwind and increases with a tailwind.",
           "cite": "FAA Pilot's Handbook of Aeronautical Knowledge",
           "citeUrl": "../document.html?type=reference&id=pilots-handbook-of-aeronautical-knowledge-faa-h-8083-25c"
+        }
+      ],
+      "titleAr": "الملاحة الجوية والتخطيط للرحلات",
+      "descAr": "الخرائط، نظام الإحداثيات، الانحراف المغناطيسي، الملاحة بأجهزة VOR وتصحيح أثر الرياح."
+    },
+    {
+      "id": "flight-ops",
+      "title": "Flight Operations & Aerodromes",
+      "titleAr": "عمليات التشغيل والمطارات",
+      "desc": "Preflight action, minimum safe altitudes, traffic patterns, fuel-management calls, aerobatics and formation rules under GACAR Part 91.",
+      "descAr": "إجراءات ما قبل الطيران، الارتفاعات الآمنة الدنيا، أنماط الحركة حول المطار، نداءات إدارة الوقود، الطيران البهلواني وقواعد طيران التشكيل وفق الجزء 91.",
+      "source": "GACAR Part 91",
+      "questions": [
+        {
+          "q": "Before beginning a flight, what does GACAR §91.43 require of the pilot in command?",
+          "options": [
+            "Obtain a special flight permit from GACA",
+            "File an IFR flight plan regardless of weather",
+            "Become familiar with all available information concerning that flight",
+            "Deposit a copy of the load sheet with the aerodrome office"
+          ],
+          "answer": 2,
+          "explain": "GACAR §91.43 requires each PIC, before beginning a flight, to become familiar with all available information concerning that flight — including the AFM and its placards and limitations — and to ensure that information reaches the appropriate flight crew members.",
+          "cite": "GACAR Part 91, §91.43",
+          "citeUrl": ""
+        },
+        {
+          "q": "Except when necessary for takeoff or landing, what is the minimum altitude over a congested area of a city, town or settlement?",
+          "options": [
+            "500 ft above the surface",
+            "1,000 ft (300 m) above the highest obstacle within a horizontal radius of 2,000 ft (600 m)",
+            "1,500 ft above the highest obstacle within 4 NM",
+            "2,000 ft above ground level"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.67(b): over any congested area or open-air assembly of persons, the minimum is 1,000 ft (300 m) above the highest obstacle within a horizontal radius of 2,000 ft (600 m) of the aircraft.",
+          "cite": "GACAR Part 91, §91.67",
+          "citeUrl": ""
+        },
+        {
+          "q": "Over other than congested areas, GACAR §91.67 sets a minimum altitude of —",
+          "options": [
+            "500 ft (150 m) above the surface",
+            "300 ft above the surface",
+            "700 ft above the surface",
+            "1,000 ft above the surface"
+          ],
+          "answer": 0,
+          "explain": "GACAR §91.67(c) requires 500 ft (150 m) above the surface outside congested areas. Over open water or sparsely populated areas you may fly lower, but never closer than 500 ft to any person, vessel, vehicle or structure.",
+          "cite": "GACAR Part 91, §91.67",
+          "citeUrl": ""
+        },
+        {
+          "q": "When approaching to land at an aerodrome without an operating control tower in Class G airspace, an airplane pilot must —",
+          "options": [
+            "Make all turns to the right",
+            "Fly a straight-in approach whenever possible",
+            "Circle overhead at 2,000 ft before joining",
+            "Make all turns to the left, unless right-hand patterns are established for that aerodrome"
+          ],
+          "answer": 3,
+          "explain": "GACAR §91.121(b): when approaching to land at an aerodrome without an operating control tower in Class G airspace, make all turns to the left — unless right-hand patterns have been established for that aerodrome under GACAR Part 93.",
+          "cite": "GACAR Part 91, §91.121",
+          "citeUrl": ""
+        },
+        {
+          "q": "What is the correct radio broadcast when the usable fuel predicted on landing at the nearest aerodrome where a safe landing can be made is less than the planned final reserve fuel?",
+          "options": [
+            "PAN PAN FUEL",
+            "MINIMUM FUEL",
+            "MAYDAY MAYDAY MAYDAY FUEL",
+            "FUEL EMERGENCY, FUEL EMERGENCY"
+          ],
+          "answer": 2,
+          "explain": "GACAR §91.267 requires the PIC to declare a fuel emergency by broadcasting MAYDAY MAYDAY MAYDAY FUEL when the calculated usable fuel available on landing at the nearest aerodrome where a safe landing can be made is less than the planned final reserve fuel.",
+          "cite": "GACAR Part 91, §91.267",
+          "citeUrl": ""
+        },
+        {
+          "q": "Declaring “MINIMUM FUEL” to ATC means —",
+          "options": [
+            "The flight is declaring an emergency and requires priority handling",
+            "Having committed to land at a specific aerodrome, any change to the existing clearance may result in landing with less than the planned final reserve fuel",
+            "Exactly 30 minutes of fuel remains on board",
+            "The fuel quantity indicators are unreliable"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.267: MINIMUM FUEL advises ATC that, having committed to land at a specific aerodrome, any change to the existing clearance may result in landing with less than the planned final reserve fuel. It is an advisory, not an emergency — the emergency broadcast is MAYDAY MAYDAY MAYDAY FUEL.",
+          "cite": "GACAR Part 91, §91.267",
+          "citeUrl": ""
+        },
+        {
+          "q": "Aerobatic flight is prohibited below which height above the surface?",
+          "options": [
+            "1,000 ft (300 m)",
+            "1,500 ft (460 m)",
+            "3,000 ft (900 m)",
+            "5,000 ft (1,500 m)"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.417 prohibits aerobatic flight below 1,500 ft (460 m) above the surface — and also over congested areas, over open-air assemblies of persons, within the lateral boundaries of the surface areas of Class B, C, D or E airspace designated for an aerodrome, and within 4 NM of an airway centreline.",
+          "cite": "GACAR Part 91, §91.417",
+          "citeUrl": ""
+        },
+        {
+          "q": "May the pilot in command allow an object to be dropped from an aircraft in flight?",
+          "options": [
+            "Never, under any circumstances",
+            "Only over open water",
+            "Only with a certificate of waiver, in every case",
+            "Yes, if reasonable precautions are taken to avoid injury or damage to persons or property"
+          ],
+          "answer": 3,
+          "explain": "GACAR §91.19 prohibits dropping any object that creates a hazard to persons or property — but it does not prohibit dropping an object when reasonable precautions are taken to avoid injury or damage.",
+          "cite": "GACAR Part 91, §91.19",
+          "citeUrl": ""
+        },
+        {
+          "q": "Formation flight is permitted only —",
+          "options": [
+            "By arrangement with the pilot in command of each aircraft in the formation",
+            "When all aircraft are of the same category",
+            "For aircraft holding a special airworthiness certificate",
+            "When approved by the aerodrome operator"
+          ],
+          "answer": 0,
+          "explain": "GACAR §91.59(b): formation flight requires arrangement with the PIC of each aircraft — and in controlled airspace, compliance with the conditions prescribed by the Air Traffic Service authorities. §91.59(c) adds that no aircraft carrying passengers for hire may be flown in formation.",
+          "cite": "GACAR Part 91, §91.59",
+          "citeUrl": ""
+        },
+        {
+          "q": "Under GACAR §91.49, each person on board must occupy an approved seat or berth with the safety belt secured —",
+          "options": [
+            "Only during takeoff and landing",
+            "During the entire flight",
+            "During movement on the surface, takeoff and landing",
+            "Only when the PIC expects turbulence"
+          ],
+          "answer": 2,
+          "explain": "GACAR §91.49 requires each person on board (except in a manned balloon with a basket or gondola) to occupy an approved seat or berth with the safety belt — and shoulder harness, if installed — properly secured during movement on the surface, takeoff and landing.",
+          "cite": "GACAR Part 91, §91.49",
+          "citeUrl": ""
+        },
+        {
+          "q": "Flying below 15,000 ft (4,550 m) MSL, the altimeter must be set to —",
+          "options": [
+            "1013.2 hPa at all times",
+            "The current reported altimeter setting of a station along the route within 185 km (100 NM)",
+            "The elevation of the destination aerodrome",
+            "The setting last assigned by ATC on a previous flight"
+          ],
+          "answer": 1,
+          "explain": "GACAR §91.71: below 15,000 ft (4,550 m) MSL, maintain cruising altitude by reference to an altimeter set to the current reported setting of a station along the route within 185 km (100 NM) of the aircraft — or, failing that, of an appropriate available station.",
+          "cite": "GACAR Part 91, §91.71",
+          "citeUrl": ""
+        },
+        {
+          "q": "Before each takeoff with passengers on board, the PIC must ensure all passengers have been orally briefed on —",
+          "options": [
+            "Smoking, and the use of safety belts and shoulder harnesses",
+            "The aircraft’s maintenance history",
+            "The names and licences of the flight crew",
+            "The detailed en-route weather forecast"
+          ],
+          "answer": 0,
+          "explain": "GACAR §91.45(a): before each takeoff, every passenger must be orally briefed on smoking — when, where and under what conditions it is prohibited — and on when, where and how safety belts and shoulder harnesses are to be used.",
+          "cite": "GACAR Part 91, §91.45",
+          "citeUrl": ""
         }
       ]
     }
