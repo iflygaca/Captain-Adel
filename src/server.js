@@ -252,7 +252,7 @@ app.post('/v1/feedback', corsMiddleware, (req, res) => {
   res.json({ ok: true });
 });
 
-/* Account & billing API: /v1/billing/checkout, /v1/billing/portal, /v1/me,
+/* Account & billing API: /v1/billing/checkout, /v1/account/delete, /v1/me,
  * /v1/config. The webhook is mounted separately above (raw body). All ship dark
  * until the Moyasar / Firebase env is set. */
 app.use('/v1', corsMiddleware, billing.router);

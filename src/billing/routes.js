@@ -12,6 +12,7 @@
  *   POST /v1/billing/webhook           (raw)  -> settle via payment_paid
  *   POST /v1/billing/cancel-auto-renew (auth) -> stop future charges
  *   POST /v1/billing/renewals/run      (cron) -> charge due saved-card tokens
+ *   POST /v1/account/delete            (auth) -> purge Firestore + the Auth user
  *   GET  /v1/me                        (auth) -> { signedIn, plan, quota, ... }
  *   GET  /v1/config                           -> { launchMode, billingEnabled, ... }
  *
@@ -40,6 +41,7 @@ const firebase = require('../firebase');
 const ent = require('./entitlements');
 const mc = require('./moyasar-core');
 const quota = require('../quota/quota');
+const qc = require('../quota/quota-core');
 const tierCore = require('./tier-core');
 const authMiddleware = require('../middleware/auth');
 
@@ -342,6 +344,75 @@ async function renewOne(uid, sub, out) {
   }, { merge: true });
 }
 
+/* ---- POST /v1/account/delete ---------------------------------------------- */
+/* Apple 5.1.1(v) / PDPL erasure. Order is load-bearing: Firestore purge FIRST,
+ * the Auth user LAST — if Auth died first the caller's token would be dead and
+ * the data purge unretryable. Idempotent throughout: doc deletes of missing
+ * docs are no-ops, queries come back empty on retry, and a user-not-found from
+ * Auth (a retry inside the old ID token's ≤1h validity) counts as success.
+ * moyasarPayments docs are NOT deleted — each is the settle-once idempotency
+ * marker (see settlePayment): a deleted marker would let a replayed webhook
+ * re-grant an entitlement to the dead uid. They are tombstoned instead: the
+ * doc is overwritten (uid/checkoutId erased) but kept, so create() still
+ * fails. Quota counters are swept best-effort; stragglers TTL out (expireAt). */
+async function deleteAccountHandler(req, res) {
+  if (!firebase.available()) { res.status(503).json({ error: 'account_unavailable' }); return; }
+  const uid = req.user && req.user.uid;
+  if (!uid) { res.status(401).json({ error: 'sign_in_required' }); return; }
+
+  try {
+    const db = firebase.db();
+
+    // 1. Saved card token first — the most sensitive doc, and removing it
+    //    guarantees no future renewal can charge even if a later step fails.
+    await db.collection('moyasarCustomers').doc(uid).delete();
+    // 2. Subscription — drops the uid out of the renewals cron query.
+    await db.collection('subscriptions').doc(uid).delete();
+    // 3. Profile + entitlement.
+    await db.collection('users').doc(uid).delete();
+
+    // 4. Checkout intents are keyed by uuid but carry the uid — query-delete.
+    const intents = await db.collection('checkoutIntents').where('uid', '==', uid).get();
+    for (const d of intents.docs) {
+      // eslint-disable-next-line no-await-in-loop
+      await db.collection('checkoutIntents').doc(d.id).delete();
+    }
+
+    // 5. Settle markers: overwrite (non-merge set), never delete — the doc's
+    //    existence is the replay guard; its uid is the personal data.
+    const markers = await db.collection('moyasarPayments').where('uid', '==', uid).get();
+    for (const d of markers.docs) {
+      // eslint-disable-next-line no-await-in-loop
+      await db.collection('moyasarPayments').doc(d.id)
+        .set({ tombstone: true, deletedAt: firebase.serverTimestamp() });
+    }
+
+    // 6. Quota counters (uid lives only in the doc id; stamps are
+    //    deterministic). Sweep BOTH period stamps so an ADEL_FREE_PERIOD flip
+    //    can't strand a live counter. Best effort — they hold only a count.
+    try {
+      const now = Date.now();
+      await db.collection('adelQuota').doc(qc.dayStamp(now) + '__uid:' + uid).delete();
+      await db.collection('adelQuota').doc(qc.monthStamp(now) + '__uid:' + uid).delete();
+    } catch (_) { /* fail open — the TTL policy on expireAt cleans up */ }
+
+    // 7. The Auth user, LAST. user-not-found = a retry after success (the old
+    //    ID token verifies for up to ~1h; verifyIdToken doesn't checkRevoked).
+    try {
+      await firebase.deleteUser(uid);
+    } catch (err) {
+      if (!err || err.code !== 'auth/user-not-found') throw err;
+    }
+
+    authMiddleware.invalidate(uid);   // this instance forgets the uid now
+    res.json({ ok: true });           // the client signs out locally on ok
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('account delete failed', String((err && err.message) || err));
+    res.status(502).json({ error: 'delete_failed' });   // token still valid — retry
+  }
+}
+
 /* ---- GET /v1/me ---------------------------------------------------------- */
 async function meHandler(req, res) {
   const uid = req.user && req.user.uid;
@@ -388,6 +459,7 @@ router.post('/billing/checkout', express.json({ limit: 16 * 1024 }), authMiddlew
 router.post('/billing/confirm', express.json({ limit: 16 * 1024 }), authMiddleware, confirmHandler);
 router.post('/billing/cancel-auto-renew', express.json({ limit: 16 * 1024 }), authMiddleware, cancelAutoRenewHandler);
 router.post('/billing/renewals/run', express.json({ limit: 16 * 1024 }), renewalsHandler);
+router.post('/account/delete', express.json({ limit: 16 * 1024 }), authMiddleware, deleteAccountHandler);
 router.get('/me', authMiddleware, meHandler);
 router.get('/config', configHandler);
 
@@ -396,6 +468,6 @@ module.exports = {
   webhookHandler,
   // exported for tests
   checkoutHandler, confirmHandler, cancelAutoRenewHandler, renewalsHandler,
-  meHandler, configHandler, billingEnabled, settlePayment,
+  deleteAccountHandler, meHandler, configHandler, billingEnabled, settlePayment,
   _tierCore: tierCore,
 };

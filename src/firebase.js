@@ -57,4 +57,10 @@ async function verifyIdToken(token) {
   return admin().auth().verifyIdToken(token);
 }
 
-module.exports = { available, app, db, serverTimestamp, verifyIdToken };
+/* Delete a Firebase Auth user (account deletion, Apple 5.1.1(v)). */
+async function deleteUser(uid) {
+  app();
+  return admin().auth().deleteUser(uid);
+}
+
+module.exports = { available, app, db, serverTimestamp, verifyIdToken, deleteUser };

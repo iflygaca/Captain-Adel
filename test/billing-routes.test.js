@@ -111,3 +111,12 @@ test('/v1/chat contract is unchanged for the trusted gateway tier', async () => 
   assert.equal(r.status, 400);
   assert.equal(r.json.error, 'message_required');
 });
+
+test('POST /v1/account/delete: 503 account_unavailable while Firebase is dark', async () => {
+  // Doubles as the route-mounted proof (a 404 would fail it). The anonymous-401
+  // case can't appear here by design — the dark gate fires before the uid guard —
+  // so it lives in billing-handlers.test.js instead.
+  const r = await req('POST', '/v1/account/delete', { body: {} });
+  assert.equal(r.status, 503);
+  assert.equal(r.json.error, 'account_unavailable');
+});
