@@ -175,6 +175,8 @@ happens in Xcode, in its own repo.
   App Store gates in `docs/ios-app-plan.md`, with phone-frame mockups in `docs/mockups/`.
 - [ ] **Phase 0 spike** — a `URLSession` SSE parser for the POST `token/reset/final` frames
   (`src/brain/answer.js`) + one streamed `/v1/chat` turn, on TestFlight.
+  *(in-repo half landed: the `ios/AdelCore` parser package + CI-verified wire fixtures;
+  the remaining leg is Xcode + TestFlight per `ios/README.md`)*
 - [ ] **v1 — chat + mock exam** — port `chat-core.js`/`exam-core.js` semantics to Swift
   (allow-list markdown, `§` cite chips, grounding badge, shuffles, resume snapshots), bundle
   `quiz.json` for offline exams; optional email sign-in honours web Pro read-only via `/v1/me`.

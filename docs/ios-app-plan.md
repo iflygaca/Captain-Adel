@@ -299,12 +299,16 @@ server work existing.
 - **Equivalence, not vibes:** `AdelChatCore`/`AdelExamCore` unit tests mirror
   [`test/chat-core.test.js`](../test/chat-core.test.js) and
   [`test/exam-core.test.js`](../test/exam-core.test.js) case for case.
-- **Recorded stream fixtures** — one each of grounded / partial / refusal / `na`, plus a
-  `reset`-bearing stream and a stream that dies without `final` — as `AdelSSE` test
-  vectors, recorded from the real API.
+- **Recorded stream fixtures** — one each of grounded / partial / refusal / `na`, plus
+  `reset`-bearing streams and a stream that dies without `final` — as `AdelSSE` test
+  vectors. Recorded by [`scripts/record-sse-fixtures.js`](../scripts/record-sse-fixtures.js):
+  the real server pipeline (routing → retrieval → grounding → SSE serialization) with
+  stubbed providers — byte-exact, deterministic, key-free, and regression-guarded in CI by
+  [`test/sse-fixtures.test.js`](../test/sse-fixtures.test.js). A deliberate improvement
+  over live-API capture, which would be nondeterministic and need production keys.
 - **TestFlight against production** captadel.com from Phase 0 — no staging fork.
-- This repo's gates are untouched: the deliverable is docs-only, and
-  `npm run smoke && npm run test:unit && npm run eval:dry` must stay green.
+- This repo's gates stay green — `npm run smoke && npm run test:unit && npm run eval:dry` —
+  and the unit run now includes the fixture cross-check above.
 
 ---
 
