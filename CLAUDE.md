@@ -160,7 +160,7 @@ evals/                 Regression harness (cases.json, run.js, parity.js, lib.js
 scripts/               One-off scripts (build-embeddings.js)
 deploy/                docker-compose.yml, deploy.sh (Cloud Run), allam-vllm.md (vLLM GPU
                        endpoint runbook) — the Dockerfile itself lives at the repo root
-docs/                  models, refusal-taxonomy, data-contract, RUNBOOKs, mockups/
+docs/                  models, refusal-taxonomy, data-contract, ios-app-plan, RUNBOOKs, mockups/
 authoring/             Source-of-truth system prompt + KB scope + Python reference (rag.py, captain_adel.py)
 ```
 
@@ -297,4 +297,5 @@ advanced switches (`ADEL_REWRITE*`, `ADEL_GROUNDING`, `ADEL_PARENT_CHILD`,
 > 📖 **Family context:** [The Book of Fly GACA](https://github.com/ay2m/FlyGACA/blob/main/THE-BOOK-OF-FLY-GACA.md) is the whole-family reference — all ten repos, the shared tenets, and the glossary in one place.
 
 `README.md` (overview), `ROADMAP.md` (direction), `evals/README.md`, and
-`docs/` (`models.md`, `refusal-taxonomy.md`, `data-contract.md`, the RUNBOOKs).
+`docs/` (`models.md`, `refusal-taxonomy.md`, `data-contract.md`, `ios-app-plan.md`,
+the RUNBOOKs).
