@@ -33,6 +33,7 @@ function withFirebase({ projectId = '', existingApps = [] } = {}, fn) {
   delete require.cache[FIREBASE_PATH];
 
   const initializeAppCalls = [];
+  const deleteUserCalls = [];
   const newApp = { name: 'new-app' };
   const fakeAdmin = {
     apps: existingApps,
@@ -40,13 +41,16 @@ function withFirebase({ projectId = '', existingApps = [] } = {}, fn) {
     firestore: Object.assign(() => ({ fake: 'firestore' }), {
       FieldValue: { serverTimestamp: () => 'SENTINEL_TIMESTAMP' },
     }),
-    auth: () => ({ verifyIdToken: async (token) => ({ uid: `uid-${token}` }) }),
+    auth: () => ({
+      verifyIdToken: async (token) => ({ uid: `uid-${token}` }),
+      deleteUser: async (uid) => { deleteUserCalls.push(uid); },
+    }),
   };
   require.cache[ADMIN_PATH].exports = fakeAdmin;
 
   try {
     const firebase = require(FIREBASE_PATH);
-    return fn(firebase, { fakeAdmin, initializeAppCalls, newApp });
+    return fn(firebase, { fakeAdmin, initializeAppCalls, newApp, deleteUserCalls });
   } finally {
     require.cache[ADMIN_PATH].exports = savedAdminExports;
     config.firebaseProjectId = savedProjectId;
@@ -140,5 +144,13 @@ test('verifyIdToken(): calls app() first, then resolves via admin().auth().verif
     const decoded = await firebase.verifyIdToken('sometoken');
     assert.deepEqual(decoded, { uid: 'uid-sometoken' });
     assert.equal(initializeAppCalls.length, 1, 'verifyIdToken() must have triggered app() init');
+  });
+});
+
+test('deleteUser(): calls app() first, then delegates to admin().auth().deleteUser()', async () => {
+  await withFirebase({ projectId: 'my-project', existingApps: [] }, async (firebase, { initializeAppCalls, deleteUserCalls }) => {
+    await firebase.deleteUser('u-gone');
+    assert.deepEqual(deleteUserCalls, ['u-gone']);
+    assert.equal(initializeAppCalls.length, 1, 'deleteUser() must have triggered app() init');
   });
 });

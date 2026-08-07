@@ -181,7 +181,8 @@ happens in Xcode, in its own repo.
   (allow-list markdown, `§` cite chips, grounding badge, shuffles, resume snapshots), bundle
   `quiz.json` for offline exams; optional email sign-in honours web Pro read-only via `/v1/me`.
 - [ ] **v1.x — accounts** — Google + Sign in with Apple and in-app account creation, plus the
-  account-deletion endpoint Apple then requires (the one new backend route before billing).
+  account-deletion endpoint Apple then requires (landed: `POST /v1/account/delete` —
+  the client wiring is what remains).
 - [ ] **v2 — StoreKit 2 billing** — in-app subscription per guideline 3.1.1, settled by a new
   server route writing the same entitlement shape as Moyasar (`store: 'APPSTORE'`,
   `src/billing/entitlements-core.js`).

@@ -16,6 +16,7 @@ const config = require('../src/config');
 const firebase = require('../src/firebase');
 const ent = require('../src/billing/entitlements');
 const authMiddleware = require('../src/middleware/auth');
+const qc = require('../src/quota/quota-core');
 
 function fakeRes() {
   return {
@@ -44,6 +45,7 @@ function memDb() {
             if (store.has(key)) throw new Error('already-exists');
             store.set(key, data);
           },
+          async delete() { store.delete(key); },
         };
       },
       where(f, o, v) {
@@ -82,12 +84,14 @@ async function withOverrides(over, fn) {
   }
   const saved = {
     available: firebase.available, db: firebase.db, serverTimestamp: firebase.serverTimestamp,
+    deleteUser: firebase.deleteUser,
     applyEntitlement: ent.applyEntitlement, readEntitlement: ent.readEntitlement,
     invalidate: authMiddleware.invalidate, fetch: global.fetch,
   };
   if (over.available !== undefined) firebase.available = () => over.available;
   if (over.db) firebase.db = over.db;
   firebase.serverTimestamp = () => 'ts';
+  firebase.deleteUser = over.deleteUser || (async () => {});   // never the real Admin SDK
   if (over.applyEntitlement) ent.applyEntitlement = over.applyEntitlement;
   if (over.readEntitlement) ent.readEntitlement = over.readEntitlement;
   authMiddleware.invalidate = over.invalidate || (() => {});
@@ -96,6 +100,7 @@ async function withOverrides(over, fn) {
     for (const k of Object.keys(savedConfig)) config[k] = savedConfig[k];
     Object.assign(firebase, {
       available: saved.available, db: saved.db, serverTimestamp: saved.serverTimestamp,
+      deleteUser: saved.deleteUser,
     });
     Object.assign(ent, {
       applyEntitlement: saved.applyEntitlement, readEntitlement: saved.readEntitlement,
@@ -456,4 +461,152 @@ test('config: exposes the publishable key only when set', async () => {
     routes.configHandler({}, res);
     assert.equal(res.body.moyasarPublishableKey, null);
   });
+});
+
+/* ---- account delete -------------------------------------------------------*/
+
+/* Wrap a memDb so doc deletes in one collection throw — for the ordering and
+ * fail-open cases. */
+function failingDeletes(mem, badCol) {
+  return () => {
+    const real = mem.db();
+    return {
+      collection(col) {
+        const c = real.collection(col);
+        if (col !== badCol) return c;
+        return {
+          ...c,
+          doc(id) {
+            return { ...c.doc(id), async delete() { throw new Error('firestore down'); } };
+          },
+        };
+      },
+    };
+  };
+}
+
+test('account-delete: 503 account_unavailable when Firebase is dark', async () => {
+  await withOverrides({ available: false }, async () => {
+    const res = fakeRes();
+    await routes.deleteAccountHandler({ user: { uid: 'u1' } }, res);
+    assert.equal(res.statusCode, 503);
+    assert.equal(res.body.error, 'account_unavailable');
+  });
+});
+
+test('account-delete: 401 when Firebase is live but the caller is anonymous', async () => {
+  await withOverrides({ available: true }, async () => {
+    const res = fakeRes();
+    await routes.deleteAccountHandler({ user: { uid: '' } }, res);
+    assert.equal(res.statusCode, 401);
+    assert.equal(res.body.error, 'sign_in_required');
+  });
+});
+
+test('account-delete: purges the uid-keyed set, tombstones settle markers, deletes the Auth user, invalidates', async () => {
+  const mem = memDb();
+  mem.store.set('users/u1', { entitlement: { plan: 'pro' } });
+  mem.store.set('subscriptions/u1', { autoRenew: true });
+  mem.store.set('moyasarCustomers/u1', { token: 'tok_9', last4: '1111' });
+  mem.store.set('checkoutIntents/ci1', { uid: 'u1', amountHalalas: 29900 });
+  mem.store.set('checkoutIntents/ci9', { uid: 'other' });
+  mem.store.set('moyasarPayments/pay_1', { uid: 'u1', checkoutId: 'ci1', settledAt: 'x' });
+  mem.store.set('moyasarPayments/pay_9', { uid: 'other' });
+  const quotaId = 'adelQuota/' + qc.dayStamp(Date.now()) + '__uid:u1';
+  mem.store.set(quotaId, { count: 3 });
+
+  const deleted = []; const invalidated = [];
+  await withOverrides({
+    available: true, db: mem.db,
+    deleteUser: async (uid) => { deleted.push(uid); },
+    invalidate: (uid) => { invalidated.push(uid); },
+  }, async () => {
+    const res = fakeRes();
+    await routes.deleteAccountHandler({ user: { uid: 'u1' } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(res.body, { ok: true });
+  });
+
+  for (const gone of ['users/u1', 'subscriptions/u1', 'moyasarCustomers/u1', 'checkoutIntents/ci1', quotaId]) {
+    assert.equal(mem.store.has(gone), false, gone + ' is purged');
+  }
+  assert.deepEqual(mem.store.get('checkoutIntents/ci9'), { uid: 'other' }, 'other users untouched');
+  assert.deepEqual(mem.store.get('moyasarPayments/pay_9'), { uid: 'other' });
+  const marker = mem.store.get('moyasarPayments/pay_1');
+  assert.ok(marker, 'the settle marker still exists (replay guard)');
+  assert.equal(marker.tombstone, true);
+  assert.equal(marker.uid, undefined, 'the uid is erased from the marker');
+  assert.deepEqual(deleted, ['u1']);
+  assert.deepEqual(invalidated, ['u1']);
+});
+
+test('account-delete: a tombstoned marker still blocks a replayed settle', async () => {
+  const mem = memDb();
+  seedIntent(mem, 'ci1');
+  mem.store.set('moyasarPayments/pay_1', { tombstone: true, deletedAt: 'ts' });
+  const payments = {
+    pay_1: {
+      id: 'pay_1', status: 'paid', amount: 29900, currency: 'SAR',
+      metadata: { checkoutId: 'ci1' },
+    },
+  };
+  const grants = [];
+  await withOverrides({
+    config: LIVE, available: true, db: mem.db,
+    applyEntitlement: async (...args) => { grants.push(args); },
+    fetch: moyasarFetch(payments),
+  }, async () => {
+    const out = await routes.settlePayment('pay_1');
+    assert.deepEqual(out, { ok: true, alreadySettled: true });
+    assert.equal(grants.length, 0, 'no entitlement is ever re-granted');
+  });
+});
+
+test('account-delete: a Firestore failure returns 502 and the Auth user survives', async () => {
+  const mem = memDb();
+  mem.store.set('moyasarCustomers/u1', { token: 'tok_9' });
+  const deleted = [];
+  await withOverrides({
+    available: true, db: failingDeletes(mem, 'moyasarCustomers'),
+    deleteUser: async (uid) => { deleted.push(uid); },
+  }, async () => {
+    const res = fakeRes();
+    await routes.deleteAccountHandler({ user: { uid: 'u1' } }, res);
+    assert.equal(res.statusCode, 502);
+    assert.equal(res.body.error, 'delete_failed');
+  });
+  assert.equal(deleted.length, 0, 'the Auth user is only deleted after the purge succeeds');
+});
+
+test('account-delete: a retry over already-deleted data is still ok (idempotent)', async () => {
+  const mem = memDb();   // empty store — everything already purged
+  await withOverrides({
+    available: true, db: mem.db,
+    deleteUser: async () => {
+      const err = new Error('user not found');
+      err.code = 'auth/user-not-found';
+      throw err;
+    },
+  }, async () => {
+    const res = fakeRes();
+    await routes.deleteAccountHandler({ user: { uid: 'u1' } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(res.body, { ok: true });
+  });
+});
+
+test('account-delete: a quota-sweep failure is fail-open', async () => {
+  const mem = memDb();
+  mem.store.set('users/u1', { entitlement: { plan: 'free' } });
+  const deleted = [];
+  await withOverrides({
+    available: true, db: failingDeletes(mem, 'adelQuota'),
+    deleteUser: async (uid) => { deleted.push(uid); },
+  }, async () => {
+    const res = fakeRes();
+    await routes.deleteAccountHandler({ user: { uid: 'u1' } }, res);
+    assert.equal(res.statusCode, 200);
+  });
+  assert.deepEqual(deleted, ['u1'], 'the deletion completes despite the quota sweep failing');
+  assert.equal(mem.store.has('users/u1'), false);
 });

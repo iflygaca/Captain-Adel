@@ -27,7 +27,7 @@ no sign-in, no paywall). Each step lights up one piece.
 
 | Piece | Path |
 |---|---|
-| Billing routes (checkout/confirm/webhook/cancel/renewals/me/config) | `captadel/src/billing/routes.js` |
+| Billing routes (checkout/confirm/webhook/cancel/renewals/account-delete/me/config) | `captadel/src/billing/routes.js` |
 | Entitlement writer + pure cores | `captadel/src/billing/entitlements*.js`, `moyasar-core.js`, `tier-core.js` |
 | Quota (Firestore) + calendar math | `captadel/src/quota/quota.js`, `quota-core.js` |
 | Admin SDK singleton | `captadel/src/firebase.js` |
@@ -251,3 +251,26 @@ npm start &
 curl -s -XPOST localhost:8787/v1/chat -H 'X-Adel-Api-Key: …' \
   -H 'Content-Type: application/json' -d '{"message":"hi","product":"flygaca"}'
 ```
+
+## 8. Account deletion
+
+`POST /v1/account/delete` (Bearer-authed; 503 `account_unavailable` while Firebase
+is dark) is the Apple 5.1.1(v) / PDPL erasure route. One call removes, in order:
+
+1. `moyasarCustomers/{uid}` — the **saved card token** (first, so no future
+   renewal can charge even if a later step fails),
+2. `subscriptions/{uid}` — which also drops the uid out of the renewals cron query,
+3. `users/{uid}` — profile + entitlement,
+4. every `checkoutIntents` doc carrying the uid,
+5. **tombstones** (does not delete) the uid's `moyasarPayments` markers — each doc's
+   *existence* is the settle-once webhook-replay guard, so the doc stays but its
+   `uid`/`checkoutId` are overwritten away,
+6. best-effort sweeps the current-period `adelQuota` counters (older stamps hold no
+   personal data beyond a count and TTL-expire on `expireAt` within 3/40 days),
+7. deletes the **Firebase Auth user last** — a failed Firestore purge leaves the
+   caller's token valid so the request can simply be retried (502 `delete_failed`).
+
+Notes: the just-deleted user's ID token stays verifiable for up to ~1h (we don't
+`checkRevoked` on the hot path), so a post-success retry answers `{ok:true}` via
+the `auth/user-not-found` swallow. **Deletion is irreversible** — the rollback
+lever in §6 restores code and pricing states, never deleted accounts.
