@@ -51,8 +51,8 @@ app.use(express.json({ limit: config.maxBodyBytes }));
  * these in firebase.json; this standalone service serves the same UI (public/)
  * and must match — without them captadel.com had no CSP, no frame protection,
  * and no nosniff. frame-ancestors 'none' + X-Frame-Options:DENY block
- * clickjacking; the captadel pages only load same-origin assets (one inline
- * script needs 'unsafe-inline'), so the policy below is tight. */
+ * clickjacking; the captadel pages only load same-origin assets, so the
+ * policy below is tight. */
 app.use((req, res, next) => {
   res.set('X-Content-Type-Options', 'nosniff');
   res.set('X-Frame-Options', 'DENY');
@@ -68,7 +68,7 @@ app.use((req, res, next) => {
   // frames/redirects.
   res.set('Content-Security-Policy',
     "default-src 'self'; "
-    + "script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.moyasar.com; "
+    + "script-src 'self' https://www.gstatic.com https://apis.google.com https://cdn.moyasar.com; "
     + "style-src 'self' 'unsafe-inline' https://cdn.moyasar.com; "
     + "img-src 'self' data: blob: https://*.googleusercontent.com https://cdn.moyasar.com; "
     + "font-src 'self'; "
