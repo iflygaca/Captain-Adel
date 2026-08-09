@@ -35,9 +35,13 @@ function loadWidgetAssets() {
     const css = document.createElement('link');
     css.rel = 'stylesheet';
     css.href = WIDGET_BASE + '/moyasar.css';
+    css.integrity = 'sha384-xi7T53rMqpdqL0IHHVRtmK8FTK07ngNwx8hHDl86cq+qHRy/tRcHezKNMJKYV/0J';
+    css.crossOrigin = 'anonymous';
     document.head.appendChild(css);
     const s = document.createElement('script');
     s.src = WIDGET_BASE + '/moyasar.js';
+    s.integrity = 'sha384-464kRf7qKZwwwkZHkhNjNWdPwx0yTYFpOndxh46T2nSMe1vPfYBndPpNhQV2sYXk';
+    s.crossOrigin = 'anonymous';
     s.onload = resolve;
     s.onerror = () => reject(new Error('widget_load_failed'));
     document.head.appendChild(s);

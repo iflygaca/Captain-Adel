@@ -40,7 +40,9 @@ function esc(s) {
    authoring model). Helper to build one inline. */
 function nextDest() {
   const n = params.get('next');
-  return (n && /^[A-Za-z0-9._#/?=&%-]+$/.test(n)) ? n : '';
+  if (!n || !n.startsWith('/') || n.startsWith('//')) return '';
+  if (!/^[A-Za-z0-9._#/?=&%-]+$/.test(n)) return '';
+  return n;
 }
 
 /* ---- signed-out: auth forms ---- */
