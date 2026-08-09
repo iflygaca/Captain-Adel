@@ -51,7 +51,7 @@ function loadWidgetAssets() {
 async function startLeg(plan) {
   const token = await getIdToken();
   if (!token) {
-    location.href = 'account.html?next=' + encodeURIComponent('checkout.html?plan=' + plan);
+    location.href = 'account.html?next=' + encodeURIComponent('/checkout.html?plan=' + plan);
     return;
   }
   const res = await fetch(API + '/v1/billing/checkout', {
@@ -106,7 +106,7 @@ async function returnLeg(paymentId) {
   setStatus('جارٍ تأكيد عملية الدفع…', 'Confirming your payment…');
   const token = await getIdToken();
   if (!token) {
-    location.href = 'account.html?next=' + encodeURIComponent('checkout.html?id=' + paymentId);
+    location.href = 'account.html?next=' + encodeURIComponent('/checkout.html?id=' + paymentId);
     return;
   }
   const res = await fetch(API + '/v1/billing/confirm', {
