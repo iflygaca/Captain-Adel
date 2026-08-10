@@ -2,7 +2,7 @@
    Captain Adel — captadel.com design system.  Self-contained, no framework.
 
    2026 refresh of the original night + gold instrument-deck brand. The palette
-   DNA is unchanged (night #0A0E12 · gold #C8A04A · instrument-glow teal, with
+   DNA is unchanged (night #090C10 · gold #C8A04A · instrument-glow teal, with
    the sage/amber/flag grounding signals); what changed is the execution — a
    full token scale (fluid type, 8px spacing, elevation + shadow ramp, motion
    tokens, one focus ring), layered instrument-panel depth, tactile controls,
@@ -270,7 +270,7 @@ a:hover { color: var(--gold); text-decoration: underline; text-underline-offset:
   filter: blur(6px);
 }
 .hero-art img {
-  position: relative; width: min(300px, 78%); border-radius: 50%;
+  position: relative; width: min(300px, 78%); height: auto; border-radius: 50%;
   box-shadow: var(--glow), var(--sh-3); border: 1px solid var(--line-2);
   animation: hero-float 7s var(--ease-out) infinite;
 }
