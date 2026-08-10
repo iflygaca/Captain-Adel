@@ -29,17 +29,20 @@ that Fly GACA plugs into over its API.
 A single Node service that serves both the captadel.com site and the chat API:
 
 ```
-public/            the captadel.com site (landing + chat) — own brand
-src/server.js      Express: GET /health, POST /v1/chat, serves public/
+public/            the captadel.com site (landing, chat, account, console, exam, checkout — 8 pages)
+src/server.js      Express: GET /health, POST /v1/chat + /v1/feedback, the /v1/me · /v1/config ·
+                   /v1/billing/* SaaS routes, POST /v1/account/delete, /.well-known (Apple Pay)
 src/middleware/    CORS allowlist, Firebase auth, X-Adel-Api-Key check
 src/quota/         Firestore-backed free-tier usage meter (fails open)
 src/billing/       Moyasar + Firebase SaaS layer — entitlements, tiers, routes (dark until env set)
-src/brain/         THE BRAIN — single source of truth
+src/brain/         THE BRAIN — single source of truth, also powers Fly GACA's API
   answer.js          orchestrator: pick provider + strategy
   retrieve.js        retrieve-then-read (BM25 in code)
   route.js           language/provider routing
+  grounding.js       cite-or-refuse layer: citations, refusal classes, source shaping
   providers/         gemini (agentic tool-calls) · allam · jais · fanar · qwen · commandr
                      openai-compatible.js builds every non-Gemini provider from one client
+  tools/             compute-only flight tools (wind, fuel, weight & balance, recency, density)
   embeddings.js      dense embeddings + reranker clients (hybrid retrieval, gated off)
   bm25.js            lexical retriever over the GACAR corpus
   system-prompt.js   product-neutral core + per-product framing
@@ -50,11 +53,22 @@ src/brain/         THE BRAIN — single source of truth
 test/              unit tests (node --test), one file per src/ module
 evals/             regression harness (run against either provider)
 deploy/            docker-compose + the ALLaM (vLLM) runbook
+docs/              models, refusal taxonomy, data contract, iOS app plan, RUNBOOKs
+authoring/         source-of-truth system prompt + KB scope + Python reference
+ios/               AdelCore Swift package (AdelAPI + AdelSSE) — the Phase-0 iOS spike
 ```
 
 ## The Fly GACA family
 
 Captain Adel is one of ten repositories. [**The Book of Fly GACA**](https://github.com/ay2m/FlyGACA/blob/main/THE-BOOK-OF-FLY-GACA.md) is the whole-family reference — every repo, the shared principles, the data-parity contracts and the glossary in one place.
+
+| Repo | What it holds |
+| --- | --- |
+| **FlyGACA/Captain-Adel** (this repo) | The AI flight-instructor service (captadel.com) + the shared brain behind chat |
+| [FlyGACA/FlyGACA-app](https://github.com/FlyGACA/FlyGACA-app) | flygaca.com — the React/Vite web app, Firebase backend, regulatory corpus + content pipelines |
+| [ay2m/FlyGACA](https://github.com/ay2m/FlyGACA) | The native iOS app family — FlyGACAKit + the ELPT and AIP App Store targets |
+| [FlyGACA/ELPT](https://github.com/FlyGACA/ELPT) · [AIP](https://github.com/FlyGACA/AIP) · [PPL](https://github.com/FlyGACA/PPL) · [CPL](https://github.com/FlyGACA/CPL) · [IR](https://github.com/FlyGACA/IR) · [ATPL](https://github.com/FlyGACA/ATPL) | Per-app App Store metadata repos — store listing copy, screenshots, per-app roadmap |
+| [FlyGACA/Office](https://github.com/FlyGACA/Office) | The business operating system — strategy, governance, legal, finance, GTM docs |
 
 ## The API
 
@@ -71,6 +85,15 @@ Captain Adel is one of ten repositories. [**The Book of Fly GACA**](https://gith
 - `provider` — `gemini` | `allam` | `jais` | `fanar` | `qwen` | `commandr` | `auto` (optional; defaults to `MODEL_PROVIDER`).
 - `session` — stable per-browser id for rate limiting (or send `X-Adel-Session`).
 - Trusted callers send `X-Adel-Api-Key: $ADEL_API_KEY` to skip the browser limiter.
+- Add `?stream=1` or send `Accept: text/event-stream` for SSE streaming.
+
+Response: `{ answer, sources, kind, refusalClass, grounding, suggestions, meta }` — `sources` carries
+exact `GACAR Part X, §X.YYY` citations, `suggestions` are "keep exploring" follow-ups, and `meta`
+reports `{ provider, model, rewrittenQuery, toolCalls }`. Every response echoes
+`X-Adel-Api-Version`; metered turns also carry `X-Adel-Quota-Remaining`.
+
+`POST /v1/feedback` — thumbs rating on a turn; logs only `{rating, turnId, provider, ts}`, never
+the question or answer.
 
 `GET /health` → `{ status:"ok", service:"captain-adel", … }`
 
