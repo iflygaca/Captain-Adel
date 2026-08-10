@@ -873,6 +873,17 @@ html[dir="rtl"] .acct-plan-badge { text-transform: none; letter-spacing: normal;
 .account-hint { font-size: 12.5px; color: var(--ink-faint); margin-top: var(--s-4); line-height: 1.6; }
 
 /* ============================================================================
+   Landing motion (index.html) — scroll-reveal for the demo, feature and pricing
+   cards. The .reveal / .in-view classes and the html.js-reveal gate are applied
+   by assets/js/landing.js; without JS this hides nothing (no gate → no rule).
+   ==========================================================================*/
+html.js-reveal .reveal {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity var(--dur-4) var(--ease-out), transform var(--dur-4) var(--ease-out);
+}
+html.js-reveal .reveal.in-view { opacity: 1; transform: none; }
+
+/* ============================================================================
    Reduced motion — collapse the decorative motion this file adds. (The shared
    character animations have their own guard in adel-character.css.)
    ==========================================================================*/
@@ -889,4 +900,5 @@ html[dir="rtl"] .acct-plan-badge { text-transform: none; letter-spacing: normal;
   .tb-fill { transition: none; }
   .card:hover, .price-card:hover, .exam-opt:hover, .btn:hover, .chat-suggest button:hover { transform: none; }
   .nav-links { transition: none; }
+  html.js-reveal .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
