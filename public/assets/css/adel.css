@@ -348,9 +348,11 @@ html[dir="rtl"] .hero-eyebrow { letter-spacing: normal; text-transform: none; }
    ==========================================================================*/
 .showcase { padding: var(--s-3) 0; }
 .demo-card {
-  background: var(--grad-panel); border: 1px solid var(--line); border-radius: var(--r-lg);
+  position: relative; background: var(--grad-panel); border: 1px solid var(--line); border-radius: var(--r-lg);
   padding: var(--s-5); max-width: 740px; box-shadow: var(--sh-2), var(--hair);
+  transition: transform var(--dur-3) var(--ease-out), border-color var(--dur-2) var(--ease), box-shadow var(--dur-3) var(--ease-out);
 }
+.demo-card:hover { transform: translateY(-2px); border-color: var(--line-2); box-shadow: var(--sh-3), var(--hair); }
 .demo-q { display: flex; align-items: baseline; gap: var(--s-3); justify-content: flex-end; text-align: end; }
 .demo-q .demo-who { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--ink-faint); }
 .demo-q p {
@@ -383,9 +385,9 @@ html[dir="rtl"] .demo-badge { letter-spacing: normal; text-transform: none; }
 .card {
   position: relative; background: var(--grad-panel); border: 1px solid var(--line);
   border-radius: var(--r-md); padding: var(--s-5); box-shadow: var(--sh-1), var(--hair);
-  transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+  transition: transform var(--dur-3) var(--ease-out), border-color var(--dur-2) var(--ease), box-shadow var(--dur-3) var(--ease-out);
 }
-.card:hover { transform: translateY(-3px); border-color: var(--line-2); box-shadow: var(--sh-2), var(--hair); }
+.card:hover { transform: translateY(-5px); border-color: var(--line-3); box-shadow: var(--sh-3), var(--hair); }
 .card h3 { margin: 0 0 var(--s-2); font-size: 17px; letter-spacing: -.2px; }
 .card p { margin: 0; color: var(--ink-dim); font-size: 14.5px; }
 
@@ -819,11 +821,11 @@ html[dir="rtl"] .pricing h2 { letter-spacing: normal; }
 .price-card {
   position: relative; background: var(--grad-panel); border: 1px solid var(--line);
   border-radius: var(--r-md); padding: var(--s-6) var(--s-5); display: flex; flex-direction: column; gap: var(--s-2);
-  box-shadow: var(--sh-1), var(--hair); transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+  box-shadow: var(--sh-1), var(--hair); transition: transform var(--dur-3) var(--ease-out), border-color var(--dur-2) var(--ease), box-shadow var(--dur-3) var(--ease-out);
 }
-.price-card:hover { transform: translateY(-3px); box-shadow: var(--sh-2), var(--hair); }
+.price-card:hover { transform: translateY(-5px); border-color: var(--line-3); box-shadow: var(--sh-3), var(--hair); }
 .price-card-pro { border-color: rgba(200, 160, 74, .5); background: linear-gradient(180deg, rgba(200, 160, 74, .07), var(--panel)); box-shadow: var(--glow-gold), var(--hair); }
-.price-card-pro:hover { box-shadow: 0 12px 34px -8px rgba(200, 160, 74, .5), var(--hair); }
+.price-card-pro:hover { border-color: rgba(200, 160, 74, .6); box-shadow: 0 16px 40px -10px rgba(200, 160, 74, .55), var(--hair); }
 .price-flag { position: absolute; inset-block-start: -12px; inset-inline-start: 24px; background: var(--grad-gold); color: #1A1206; font-size: 11px; font-weight: 800; padding: 5px 13px; border-radius: var(--r-pill); text-transform: uppercase; letter-spacing: .5px; box-shadow: var(--glow-gold); }
 html[dir="rtl"] .price-flag { text-transform: none; letter-spacing: normal; }
 .price-tier { font-size: 12.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-faint); font-weight: 700; }
@@ -883,6 +885,38 @@ html.js-reveal .reveal {
 }
 html.js-reveal .reveal.in-view { opacity: 1; transform: none; }
 
+/* Pointer spotlight — a soft gold highlight that tracks the cursor across a
+   card. --mx/--my are set by landing.js (physical px from the card's top-left,
+   so LTR/RTL-agnostic since radial-gradient positions are physical); the
+   fallback keeps a centred glow. Gold, never teal — teal is reserved for the
+   link/focus semantic. pointer-events:none and low alpha keep content clickable
+   and text contrast intact. */
+.card::after, .price-card::after, .demo-card::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%),
+              rgba(200, 160, 74, .10), transparent 65%);
+  opacity: 0; transition: opacity var(--dur-3) var(--ease-out);
+}
+.card:hover::after, .price-card:hover::after, .demo-card:hover::after { opacity: 1; }
+
+/* CTA sheen — a diagonal highlight that sweeps across the button on hover.
+   Additive .btn-sheen class (three landing CTAs only) so the cross-page .btn
+   selectors are untouched. Fine-pointer only, so it never sticks on touch. The
+   sweep follows reading direction (flipped under RTL). overflow lives on the
+   button itself; its own focus-ring box-shadow is not clipped by its own
+   overflow. */
+@media (hover: hover) and (pointer: fine) {
+  .btn-sheen { position: relative; overflow: hidden; }
+  .btn-sheen::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, .32) 50%, transparent 58%);
+    transform: translateX(-130%); transition: transform .55s var(--ease-out);
+  }
+  .btn-sheen:hover::after { transform: translateX(130%); }
+  html[dir="rtl"] .btn-sheen::after { transform: translateX(130%); }
+  html[dir="rtl"] .btn-sheen:hover::after { transform: translateX(-130%); }
+}
+
 /* ============================================================================
    Reduced motion — collapse the decorative motion this file adds. (The shared
    character animations have their own guard in adel-character.css.)
@@ -898,7 +932,10 @@ html.js-reveal .reveal.in-view { opacity: 1; transform: none; }
   .msg, .chat-followups, .chat-welcome, .exam-explain.visible,
   .hero-eyebrow, .hero h1, .hero h1 .g, .hero .lede, .hero-cta, .hero .cred, .hero-art { animation: none !important; }
   .tb-fill { transition: none; }
-  .card:hover, .price-card:hover, .exam-opt:hover, .btn:hover, .chat-suggest button:hover { transform: none; }
+  .card:hover, .price-card:hover, .exam-opt:hover, .btn:hover, .chat-suggest button:hover,
+  .demo-card:hover { transform: none; }
   .nav-links { transition: none; }
   html.js-reveal .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .card::after, .price-card::after, .demo-card::after { transition: none; }
+  .btn-sheen::after { content: none; }
 }
