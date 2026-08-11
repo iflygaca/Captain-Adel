@@ -89,7 +89,7 @@
   --dur-1: .12s;
   --dur-2: .2s;
   --dur-3: .34s;
-  --dur-4: .7s;
+  --dur-4: .5s;
 
   /* ---- layout ------------------------------------------------------------- */
   --maxw: 1140px;
@@ -259,9 +259,7 @@ a:hover { color: var(--gold); text-decoration: underline; text-underline-offset:
 }
 .hero h1 .g {
   background: linear-gradient(120deg, var(--gold-soft), var(--gold) 55%, var(--accent) 130%);
-  background-size: 220% 100%;
   -webkit-background-clip: text; background-clip: text; color: transparent;
-  animation: g-shimmer 1.4s var(--ease-out) .5s both;
 }
 .hero p.lede { font-size: var(--t-lede); color: var(--ink-dim); margin: 0 0 var(--s-6); max-width: 42ch; text-wrap: pretty; }
 .hero-cta { display: flex; gap: var(--s-3); flex-wrap: wrap; }
@@ -323,7 +321,7 @@ html[dir="rtl"] .hero-eyebrow { letter-spacing: normal; text-transform: none; }
 .hud-bl { bottom: 6%; inset-inline-start: 4%; border-inline-end: 0; border-top: 0; }
 .hud-br { bottom: 6%; inset-inline-end: 4%;  border-inline-start: 0; border-top: 0; }
 
-/* landing hero entrance — cinematic staggered load-in. Pure CSS (no JS
+/* landing hero entrance — a gentle staggered fade-up. Pure CSS (no JS
    dependency, plays above the fold before i18n runs). animation-fill-mode:both
    holds each element in its hidden from-state through its delay; the
    reduced-motion block (bottom of file) sets animation:none on all of these, so
@@ -334,14 +332,13 @@ html[dir="rtl"] .hero-eyebrow { letter-spacing: normal; text-transform: none; }
 .hero-eyebrow, .hero h1, .hero .lede, .hero-cta, .hero .cred {
   animation: rise-lg var(--dur-4) var(--ease-out) both;
 }
-.hero h1    { animation-delay: .10s; }
-.hero .lede { animation-delay: .20s; }
-.hero-cta   { animation-delay: .30s; }
-.hero .cred { animation-delay: .40s; }
-.hero-art   { animation: hero-enter .9s var(--ease-out) .12s both; }
-@keyframes rise-lg  { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-@keyframes hero-enter { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: none; } }
-@keyframes g-shimmer  { from { background-position: 120% 0; } to { background-position: 0 0; } }
+.hero h1    { animation-delay: .06s; }
+.hero .lede { animation-delay: .12s; }
+.hero-cta   { animation-delay: .18s; }
+.hero .cred { animation-delay: .24s; }
+.hero-art   { animation: hero-enter .6s var(--ease-out) .12s both; }
+@keyframes rise-lg  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes hero-enter { from { opacity: 0; transform: scale(.98); } to { opacity: 1; transform: none; } }
 
 /* ============================================================================
    Showcase — "how he answers" demo card
@@ -387,7 +384,7 @@ html[dir="rtl"] .demo-badge { letter-spacing: normal; text-transform: none; }
   border-radius: var(--r-md); padding: var(--s-5); box-shadow: var(--sh-1), var(--hair);
   transition: transform var(--dur-3) var(--ease-out), border-color var(--dur-2) var(--ease), box-shadow var(--dur-3) var(--ease-out);
 }
-.card:hover { transform: translateY(-5px); border-color: var(--line-3); box-shadow: var(--sh-3), var(--hair); }
+.card:hover { transform: translateY(-3px); border-color: var(--line-2); box-shadow: var(--sh-2), var(--hair); }
 .card h3 { margin: 0 0 var(--s-2); font-size: 17px; letter-spacing: -.2px; }
 .card p { margin: 0; color: var(--ink-dim); font-size: 14.5px; }
 
@@ -823,9 +820,9 @@ html[dir="rtl"] .pricing h2 { letter-spacing: normal; }
   border-radius: var(--r-md); padding: var(--s-6) var(--s-5); display: flex; flex-direction: column; gap: var(--s-2);
   box-shadow: var(--sh-1), var(--hair); transition: transform var(--dur-3) var(--ease-out), border-color var(--dur-2) var(--ease), box-shadow var(--dur-3) var(--ease-out);
 }
-.price-card:hover { transform: translateY(-5px); border-color: var(--line-3); box-shadow: var(--sh-3), var(--hair); }
+.price-card:hover { transform: translateY(-3px); border-color: var(--line-2); box-shadow: var(--sh-2), var(--hair); }
 .price-card-pro { border-color: rgba(200, 160, 74, .5); background: linear-gradient(180deg, rgba(200, 160, 74, .07), var(--panel)); box-shadow: var(--glow-gold), var(--hair); }
-.price-card-pro:hover { border-color: rgba(200, 160, 74, .6); box-shadow: 0 16px 40px -10px rgba(200, 160, 74, .55), var(--hair); }
+.price-card-pro:hover { border-color: rgba(200, 160, 74, .5); box-shadow: 0 12px 34px -8px rgba(200, 160, 74, .5), var(--hair); }
 .price-flag { position: absolute; inset-block-start: -12px; inset-inline-start: 24px; background: var(--grad-gold); color: #1A1206; font-size: 11px; font-weight: 800; padding: 5px 13px; border-radius: var(--r-pill); text-transform: uppercase; letter-spacing: .5px; box-shadow: var(--glow-gold); }
 html[dir="rtl"] .price-flag { text-transform: none; letter-spacing: normal; }
 .price-tier { font-size: 12.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-faint); font-weight: 700; }
@@ -880,7 +877,7 @@ html[dir="rtl"] .acct-plan-badge { text-transform: none; letter-spacing: normal;
    by assets/js/landing.js; without JS this hides nothing (no gate → no rule).
    ==========================================================================*/
 html.js-reveal .reveal {
-  opacity: 0; transform: translateY(18px);
+  opacity: 0; transform: translateY(10px);
   transition: opacity var(--dur-4) var(--ease-out), transform var(--dur-4) var(--ease-out);
 }
 html.js-reveal .reveal.in-view { opacity: 1; transform: none; }
@@ -893,29 +890,11 @@ html.js-reveal .reveal.in-view { opacity: 1; transform: none; }
    and text contrast intact. */
 .card::after, .price-card::after, .demo-card::after {
   content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%),
-              rgba(200, 160, 74, .10), transparent 65%);
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%),
+              rgba(200, 160, 74, .06), transparent 65%);
   opacity: 0; transition: opacity var(--dur-3) var(--ease-out);
 }
 .card:hover::after, .price-card:hover::after, .demo-card:hover::after { opacity: 1; }
-
-/* CTA sheen — a diagonal highlight that sweeps across the button on hover.
-   Additive .btn-sheen class (three landing CTAs only) so the cross-page .btn
-   selectors are untouched. Fine-pointer only, so it never sticks on touch. The
-   sweep follows reading direction (flipped under RTL). overflow lives on the
-   button itself; its own focus-ring box-shadow is not clipped by its own
-   overflow. */
-@media (hover: hover) and (pointer: fine) {
-  .btn-sheen { position: relative; overflow: hidden; }
-  .btn-sheen::after {
-    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-    background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, .32) 50%, transparent 58%);
-    transform: translateX(-130%); transition: transform .55s var(--ease-out);
-  }
-  .btn-sheen:hover::after { transform: translateX(130%); }
-  html[dir="rtl"] .btn-sheen::after { transform: translateX(130%); }
-  html[dir="rtl"] .btn-sheen:hover::after { transform: translateX(-130%); }
-}
 
 /* ============================================================================
    Reduced motion — collapse the decorative motion this file adds. (The shared
@@ -930,12 +909,11 @@ html.js-reveal .reveal.in-view { opacity: 1; transform: none; }
   .exam-timer.urgent,
   .ask-prose.streaming::after,
   .msg, .chat-followups, .chat-welcome, .exam-explain.visible,
-  .hero-eyebrow, .hero h1, .hero h1 .g, .hero .lede, .hero-cta, .hero .cred, .hero-art { animation: none !important; }
+  .hero-eyebrow, .hero h1, .hero .lede, .hero-cta, .hero .cred, .hero-art { animation: none !important; }
   .tb-fill { transition: none; }
   .card:hover, .price-card:hover, .exam-opt:hover, .btn:hover, .chat-suggest button:hover,
   .demo-card:hover { transform: none; }
   .nav-links { transition: none; }
   html.js-reveal .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
   .card::after, .price-card::after, .demo-card::after { transition: none; }
-  .btn-sheen::after { content: none; }
 }
