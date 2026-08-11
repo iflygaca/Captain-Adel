@@ -183,10 +183,9 @@ a:hover { color: var(--gold); text-decoration: underline; text-underline-offset:
 .lockup { display: flex; align-items: center; gap: var(--s-3); color: var(--ink); }
 .lockup:hover { text-decoration: none; }
 .lockup img {
-  border-radius: 50%; box-shadow: var(--glow), 0 0 0 1px var(--line-2);
-  transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+  transition: transform var(--dur-2) var(--ease), filter var(--dur-2) var(--ease);
 }
-.lockup:hover img { transform: translateY(-1px); box-shadow: 0 0 30px rgba(87, 174, 201, .3), 0 0 0 1px var(--line-3); }
+.lockup:hover img { transform: translateY(-1px); filter: drop-shadow(0 3px 10px rgba(200, 160, 74, .45)); }
 .wordmark { font-weight: 800; letter-spacing: .2px; font-size: 18px; line-height: 1.15; }
 .wm-capt { color: var(--ink); }
 .wm-adel { color: var(--gold); }
