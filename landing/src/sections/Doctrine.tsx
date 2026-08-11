@@ -80,14 +80,14 @@ function ChatDemo() {
   }, [])
 
   return (
-    <div id="chat-demo" className="border border-[#1a2540] bg-[#0c1220]">
+    <div id="chat-demo" className="h-full flex flex-col">
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#1a2540]">
         <span className="font-mono2 text-[10px] tracking-[0.2em] uppercase text-[#8b98ad]">{isAr ? 'نص مباشر — captadel.com' : 'live transcript — captadel.com'}</span>
         <span className="flex items-center gap-1.5 font-mono2 text-[10px] text-[#34d399]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] anim-pulse-dot" /> {isAr ? 'مباشر' : 'LIVE'}
         </span>
       </div>
-      <div className="p-5 space-y-4 min-h-[380px]">
+      <div className="p-5 space-y-4 min-h-[380px] flex-1">
         {SCRIPT.slice(0, step).map((m, i) => (
           <div key={i} style={{ animation: 'rise-in .5s cubic-bezier(.22,.61,.36,1) both' }}
             className={m.who === 'user' ? 'flex justify-end' : 'flex justify-start'}>
@@ -133,49 +133,63 @@ export default function Doctrine() {
       <span className="ghost-word" aria-hidden>GROUND</span>
       <div className="relative z-10 mx-auto max-w-7xl">
         <SectionTag n="01" label={isAr ? 'العقيدة — استشهد أو اعتذر' : 'The doctrine — cite or refuse'} />
-        <div className="grid lg:grid-cols-2 gap-14 items-start">
-          <div>
-            <h2 className="reveal text-[clamp(1.9rem,4vw,3rem)] font-extrabold leading-[1.05] tracking-tight text-[#e6edf6]">
-              {isAr ? (
-                <>كل إجابة تحمل <span className="text-[#22d3ee]">استشهادها</span>. وإلا فلن تغادر الأرض.</>
-              ) : (
-                <>Every answer carries its <span className="text-[#22d3ee]">citation</span>. Or it
-                doesn't leave the ground.</>
-              )}
-            </h2>
-            <p className="reveal reveal-d1 mt-6 text-[15px] leading-relaxed text-[#8b98ad] max-w-lg">
-              {isAr
-                ? 'لا مكان للتخمين الواثق في الطيران. الاسترجاع يتم برمجيًا من نصوص GACAR، تُسلَّم المقاطع المستشهَد بها إلى النموذج، وعادل يجيب منها فقط. وإن لم تكفِ النصوص، يقول ذلك — في كل مرة.'
-                : "Aviation is no place for confident guessing. Retrieval runs in code over the GACAR corpus, the cited passages are handed to the model, and Adel answers only from them. If the corpus can't support the question, he says so — every time."}
-            </p>
-            <div className="mt-10 space-y-0 divide-y divide-[#1a2540] border-y border-[#1a2540]">
-              {(isAr
-                ? [
-                    ['مؤسَّس', 'الاسترجاع هو مصدر الحقيقة — استرجاع أولًا، وقراءة ثانيًا.', 'mint'],
-                    ['بنيوي', 'الاستشهادات تُستخرج وتُتحقق بنيويًا، لا تُؤخذ على ثقة من النموذج.', 'cyan'],
-                    ['محصَّن', 'تحقق من المدخلات وتحصين ضد الحقن يحرسان كل طلب.', 'amber'],
-                    ['بوابة تقييم', 'لا يُطلَق أي مزوّد حتى يطابق أو يتفوق على Gemini في بوابة التكافؤ.', 'mint'],
-                  ]
-                : [
-                    ['GROUNDED', 'RAG is the source of truth for facts — retrieval first, reading second.', 'mint'],
-                    ['STRUCTURAL', 'Citations are extracted and verified structurally, not trusted from the model.', 'cyan'],
-                    ['HARDENED', 'Input validation plus soft injection hardening guard every request.', 'amber'],
-                    ['EVAL-GATED', 'No provider ships until it matches-or-beats Gemini on the parity gate.', 'mint'],
-                  ]
-              ).map(([k, v, c], i) => (
-                <div key={k} className={`reveal reveal-d${i + 1} flex gap-5 py-5`}>
-                  <span className={`mt-1 w-2 h-2 rounded-full shrink-0 ${c === 'mint' ? 'bg-[#34d399] anim-pulse-dot' : c === 'amber' ? 'bg-[#fbbf24]' : 'bg-[#22d3ee] anim-pulse-cyan'}`} />
-                  <div>
-                    <div className="font-mono2 text-[11px] tracking-[0.22em] uppercase text-[#e6edf6]">{k}</div>
-                    <p className="mt-1 text-[13px] leading-relaxed text-[#8b98ad]">{v}</p>
-                  </div>
-                </div>
-              ))}
+        <h2 className="reveal max-w-3xl text-[clamp(1.9rem,4vw,3rem)] font-extrabold leading-[1.05] tracking-tight text-[#e6edf6]">
+          {isAr ? (
+            <>كل إجابة تحمل <span className="text-[#22d3ee]">استشهادها</span>. وإلا فلن تغادر الأرض.</>
+          ) : (
+            <>Every answer carries its <span className="text-[#22d3ee]">citation</span>. Or it
+            doesn't leave the ground.</>
+          )}
+        </h2>
+        <p className="reveal reveal-d1 mt-6 text-[15px] leading-relaxed text-[#8b98ad] max-w-lg">
+          {isAr
+            ? 'لا مكان للتخمين الواثق في الطيران. الاسترجاع يتم برمجيًا من نصوص GACAR، تُسلَّم المقاطع المستشهَد بها إلى النموذج، وعادل يجيب منها فقط. وإن لم تكفِ النصوص، يقول ذلك — في كل مرة.'
+            : "Aviation is no place for confident guessing. Retrieval runs in code over the GACAR corpus, the cited passages are handed to the model, and Adel answers only from them. If the corpus can't support the question, he says so — every time."}
+        </p>
+        {/* bento: the live transcript is the hero tile, the four principles orbit it.
+            .reveal and .bento-tile sit on separate elements so their transform
+            transitions never fight; --mx/--my for the spotlight are delegated
+            from the grid. */}
+        <div
+          className="mt-12 grid gap-4 lg:grid-cols-4 lg:auto-rows-fr"
+          onPointerMove={(e) => {
+            const t = (e.target as HTMLElement).closest?.('.bento-tile') as HTMLElement | null
+            if (!t) return
+            const r = t.getBoundingClientRect()
+            t.style.setProperty('--mx', `${e.clientX - r.left}px`)
+            t.style.setProperty('--my', `${e.clientY - r.top}px`)
+          }}
+        >
+          <div className="reveal lg:col-span-2 lg:row-span-2">
+            <div className="bento-tile h-full">
+              <ChatDemo />
             </div>
           </div>
-          <div className="reveal reveal-d2 lg:sticky lg:top-24">
-            <ChatDemo />
-          </div>
+          {(isAr
+            ? [
+                ['مؤسَّس', 'الاسترجاع هو مصدر الحقيقة — استرجاع أولًا، وقراءة ثانيًا.', 'mint'],
+                ['بنيوي', 'الاستشهادات تُستخرج وتُتحقق بنيويًا، لا تُؤخذ على ثقة من النموذج.', 'cyan'],
+                ['محصَّن', 'تحقق من المدخلات وتحصين ضد الحقن يحرسان كل طلب.', 'amber'],
+                ['بوابة تقييم', 'لا يُطلَق أي مزوّد حتى يطابق أو يتفوق على Gemini في بوابة التكافؤ.', 'mint'],
+              ]
+            : [
+                ['GROUNDED', 'RAG is the source of truth for facts — retrieval first, reading second.', 'mint'],
+                ['STRUCTURAL', 'Citations are extracted and verified structurally, not trusted from the model.', 'cyan'],
+                ['HARDENED', 'Input validation plus soft injection hardening guard every request.', 'amber'],
+                ['EVAL-GATED', 'No provider ships until it matches-or-beats Gemini on the parity gate.', 'mint'],
+              ]
+          ).map(([k, v, c], i) => (
+            <div key={k} className={`reveal reveal-d${i + 1}`}>
+              <div className="bento-tile h-full p-6 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${c === 'mint' ? 'bg-[#34d399] anim-pulse-dot' : c === 'amber' ? 'bg-[#fbbf24]' : 'bg-[#22d3ee] anim-pulse-cyan'}`} />
+                  <span className="font-mono2 text-[10px] tracking-[0.24em] text-[#8b98ad]/70">{isAr ? ['٠١', '٠٢', '٠٣', '٠٤'][i] : `0${i + 1}`}</span>
+                </div>
+                <div className="font-mono2 text-[11px] tracking-[0.22em] uppercase text-[#e6edf6]">{k}</div>
+                <p className="text-[13px] leading-relaxed text-[#8b98ad]">{v}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

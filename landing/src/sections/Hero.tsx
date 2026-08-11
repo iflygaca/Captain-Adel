@@ -1,5 +1,6 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { type CSSProperties } from 'react'
 import { isAr } from '../i18n'
+import ConsoleDemo from './HeroDemo'
 
 /* Stylized KSA airspace: abstract node map with animated route arcs */
 function AirspaceMap() {
@@ -62,20 +63,6 @@ function AirspaceMap() {
   )
 }
 
-const BOOT_EN = [
-  '> loading GACAR corpus ......... OK',
-  '> BM25 index ................... OK',
-  '> grounding: cite-or-refuse .... ARMED',
-  '> provider route: auto ......... READY',
-]
-const BOOT_AR = [
-  '> تحميل نصوص GACAR ............ تم',
-  '> فهرس BM25 .................... تم',
-  '> التأسيس: استشهد أو اعتذر ..... مسلّح',
-  '> مسار النموذج: تلقائي ......... جاهز',
-]
-const BOOT = isAr ? BOOT_AR : BOOT_EN
-
 /* kinetic headline — letters enter one by one */
 function Kinetic({ text, base = 0.3, className = '' }: { text: string; base?: number; className?: string }) {
   return (
@@ -90,13 +77,6 @@ function Kinetic({ text, base = 0.3, className = '' }: { text: string; base?: nu
 }
 
 export default function Hero() {
-  const [booted, setBooted] = useState(0)
-  useEffect(() => {
-    if (booted >= BOOT.length) return
-    const id = setTimeout(() => setBooted((b) => b + 1), 420)
-    return () => clearTimeout(id)
-  }, [booted])
-
   return (
     <section id="top" className="relative min-h-screen flex flex-col overflow-hidden noise-bg scanlines">
       {/* map backdrop */}
@@ -244,19 +224,8 @@ export default function Hero() {
                   </div>
                 ))}
               </div>
-              {/* boot console */}
-              <div className="p-4 font-mono2 text-[11px] leading-5 text-[#34d399] min-h-[128px]">
-                {BOOT.slice(0, booted).map((l) => (
-                  <div key={l}>{l}</div>
-                ))}
-                {booted >= BOOT.length ? (
-                  <div className="text-[#22d3ee]">
-                    {'> '}{isAr ? 'كابتن عادل على التردد' : 'captain adel is on frequency'}<span className="anim-caret">▌</span>
-                  </div>
-                ) : (
-                  <span className="anim-caret text-[#22d3ee]">▌</span>
-                )}
-              </div>
+              {/* boot console → live Q&A demo (HeroDemo.tsx) */}
+              <ConsoleDemo />
             </div>
           </div>
         </div>

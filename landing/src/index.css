@@ -156,10 +156,29 @@
 /* parallax layers */
 .parallax { will-change: transform; }
 
+/* bento tiles (Doctrine) — border glow + a cyan spotlight that tracks the
+   pointer (--mx/--my set by the grid's onPointerMove; centred fallback).
+   Fine-pointer only, and inert under reduced motion. */
+.bento-tile {
+  position: relative; height: 100%; border: 1px solid #1a2540; background: #0c1220;
+  transition: border-color .3s ease, transform .3s cubic-bezier(.22,.61,.36,1), box-shadow .3s ease;
+}
+.bento-tile::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgba(34, 211, 238, .08), transparent 65%);
+  transition: opacity .3s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .bento-tile:hover { border-color: #2d8ea8; transform: translateY(-3px); box-shadow: 0 14px 44px -20px rgba(34, 211, 238, .3); }
+  .bento-tile:hover::after { opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .anim-sweep, .anim-sweep-slow, .anim-ticker, .anim-dash, .anim-blip, .anim-float,
   .anim-pulse-dot, .anim-pulse-cyan { animation: none !important; }
   .reveal { opacity: 1; transform: none; transition: none; }
+  .bento-tile, .bento-tile::after { transition: none; }
+  .bento-tile:hover { transform: none; }
   html { scroll-behavior: auto; }
 }
 
