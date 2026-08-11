@@ -1,0 +1,43 @@
+import { useRevealAll, useScrollSpy, useParallax, useMagnetic, useLenis } from '../hooks/useReveal'
+import Header from '../sections/Header'
+import Loader from '../sections/Loader'
+import Hero from '../sections/Hero'
+import Ticker from '../sections/Ticker'
+import Cinematic from '../sections/Cinematic'
+import Doctrine from '../sections/Doctrine'
+import MeetCaptain from '../sections/MeetCaptain'
+import Gallery from '../sections/Gallery'
+import Brain from '../sections/Brain'
+import Models from '../sections/Models'
+import FaqSection from '../sections/FaqSection'
+import GacarQa from '../sections/GacarQa'
+import ApiSection from '../sections/ApiSection'
+import Footer from '../sections/Footer'
+
+export default function Home() {
+  useRevealAll()
+  useLenis()
+  useScrollSpy(['doctrine', 'captain', 'brain', 'models', 'faq', 'qa', 'api'])
+  useParallax()
+  useMagnetic()
+  return (
+    <div className="grain min-h-screen bg-[#050810] text-[#e6edf6]">
+      <Loader />
+      <Header />
+      <main>
+        <Hero />
+        <Ticker />
+        <Cinematic />
+        <Doctrine />
+        <MeetCaptain />
+        <Gallery />
+        <Brain />
+        <Models />
+        <FaqSection />
+        <GacarQa />
+        <ApiSection />
+        <Footer />
+      </main>
+    </div>
+  )
+}

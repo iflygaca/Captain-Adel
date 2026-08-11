@@ -2,7 +2,7 @@
    Captain Adel — captadel.com design system.  Self-contained, no framework.
 
    2026 refresh of the original night + gold instrument-deck brand. The palette
-   DNA is unchanged (night #0A0E12 · gold #C8A04A · instrument-glow teal, with
+   DNA is unchanged (night #090C10 · gold #C8A04A · instrument-glow teal, with
    the sage/amber/flag grounding signals); what changed is the execution — a
    full token scale (fluid type, 8px spacing, elevation + shadow ramp, motion
    tokens, one focus ring), layered instrument-panel depth, tactile controls,
@@ -89,6 +89,7 @@
   --dur-1: .12s;
   --dur-2: .2s;
   --dur-3: .34s;
+  --dur-4: .5s;
 
   /* ---- layout ------------------------------------------------------------- */
   --maxw: 1140px;
@@ -182,10 +183,9 @@ a:hover { color: var(--gold); text-decoration: underline; text-underline-offset:
 .lockup { display: flex; align-items: center; gap: var(--s-3); color: var(--ink); }
 .lockup:hover { text-decoration: none; }
 .lockup img {
-  border-radius: 50%; box-shadow: var(--glow), 0 0 0 1px var(--line-2);
-  transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+  transition: transform var(--dur-2) var(--ease), filter var(--dur-2) var(--ease);
 }
-.lockup:hover img { transform: translateY(-1px); box-shadow: 0 0 30px rgba(87, 174, 201, .3), 0 0 0 1px var(--line-3); }
+.lockup:hover img { transform: translateY(-1px); filter: drop-shadow(0 3px 10px rgba(200, 160, 74, .45)); }
 .wordmark { font-weight: 800; letter-spacing: .2px; font-size: 18px; line-height: 1.15; }
 .wm-capt { color: var(--ink); }
 .wm-adel { color: var(--gold); }
@@ -254,13 +254,13 @@ a:hover { color: var(--gold); text-decoration: underline; text-underline-offset:
 .hero-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: clamp(28px, 5vw, 56px); align-items: center; }
 .hero h1 {
   font-size: var(--t-display); line-height: 1.04; margin: 0 0 var(--s-4);
-  letter-spacing: -1px; font-weight: 800;
+  letter-spacing: -1px; font-weight: 800; text-wrap: balance;
 }
 .hero h1 .g {
   background: linear-gradient(120deg, var(--gold-soft), var(--gold) 55%, var(--accent) 130%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.hero p.lede { font-size: var(--t-lede); color: var(--ink-dim); margin: 0 0 var(--s-6); max-width: 42ch; }
+.hero p.lede { font-size: var(--t-lede); color: var(--ink-dim); margin: 0 0 var(--s-6); max-width: 42ch; text-wrap: pretty; }
 .hero-cta { display: flex; gap: var(--s-3); flex-wrap: wrap; }
 .hero-art { position: relative; display: grid; place-items: center; }
 /* glowing instrument ring behind the captain */
@@ -270,7 +270,7 @@ a:hover { color: var(--gold); text-decoration: underline; text-underline-offset:
   filter: blur(6px);
 }
 .hero-art img {
-  position: relative; width: min(300px, 78%); border-radius: 50%;
+  position: relative; width: min(300px, 78%); height: auto; border-radius: 50%;
   box-shadow: var(--glow), var(--sh-3); border: 1px solid var(--line-2);
   animation: hero-float 7s var(--ease-out) infinite;
 }
@@ -302,9 +302,10 @@ html[dir="rtl"] .hero-eyebrow { letter-spacing: normal; text-transform: none; }
   width: min(348px, 94%); aspect-ratio: 1; border-radius: 50%;
   border: 1px dashed rgba(87, 174, 201, .35);
   box-shadow: inset 0 0 0 1px rgba(87, 174, 201, .08);
-  animation: hud-spin 38s linear infinite;
+  animation: hud-spin 38s linear infinite, hud-fade 1.1s var(--ease-out) .25s both;
 }
 @keyframes hud-spin { to { transform: rotate(360deg); } }
+@keyframes hud-fade { from { opacity: 0; } }
 .hud-horizon {
   position: absolute; width: min(348px, 94%); height: 1px;
   background: linear-gradient(90deg, transparent, rgba(87, 174, 201, .5) 18%, rgba(87, 174, 201, .5) 82%, transparent);
@@ -319,14 +320,35 @@ html[dir="rtl"] .hero-eyebrow { letter-spacing: normal; text-transform: none; }
 .hud-bl { bottom: 6%; inset-inline-start: 4%; border-inline-end: 0; border-top: 0; }
 .hud-br { bottom: 6%; inset-inline-end: 4%;  border-inline-start: 0; border-top: 0; }
 
+/* landing hero entrance — a gentle staggered fade-up. Pure CSS (no JS
+   dependency, plays above the fold before i18n runs). animation-fill-mode:both
+   holds each element in its hidden from-state through its delay; the
+   reduced-motion block (bottom of file) sets animation:none on all of these, so
+   with motion reduced — or if the animation engine never runs — every element
+   sits in its natural, fully-visible state. rise-lg/hero-enter move on the
+   block axis / scale only, so they compose with the img's infinite hero-float
+   and stay RTL-neutral. */
+.hero-eyebrow, .hero h1, .hero .lede, .hero-cta, .hero .cred {
+  animation: rise-lg var(--dur-4) var(--ease-out) both;
+}
+.hero h1    { animation-delay: .06s; }
+.hero .lede { animation-delay: .12s; }
+.hero-cta   { animation-delay: .18s; }
+.hero .cred { animation-delay: .24s; }
+.hero-art   { animation: hero-enter .6s var(--ease-out) .12s both; }
+@keyframes rise-lg  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes hero-enter { from { opacity: 0; transform: scale(.98); } to { opacity: 1; transform: none; } }
+
 /* ============================================================================
    Showcase — "how he answers" demo card
    ==========================================================================*/
 .showcase { padding: var(--s-3) 0; }
 .demo-card {
-  background: var(--grad-panel); border: 1px solid var(--line); border-radius: var(--r-lg);
+  position: relative; background: var(--grad-panel); border: 1px solid var(--line); border-radius: var(--r-lg);
   padding: var(--s-5); max-width: 740px; box-shadow: var(--sh-2), var(--hair);
+  transition: transform var(--dur-3) var(--ease-out), border-color var(--dur-2) var(--ease), box-shadow var(--dur-3) var(--ease-out);
 }
+.demo-card:hover { transform: translateY(-2px); border-color: var(--line-2); box-shadow: var(--sh-3), var(--hair); }
 .demo-q { display: flex; align-items: baseline; gap: var(--s-3); justify-content: flex-end; text-align: end; }
 .demo-q .demo-who { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--ink-faint); }
 .demo-q p {
@@ -359,7 +381,7 @@ html[dir="rtl"] .demo-badge { letter-spacing: normal; text-transform: none; }
 .card {
   position: relative; background: var(--grad-panel); border: 1px solid var(--line);
   border-radius: var(--r-md); padding: var(--s-5); box-shadow: var(--sh-1), var(--hair);
-  transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+  transition: transform var(--dur-3) var(--ease-out), border-color var(--dur-2) var(--ease), box-shadow var(--dur-3) var(--ease-out);
 }
 .card:hover { transform: translateY(-3px); border-color: var(--line-2); box-shadow: var(--sh-2), var(--hair); }
 .card h3 { margin: 0 0 var(--s-2); font-size: 17px; letter-spacing: -.2px; }
@@ -795,11 +817,11 @@ html[dir="rtl"] .pricing h2 { letter-spacing: normal; }
 .price-card {
   position: relative; background: var(--grad-panel); border: 1px solid var(--line);
   border-radius: var(--r-md); padding: var(--s-6) var(--s-5); display: flex; flex-direction: column; gap: var(--s-2);
-  box-shadow: var(--sh-1), var(--hair); transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+  box-shadow: var(--sh-1), var(--hair); transition: transform var(--dur-3) var(--ease-out), border-color var(--dur-2) var(--ease), box-shadow var(--dur-3) var(--ease-out);
 }
-.price-card:hover { transform: translateY(-3px); box-shadow: var(--sh-2), var(--hair); }
+.price-card:hover { transform: translateY(-3px); border-color: var(--line-2); box-shadow: var(--sh-2), var(--hair); }
 .price-card-pro { border-color: rgba(200, 160, 74, .5); background: linear-gradient(180deg, rgba(200, 160, 74, .07), var(--panel)); box-shadow: var(--glow-gold), var(--hair); }
-.price-card-pro:hover { box-shadow: 0 12px 34px -8px rgba(200, 160, 74, .5), var(--hair); }
+.price-card-pro:hover { border-color: rgba(200, 160, 74, .5); box-shadow: 0 12px 34px -8px rgba(200, 160, 74, .5), var(--hair); }
 .price-flag { position: absolute; inset-block-start: -12px; inset-inline-start: 24px; background: var(--grad-gold); color: #1A1206; font-size: 11px; font-weight: 800; padding: 5px 13px; border-radius: var(--r-pill); text-transform: uppercase; letter-spacing: .5px; box-shadow: var(--glow-gold); }
 html[dir="rtl"] .price-flag { text-transform: none; letter-spacing: normal; }
 .price-tier { font-size: 12.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-faint); font-weight: 700; }
@@ -849,6 +871,31 @@ html[dir="rtl"] .acct-plan-badge { text-transform: none; letter-spacing: normal;
 .account-hint { font-size: 12.5px; color: var(--ink-faint); margin-top: var(--s-4); line-height: 1.6; }
 
 /* ============================================================================
+   Landing motion (index.html) — scroll-reveal for the demo, feature and pricing
+   cards. The .reveal / .in-view classes and the html.js-reveal gate are applied
+   by assets/js/landing.js; without JS this hides nothing (no gate → no rule).
+   ==========================================================================*/
+html.js-reveal .reveal {
+  opacity: 0; transform: translateY(10px);
+  transition: opacity var(--dur-4) var(--ease-out), transform var(--dur-4) var(--ease-out);
+}
+html.js-reveal .reveal.in-view { opacity: 1; transform: none; }
+
+/* Pointer spotlight — a soft gold highlight that tracks the cursor across a
+   card. --mx/--my are set by landing.js (physical px from the card's top-left,
+   so LTR/RTL-agnostic since radial-gradient positions are physical); the
+   fallback keeps a centred glow. Gold, never teal — teal is reserved for the
+   link/focus semantic. pointer-events:none and low alpha keep content clickable
+   and text contrast intact. */
+.card::after, .price-card::after, .demo-card::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%),
+              rgba(200, 160, 74, .06), transparent 65%);
+  opacity: 0; transition: opacity var(--dur-3) var(--ease-out);
+}
+.card:hover::after, .price-card:hover::after, .demo-card:hover::after { opacity: 1; }
+
+/* ============================================================================
    Reduced motion — collapse the decorative motion this file adds. (The shared
    character animations have their own guard in adel-character.css.)
    ==========================================================================*/
@@ -860,8 +907,12 @@ html[dir="rtl"] .acct-plan-badge { text-transform: none; letter-spacing: normal;
   .chat-mic.listening,
   .exam-timer.urgent,
   .ask-prose.streaming::after,
-  .msg, .chat-followups, .chat-welcome, .exam-explain.visible { animation: none !important; }
+  .msg, .chat-followups, .chat-welcome, .exam-explain.visible,
+  .hero-eyebrow, .hero h1, .hero .lede, .hero-cta, .hero .cred, .hero-art { animation: none !important; }
   .tb-fill { transition: none; }
-  .card:hover, .price-card:hover, .exam-opt:hover, .btn:hover, .chat-suggest button:hover { transform: none; }
+  .card:hover, .price-card:hover, .exam-opt:hover, .btn:hover, .chat-suggest button:hover,
+  .demo-card:hover { transform: none; }
   .nav-links { transition: none; }
+  html.js-reveal .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .card::after, .price-card::after, .demo-card::after { transition: none; }
 }

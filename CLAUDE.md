@@ -9,9 +9,14 @@ civil aviation (captadel.com). It answers **GACAR** (General Authority of Civil
 Aviation Regulations) questions with exact Part/section citations, and refuses to
 guess when it can't ground an answer in the regulations.
 
-It is one **Node.js 20 + Express** service that serves both:
+Two surfaces live here. The **captadel.com landing** is a separate static
+Vite + React app in `landing/` (EN at `/`, AR at `/ar/`), served by the
+Cloudflare Worker `captadel` and deployed **manually** (`landing/README.md`
+has the wrangler runbook — no CI deploy, on purpose). Everything below is the
+second surface: one **Node.js 20 + Express** service that serves both:
 
-- the static **captadel.com** site (`public/`), and
+- the static **app pages** (`public/` — chat, exam, account, console,
+  checkout, legal), and
 - the API: `GET /health`, `POST /v1/chat`, `POST /v1/feedback` (thumbs rating —
   logs only `{rating, turnId, provider, ts}`, never the question or answer), the
   `/v1/me` + `/v1/config` + `/v1/billing/*` SaaS routes plus
@@ -120,6 +125,9 @@ and 402 (quota) responses set `Retry-After`.
 ## Directory map
 
 ```
+landing/               captadel.com landing (Vite + React + Tailwind, EN + /ar/) —
+                       built dist/ served by the Cloudflare Worker "captadel";
+                       manual deploy via wrangler (landing/README.md runbook)
 src/
   server.js            Express entry: routes, security headers, rate-limit + quota gating
   config.js            Env loader (NO secrets in code)
