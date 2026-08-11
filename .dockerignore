@@ -10,4 +10,5 @@ test
 authoring
 scripts
 docs
+examples
 **/*.md

@@ -61,7 +61,8 @@ src/brain/         THE BRAIN — single source of truth, also powers Fly GACA's 
 test/              unit tests (node --test), one file per src/ module
 evals/             regression harness (run against either provider)
 deploy/            docker-compose + the ALLaM (vLLM) runbook
-docs/              models, refusal taxonomy, data contract, iOS app plan, RUNBOOKs
+docs/              models, refusal taxonomy, data contract, iOS app plan, multi-agent orchestrator, RUNBOOKs
+examples/          multi-agent orchestrator boilerplate (Claude API, Python + TS) — decoupled from src/
 authoring/         source-of-truth system prompt + KB scope + Python reference
 ios/               AdelCore Swift package (AdelAPI + AdelSSE) — the Phase-0 iOS spike
 ```
