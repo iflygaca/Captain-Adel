@@ -84,11 +84,13 @@ starting with Fly GACA — plug into.
   audit, so a markup/style regression can't ship silently.
 
 ### 🔒 Dependency & supply-chain security  *(new)*
-- [ ] **Clear the 9 moderate advisories** — all transitive through `firebase-admin`
-  (`uuid` / `gaxios` / `google-gax` / `@google-cloud/firestore` / `storage`). Bump
-  `firebase-admin` (currently `^12.7.0`) and re-audit.
-- [ ] **Add an `npm audit` / Dependabot gate** (the repo already shows 2 Dependabot alerts on
-  default) so new advisories surface on PRs.
+- [x] **Dependabot + `npm audit` (report-only) gate** — `.github/dependabot.yml` + `ci.yml`'s
+  report-only `npm audit` step are live; 7 Dependabot PRs are open (#32–#38), including the
+  `express` 4→5 and `firebase-admin` 12→14 majors.
+- [ ] **Burn down the alert backlog** — `main` currently carries **43 open alerts (27 high, 15
+  moderate, 1 low)**, up from the 9 moderate this roadmap previously tracked. Triage monthly —
+  decide the two majors rather than letting them queue. This is also the prerequisite for the
+  "make the repo public" decision in the 🪧 Brand & public presence track.
 - [ ] **Secret-scanning + CSP report-uri** — catch leaked keys and CSP violations in the wild.
 
 ### 🔍 Retrieval
@@ -136,6 +138,54 @@ that durable and measurable.
   language consistently; revisit the `library.html` deep-link the refusal path references.
 - [ ] **Installable PWA** — offline-friendly transcript + add-to-home-screen, within CSP.
   *(complements — does not replace — the native app: see 📱 Mobile under Next)*
+
+---
+
+## 🪧 Now/Next — brand & public presence  *(new track)*
+
+A presentation audit across GitHub, captadel.com, and Hugging Face
+([`docs/brand-audit-2026-08.md`](docs/brand-audit-2026-08.md), Aug 2026) found the repo's
+internals (README, evals, CI) ahead of every public-facing surface — developers and pilots hit
+dead links and empty scaffolds everywhere the actual quality lives. Full findings, a scorecard,
+and copy-paste templates are in the audit doc; this track sequences its action items.
+
+**Quick (≤1h each, do first — unblocks everything below):**
+- [ ] **Fix the Hugging Face Space** (`flygaca/captain-adel`) — declares `app_file: app.py`
+  with no `app.py` in the repo, so visitors hit an error state. Switch to `sdk: static` with a
+  branded placeholder linking to captadel.com, or make it private.
+- [ ] **Publish `evals/cases.json` to the empty `flygaca/gacar-assistant-evals` dataset** — 83
+  bilingual eval cases as JSONL, with a real card (schema, license, "every change is eval-gated
+  in both languages"). Self-authored and the strongest public proof of rigor available today.
+- [ ] **Broken-link sweep** — the HF model card links to `github.com/FlyGACA/flygaca` (404); the
+  landing footer + JSON-LD `sameAs` link to this private repo and to `ay2m/FlyGACA` (not
+  public). Point every public surface at things that actually resolve for a logged-out visitor.
+- [ ] **`og:image` + `twitter:card`** on all 8 `public/*.html` pages (none has one today —
+  shared chat/exam links render as bare text).
+- [ ] **GitHub presentation pass** — org profile README, pin `FlyGACA-app` + `FlyGACA-ios`,
+  add `SECURITY.md` (this service takes payments — give researchers a disclosure channel) and
+  `CONTRIBUTING.md` stating the source-visible/proprietary posture, delete the README's stale
+  "Promotion to its own repo" section (see the `Later` item below — that split is done).
+- [ ] **Verify production routing** — confirm `captadel.com/chat.html` actually reaches the app
+  and not the landing Worker's SPA fallback (`landing/worker/index.js` falls back to the
+  language shell for any path it doesn't recognize).
+
+**Strategic (bigger decisions, sequence after the above):**
+- [ ] **Decide the public face of the code** — make this repo public as source-visible
+  proprietary (the license already forbids reuse); or keep it private behind a public showcase
+  repo; or extract the eval harness / `exam-core.js` / the provider factory into a small public
+  MIT repo. Gated on clearing the Dependabot alert backlog (🔒 Dependency & supply-chain
+  security track) — a reviewer's first impression of a newly-public repo is its alert count.
+- [ ] **Make Hugging Face real** — publish the Gemini-vs-Arabic-provider parity results as a
+  dataset + writeup (bilingual aviation-RAG evals are content nobody else has), then a CaptAdel
+  v0.1 embeddings release (scaffolding already exists: `embeddings.js`, `build:embeddings`,
+  BGE-M3), then rebuild the Space as a thin Gradio client on `/v1/chat`.
+- [ ] **One brand system, one human** — a naming matrix (Captain Adel / CaptAdel / Fly GACA /
+  BDA Company International), one public email per brand, full pairwise cross-linking across
+  surfaces, and a persona-vs-person decision — `linkedin.com/in/captadel` is currently linked
+  from nowhere.
+- [ ] **SERP hygiene** — a legacy-URL map in the landing Worker (301/410 the pre-relaunch
+  `/News/…` and `/gacar-part-*` paths Google still indexes instead of serving them a 200),
+  register both domains in Search Console.
 
 ---
 
@@ -199,7 +249,9 @@ happens in Xcode, in its own repo.
 - [ ] **Personalization** (opt-in) — tailor to a pilot's licence level and currency; tie into
   the Fly GACA logbook.
 - [ ] **Scale & resilience** — CDN for the static site, autoscaling API, GPU autoscaling for ALLaM.
-- [ ] **Promote to the standalone repo** — `git subtree split --prefix=captadel` → `FlyGACA/captadel`.
+- [x] **Promoted to the standalone repo** — done; this repo (`FlyGACA/Captain-Adel`, created
+  June 2026) is the result of that split. The README's now-stale "Promotion to its own repo"
+  runbook section is cleaned up as part of the 🪧 Brand & public presence pass above.
 
 ---
 

@@ -9,6 +9,9 @@ Audience assumed: pilots, aviation enthusiasts, and developers evaluating the ma
 > vanilla bilingual HTML/JS app (`public/`) — not Astro. Worth fixing anywhere the stack is
 > described externally (CV, LinkedIn, bios).
 
+> This audit's action items are sequenced into [`ROADMAP.md`](../ROADMAP.md)'s
+> **🪧 Now/Next — brand & public presence** track — check there for current status.
+
 ## Scorecard
 
 | Surface | First impression today | Verdict |
@@ -57,8 +60,8 @@ report-only coverage/audit, gated deploy with health check).
   For a proprietary repo the point isn't accepting PRs — it's signaling intentionality, and
   (for SECURITY.md) giving researchers a disclosure channel for a service that **handles live
   payments**. Templates in the appendix.
-- **Hygiene signals**: 6 open Dependabot PRs (incl. the `express` 4→5 and `firebase-admin`
-  12→14 majors), and GitHub currently reports **43 open dependency alerts on `main`
+- **Hygiene signals**: 7 open Dependabot PRs (#32–#38, incl. the `express` 4→5 and
+  `firebase-admin` 12→14 majors), and GitHub currently reports **43 open dependency alerts on `main`
   (27 high, 15 moderate, 1 low)** — mostly transitive and invisible to visitors while private,
   but the *first* thing a reviewer sees if the repo goes public. No releases/tags, no branch
   protection visible.
