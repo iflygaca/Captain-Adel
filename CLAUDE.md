@@ -170,7 +170,10 @@ evals/                 Regression harness (cases.json, run.js, parity.js, lib.js
 scripts/               One-off scripts (build-embeddings.js, record-sse-fixtures.js)
 deploy/                docker-compose.yml, deploy.sh (Cloud Run), allam-vllm.md (vLLM GPU
                        endpoint runbook) — the Dockerfile itself lives at the repo root
-docs/                  models, refusal-taxonomy, data-contract, ios-app-plan, RUNBOOKs, mockups/
+docs/                  models, refusal-taxonomy, data-contract, ios-app-plan, multi-agent-orchestrator,
+                       RUNBOOKs, mockups/
+examples/              Runnable reference code, decoupled from src/ — multi-agent-orchestrator/ is the
+                       Claude API orchestrator–worker boilerplate (Python + TS, own package.json)
 ios/                   AdelCore local Swift package (AdelAPI + AdelSSE) — the Phase-0 iOS spike;
                        compile-unverified here (no Swift toolchain), see ios/README.md; wire
                        fixtures live in AdelCore/Tests/AdelSSETests/Fixtures/
@@ -315,4 +318,4 @@ advanced switches (`ADEL_REWRITE*`, `ADEL_GROUNDING`, `ADEL_PARENT_CHILD`,
 
 `README.md` (overview), `ROADMAP.md` (direction), `evals/README.md`, and
 `docs/` (`models.md`, `refusal-taxonomy.md`, `data-contract.md`, `ios-app-plan.md`,
-the RUNBOOKs).
+`multi-agent-orchestrator.md`, the RUNBOOKs).
