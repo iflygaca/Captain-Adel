@@ -1,0 +1,9 @@
+# captadel.com landing — Cloudflare Worker + static assets.
+# Deploy is MANUAL (no CI): build first, then `npx wrangler deploy` from landing/.
+name = "captadel"
+main = "worker/index.js"
+compatibility_date = "2026-08-09"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"

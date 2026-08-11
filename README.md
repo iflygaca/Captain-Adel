@@ -26,10 +26,18 @@ that Fly GACA plugs into over its API.
 
 ## What this is
 
-A single Node service that serves both the captadel.com site and the chat API:
+Two surfaces, one repo:
+
+- **captadel.com (the landing)** — a static Vite + React marketing page in
+  [`landing/`](landing/), served by the Cloudflare Worker `captadel`
+  (English at `/`, Arabic at `/ar/`). Built and deployed **manually** —
+  see `landing/README.md` for the wrangler runbook.
+- **The product app + API** — a single Node service that serves the app
+  pages and the chat API:
 
 ```
-public/            the captadel.com site (landing, chat, account, console, exam, checkout — 8 pages)
+landing/           captadel.com landing source (Vite + React, EN + /ar/) → Cloudflare Worker
+public/            the app pages (chat, account, console, exam, checkout, legal — 8 pages)
 src/server.js      Express: GET /health, POST /v1/chat + /v1/feedback, the /v1/me · /v1/config ·
                    /v1/billing/* SaaS routes, POST /v1/account/delete, /.well-known (Apple Pay)
 src/middleware/    CORS allowlist, Firebase auth, X-Adel-Api-Key check
