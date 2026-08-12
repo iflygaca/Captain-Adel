@@ -109,6 +109,11 @@ starting with Fly GACA — plug into.
 - [ ] **LLM-as-judge grader** for groundedness + citation correctness (beyond keyword heuristics).
 - [ ] **Citation-faithfulness check** — verify the cited section actually contains the claimed
   text; flag/strip uncited claims post-hoc.
+- [ ] **Multi-agent eval-case drafting** — a `claude-sonnet-5`-lead/`claude-haiku-4-5`-worker swarm
+  grounds itself in real `retrieve()` hits and drafts candidate cases for human review, targeting
+  GACAR Parts with zero coverage today (only 91/61/67 have any `citesPart` cases). Built and
+  structurally verified in `evals/gen-cases/`; a live run to confirm real drafting quality is
+  still pending. See `docs/multi-agent-orchestrator.md`.
 
 ### 🛡️ Safety & ops
 - [ ] **App Check / abuse hardening** for the public API (monitoring → enforce).

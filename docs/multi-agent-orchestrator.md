@@ -235,6 +235,9 @@ research — until that changes. It is *not* a `MODEL_PROVIDER` candidate and mu
 wired into `/v1/chat`. (Same rule the HF/US dev endpoints already live under — see
 `CLAUDE.md` → Compliance.)
 
+A first realization of this mapping ships as
+[`evals/gen-cases/`](../evals/gen-cases/) — see its README.
+
 ---
 
 ## Running it
