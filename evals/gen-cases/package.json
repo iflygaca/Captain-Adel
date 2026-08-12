@@ -1,0 +1,17 @@
+{
+  "name": "captain-adel-gen-cases",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Multi-agent eval-case drafting tool grounded in the real GACAR corpus — see README.md",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "generate": "node generate.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0",
+    "zod": "^4.3.5"
+  }
+}
