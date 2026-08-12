@@ -69,7 +69,7 @@ function Pipeline() {
 
 export default function Brain() {
   return (
-    <section id="brain" className="relative py-28 px-5 bg-[#070b14] overflow-hidden">
+    <section id="brain" className="relative py-16 md:py-28 px-5 bg-[#070b14] overflow-hidden">
       <span className="ghost-word" aria-hidden>BRAIN</span>
       <div className="relative z-10 mx-auto max-w-7xl">
         <SectionTag n="02" label={isAr ? 'العقل — استرجع، ثم اقرأ' : 'The brain — retrieve, then read'} />

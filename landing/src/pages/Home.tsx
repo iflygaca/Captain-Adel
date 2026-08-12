@@ -1,4 +1,4 @@
-import { useRevealAll, useScrollSpy, useParallax, useMagnetic, useLenis } from '../hooks/useReveal'
+import { useRevealAll, useScrollSpy, useParallax, useMagnetic, useLenis, useScrollFx, useScrollSkew } from '../hooks/useReveal'
 import Header from '../sections/Header'
 import Loader from '../sections/Loader'
 import Hero from '../sections/Hero'
@@ -13,6 +13,7 @@ import FaqSection from '../sections/FaqSection'
 import GacarQa from '../sections/GacarQa'
 import ApiSection from '../sections/ApiSection'
 import Footer from '../sections/Footer'
+import StickyCta from '../sections/StickyCta'
 
 export default function Home() {
   useRevealAll()
@@ -20,11 +21,13 @@ export default function Home() {
   useScrollSpy(['doctrine', 'captain', 'brain', 'models', 'faq', 'qa', 'api'])
   useParallax()
   useMagnetic()
+  useScrollFx()
+  useScrollSkew()
   return (
     <div className="grain min-h-screen bg-[#050810] text-[#e6edf6]">
       <Loader />
       <Header />
-      <main>
+      <main className="skewy">
         <Hero />
         <Ticker />
         <Cinematic />
@@ -38,6 +41,7 @@ export default function Home() {
         <ApiSection />
         <Footer />
       </main>
+      <StickyCta />
     </div>
   )
 }

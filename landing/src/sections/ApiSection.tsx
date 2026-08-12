@@ -72,7 +72,7 @@ const ENDPOINTS = isAr
 
 export default function ApiSection() {
   return (
-    <section id="api" className="relative py-28 px-5 bg-[#070b14] overflow-hidden">
+    <section id="api" className="relative py-16 md:py-28 px-5 bg-[#070b14] overflow-hidden">
       <span className="ghost-word" aria-hidden>/v1/chat</span>
       <div className="relative z-10 mx-auto max-w-7xl">
         <SectionTag n="04" label={isAr ? 'الواجهة البرمجية — عقل واحد، وجهان' : 'The API — one brain, two faces'} />

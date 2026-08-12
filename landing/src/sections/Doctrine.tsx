@@ -129,7 +129,7 @@ function ChatDemo() {
 
 export default function Doctrine() {
   return (
-    <section id="doctrine" className="relative py-28 px-5 overflow-hidden">
+    <section id="doctrine" className="relative py-16 md:py-28 px-5 overflow-hidden">
       <span className="ghost-word" aria-hidden>GROUND</span>
       <div className="relative z-10 mx-auto max-w-7xl">
         <SectionTag n="01" label={isAr ? 'العقيدة — استشهد أو اعتذر' : 'The doctrine — cite or refuse'} />

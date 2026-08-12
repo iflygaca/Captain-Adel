@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { isAr } from '../i18n'
 
 const MODELS_EN = [
@@ -28,7 +29,7 @@ const STATUS_STYLE: Record<string, { dot: string; text: string; label: string }>
 
 export default function Models() {
   return (
-    <section id="models" className="paper relative py-28 px-5 overflow-hidden">
+    <section id="models" className="paper relative py-16 md:py-28 px-5 overflow-hidden">
       <span className="ghost-word" aria-hidden>ROSTER</span>
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="reveal flex items-center gap-3 font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#0e7490] mb-6">
@@ -59,7 +60,44 @@ export default function Models() {
           </p>
         </div>
 
-        <div className="reveal reveal-d2 border border-[#d8d3c6] bg-[#faf8f2] shadow-[0_1px_0_#d8d3c6,0_12px_32px_-16px_rgba(16,21,31,0.18)] overflow-x-auto">
+        {/* phones: stacked cards — the 5-column table clipped to 2 columns at 390px */}
+        <div className="reveal reveal-d2 md:hidden grid gap-3">
+          {MODELS.map((m, i) => {
+            const s = STATUS_STYLE[m.status]
+            return (
+              <div
+                key={m.name}
+                className="border border-[#d8d3c6] bg-[#faf8f2] p-4 shadow-[0_1px_0_#d8d3c6]"
+                style={{ '--i': i } as CSSProperties}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[15px] font-semibold text-[#10151f]">{m.name}</div>
+                    <div className="font-mono2 text-[10px] tracking-[0.12em] text-[#5b6472] mt-0.5">{m.org}</div>
+                  </div>
+                  <span className={`flex shrink-0 items-center gap-1.5 font-mono2 text-[9.5px] tracking-[0.18em] ${s.text}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+                    {s.label}
+                  </span>
+                </div>
+                <dl className="mt-3 pt-3 border-t border-[#e6e1d4] grid gap-2 text-[12.5px]">
+                  {([
+                    [isAr ? 'الاستراتيجية' : 'Strategy', <span className="font-mono2 text-[11.5px] text-[#0e7490]">{m.strategy}</span>],
+                    [isAr ? 'التكليف' : 'Assignment', <span className="text-[#5b6472]">{m.role}</span>],
+                    [isAr ? 'الرخصة' : 'License', <span className="font-mono2 text-[11px] text-[#5b6472]">{m.license}</span>],
+                  ] as const).map(([k, v]) => (
+                    <div key={k} className="flex items-baseline justify-between gap-4">
+                      <dt className="font-mono2 text-[9.5px] tracking-[0.18em] uppercase text-[#5b6472] shrink-0">{k}</dt>
+                      <dd className="text-end">{v}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="reveal reveal-d2 hidden md:block border border-[#d8d3c6] bg-[#faf8f2] shadow-[0_1px_0_#d8d3c6,0_12px_32px_-16px_rgba(16,21,31,0.18)] overflow-x-auto">
           <table className="w-full min-w-[760px] text-left">
             <thead>
               <tr className="border-b border-[#d8d3c6] font-mono2 text-[10px] tracking-[0.22em] uppercase text-[#5b6472]">
