@@ -202,13 +202,3 @@ Arabic) `ALLAM_BASE_URL` pointing at a GPU vLLM endpoint. Map `captadel.com`
 Where Captain Adel is headed — retrieval quality, ALLaM to production, deeper evals, and
 Captain Adel as a platform — is tracked in [`ROADMAP.md`](ROADMAP.md). Every change is
 eval-gated.
-
-## Promotion to its own repo
-
-This service is developed as the `captadel/` subtree of `flygaca/flygaca`. To
-split it into the standalone `FlyGACA/captadel` repo with history preserved:
-
-```bash
-git subtree split --prefix=captadel -b captadel-export
-# push captadel-export to the new repo's main
-```
