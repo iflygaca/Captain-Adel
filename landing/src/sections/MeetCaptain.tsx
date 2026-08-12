@@ -174,7 +174,7 @@ function FrequencyDemo() {
 
 export default function MeetCaptain() {
   return (
-    <section id="captain" className="relative py-28 md:py-36 overflow-hidden">
+    <section id="captain" className="relative py-16 md:py-36 overflow-hidden">
       <span className="ghost-word top-8 right-[-2rem]" aria-hidden style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
         كابتن
       </span>

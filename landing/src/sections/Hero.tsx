@@ -78,9 +78,9 @@ function Kinetic({ text, base = 0.3, className = '' }: { text: string; base?: nu
 
 export default function Hero() {
   return (
-    <section id="top" className="relative min-h-screen flex flex-col overflow-hidden noise-bg scanlines">
+    <section id="top" data-scrollfx className="hero-fx relative min-h-[100svh] flex flex-col overflow-hidden noise-bg scanlines">
       {/* map backdrop */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-[.55] pointer-events-none">
+      <div className="absolute inset-0 flex items-center justify-center opacity-[.22] md:opacity-[.55] pointer-events-none">
         <div className="parallax w-[min(92vw,900px)] aspect-square" data-parallax="0.14">
           <AirspaceMap />
         </div>
@@ -95,8 +95,8 @@ export default function Hero() {
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-[#050810]/70 via-transparent to-[#050810] pointer-events-none" />
 
-      <div className="relative z-10 flex-1 flex items-center mx-auto w-full max-w-7xl px-5 pt-28 pb-24">
-        <div className="grid lg:grid-cols-[1.25fr_.75fr] gap-14 items-center w-full">
+      <div className="relative z-10 flex-1 flex items-center mx-auto w-full max-w-7xl px-5 pt-24 pb-14 md:pt-28 md:pb-24">
+        <div className="grid lg:grid-cols-[1.25fr_.75fr] gap-10 lg:gap-14 items-center w-full">
           {/* copy */}
           <div>
             <div className="reveal flex items-center gap-3 font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#22d3ee] mb-7">
@@ -154,7 +154,7 @@ export default function Hero() {
               </a>
             </div>
             {/* stat strip */}
-            <div className="reveal reveal-d4 mt-12 grid grid-cols-3 max-w-md divide-x divide-[#1a2540] border-y border-[#1a2540]">
+            <div className="reveal reveal-d4 mt-9 md:mt-12 grid grid-cols-3 max-w-md divide-x divide-[#1a2540] border-y border-[#1a2540]">
               {(isAr
                 ? [
                     ['GACAR', 'مؤسَّس على النصوص'],
@@ -176,7 +176,7 @@ export default function Hero() {
           </div>
 
           {/* captain ID card + boot console */}
-          <div className="reveal reveal-d2 hidden lg:block">
+          <div className="reveal reveal-d2">
             <div className="magnetic border border-[#1a2540] bg-[#0c1220]/90 backdrop-blur-sm shadow-[0_0_60px_rgba(34,211,238,0.07)]">
               {/* card header */}
               <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#1a2540]">
@@ -187,7 +187,7 @@ export default function Hero() {
                 </span>
               </div>
               {/* portrait */}
-              <div className="relative h-[290px] overflow-hidden border-b border-[#1a2540]">
+              <div className="relative h-[240px] md:h-[290px] overflow-hidden border-b border-[#1a2540]">
                 <img
                   src="/media/captain-adel.jpg"
                   alt={isAr ? 'كابتن عادل — مدرّب طيران ذكي' : 'Captain Adel — AI flight instructor'}

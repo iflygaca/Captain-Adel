@@ -94,7 +94,7 @@ const QAS = isAr ? QA_AR : QA_EN
 export default function GacarQa() {
   const [open, setOpen] = useState(0)
   return (
-    <section id="qa" className="relative py-28 px-5 overflow-hidden border-t border-[#1a2540]">
+    <section id="qa" className="relative py-16 md:py-28 px-5 overflow-hidden border-t border-[#1a2540]">
       <span className="ghost-word" aria-hidden>GACAR</span>
       <div className="relative z-10 mx-auto max-w-4xl">
         <div className="reveal flex items-center gap-3 font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#22d3ee] mb-6">

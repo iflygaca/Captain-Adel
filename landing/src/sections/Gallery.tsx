@@ -46,7 +46,7 @@ const SHOTS = isAr ? SHOTS_AR : SHOTS_EN
 
 export default function Gallery() {
   return (
-    <section className="relative py-28 px-5 bg-[#070b14] overflow-hidden">
+    <section className="relative py-16 md:py-28 px-5 bg-[#070b14] overflow-hidden">
       <span className="ghost-word" aria-hidden>AIRSPACE</span>
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="reveal flex items-center gap-3 font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#22d3ee] mb-6">

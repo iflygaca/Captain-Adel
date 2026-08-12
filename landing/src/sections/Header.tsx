@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { useZuluClock } from '../hooks/useReveal'
 import { isAr, ALT_URL } from '../i18n'
+import { NAV } from '../nav'
+import MobileNav from './MobileNav'
 
 export function RadarMark({ size = 34 }: { size?: number }) {
   return (
@@ -25,28 +28,9 @@ export function RadarMark({ size = 34 }: { size?: number }) {
   )
 }
 
-const NAV = isAr
-  ? [
-      { label: 'العقيدة', href: '#doctrine' },
-      { label: 'الكابتن', href: '#captain' },
-      { label: 'العقل', href: '#brain' },
-      { label: 'النماذج', href: '#models' },
-      { label: 'الأسئلة', href: '#faq' },
-      { label: 'GACAR', href: '#qa' },
-      { label: 'API', href: '#api' },
-    ]
-  : [
-      { label: 'The Doctrine', href: '#doctrine' },
-      { label: 'The Captain', href: '#captain' },
-      { label: 'The Brain', href: '#brain' },
-      { label: 'Models', href: '#models' },
-      { label: 'FAQ', href: '#faq' },
-      { label: 'GACAR Q&A', href: '#qa' },
-      { label: 'API', href: '#api' },
-    ]
-
 export default function Header() {
   const clockRef = useZuluClock()
+  const [menuOpen, setMenuOpen] = useState(false)
   return (
     <header className="fixed top-0 inset-x-0 z-50 border-b border-[#1a2540] bg-[#050810]/80 backdrop-blur-md">
       <div className="mx-auto max-w-7xl px-5 h-16 flex items-center justify-between gap-4">
@@ -81,24 +65,39 @@ export default function Header() {
               {isAr ? 'الأنظمة تعمل' : 'SYSTEMS NOMINAL'}
             </span>
           </div>
-          {/* language toggle */}
+          {/* language toggle — phones get it inside the menu instead */}
           <a
             href={ALT_URL}
             hrefLang={isAr ? 'en' : 'ar'}
-            className="font-mono2 text-[11px] tracking-[0.1em] px-3 py-2 border border-[#1a2540] text-[#8b98ad] hover:border-[#2d8ea8] hover:text-[#22d3ee] transition-colors duration-150"
+            className="hidden md:inline-block font-mono2 text-[11px] tracking-[0.1em] px-3 py-2 border border-[#1a2540] text-[#8b98ad] hover:border-[#2d8ea8] hover:text-[#22d3ee] transition-colors duration-150"
             aria-label={isAr ? 'Switch to English' : 'التبديل إلى العربية'}
           >
             {isAr ? 'EN' : 'عربي'}
           </a>
           <a
             href="#api"
-            className="btn-swap font-mono2 text-[11px] tracking-[0.16em] uppercase px-4 py-2 border border-[#2d8ea8] text-[#22d3ee] hover:bg-[#22d3ee] hover:text-[#050810] transition-colors duration-150"
+            className="!hidden md:!inline-flex btn-swap font-mono2 text-[11px] tracking-[0.16em] uppercase px-4 py-2 border border-[#2d8ea8] text-[#22d3ee] hover:bg-[#22d3ee] hover:text-[#050810] transition-colors duration-150"
           >
             <span className="bs-a">{isAr ? 'اسأل عادل' : 'Ask Adel'}</span>
             <span className="bs-b">{isAr ? 'على التردد' : 'On frequency'}</span>
           </a>
+
+          {/* burger — the only way into a section on a phone */}
+          <button
+            type="button"
+            className={`mnav-burger md:hidden ${menuOpen ? 'is-open' : ''}`}
+            aria-label={menuOpen ? (isAr ? 'إغلاق القائمة' : 'Close menu') : (isAr ? 'فتح القائمة' : 'Open menu')}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav"
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            <span aria-hidden />
+            <span aria-hidden />
+          </button>
         </div>
       </div>
+
+      <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} />
     </header>
   )
 }
