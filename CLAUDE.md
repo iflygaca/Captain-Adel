@@ -178,7 +178,17 @@ ios/                   AdelCore local Swift package (AdelAPI + AdelSSE) — the 
                        compile-unverified here (no Swift toolchain), see ios/README.md; wire
                        fixtures live in AdelCore/Tests/AdelSSETests/Fixtures/
 authoring/             Source-of-truth system prompt + KB scope + Python reference (rag.py, captain_adel.py)
+.claude/               Claude Code tooling (not shipped): skills/diagram-design/ — vendored MIT
+                       editorial-diagram skill, skinned to the Captain Adel palette — plus its
+                       /export-diagram, /import-drawio, /import-mermaid commands. Provenance and
+                       the local skin delta: .claude/skills/THIRD_PARTY_NOTICES.md
 ```
+
+Diagrams from that skill are **documentation artifacts** for `docs/` — they are never served by
+`src/server.js` or referenced from `public/`, so the hand-maintained CSP needs no entry for the
+Google Fonts CDN their templates load. Moving a diagram under `public/` would require a CSP edit
+first. In the diagram palette, gold is the accent and teal is links/focus only — never use teal to
+signal a grounded or verified answer, mirroring `public/assets/css/adel.css`.
 
 ## Testing & evals
 
