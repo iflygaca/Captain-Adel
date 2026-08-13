@@ -39,6 +39,7 @@ Node 20, npm (lockfile `package-lock.json`). All scripts live in `package.json`.
 | --- | --- |
 | `npm start` | Run the server: `node src/server.js` (port `8787`). |
 | `npm run smoke` | Loads the server module (no keys) — fast sanity check. CI-safe. |
+| `npm run smoke:frontend` | Static audit of `public/*.html` (`scripts/frontend-smoke.js`): local asset + internal-link resolution, the hand-duplicated `.disclaimer-strip`/`.site-nav` chrome and the `#site-footer` mount on all 8 pages, script load order (`chat-core.js` before its consumers, `footer.js` before `i18n.js`, `type="module"` on the ES-module scripts), and JS→DOM hooks. Deterministic, no deps/network. CI-safe. |
 | `npm run test:unit` | Unit tests: `node --test test/*.test.js`. Deterministic, **no API keys / no network**. |
 | `npm run test:coverage` | Same suite with `--experimental-test-coverage` (report-only, never fails the build). What `ci.yml`'s `build` job actually runs. |
 | `npm run eval:dry` | Validate `evals/cases.json` structure only, no model calls. CI-safe. |
@@ -52,7 +53,8 @@ Node 20, npm (lockfile `package-lock.json`). All scripts live in `package.json`.
 There is **no eslint/prettier/editorconfig** — style is maintained by convention
 and review only. Match the surrounding code.
 
-Before pushing: run `npm run smoke && npm run test:unit && npm run eval:dry`
+Before pushing: run
+`npm run smoke && npm run smoke:frontend && npm run test:unit && npm run eval:dry`
 (what `deploy.yml`'s gate runs without secrets; `ci.yml`'s `build` job runs the
 same tests via `test:coverage` instead, for the report-only coverage table).
 

@@ -80,8 +80,13 @@ starting with Fly GACA — plug into.
   check is deterministic.
 - [ ] **Live-eval as a gated check** — run the Gemini eval (and ALLaM when an endpoint exists)
   as a required PR check, not just `--dry` (already stubbed in `ci.yml` behind `GEMINI_API_KEY`).
-- [ ] **Front-end smoke in CI** — HTML/CSS lint + dead-link/asset check + the JS↔CSS class-hook
-  audit, so a markup/style regression can't ship silently.
+- [x] **Front-end smoke in CI** — `npm run smoke:frontend` (`scripts/frontend-smoke.js`) audits
+  all 8 `public/*.html`: local asset + internal-link resolution, the hand-duplicated
+  `.disclaimer-strip`/`.site-nav` chrome and the `#site-footer` mount, script load order
+  (`chat-core.js` before its consumers, `footer.js` before `i18n.js`, `type="module"` on the ES
+  modules) and JS→DOM hooks. Wired into `ci.yml` and `deploy.yml`'s gate; deterministic, no
+  dependencies, no network. It found and cleared one live defect — `site.js` still carried the
+  footer-year lookup that `footer.js` took over.
 
 ### 🔒 Dependency & supply-chain security  *(new)*
 - [x] **Dependabot + `npm audit` (report-only) gate** — `.github/dependabot.yml` + `ci.yml`'s
@@ -98,20 +103,40 @@ starting with Fly GACA — plug into.
   build the index (`npm run build:embeddings`), and ship the **cross-lingual unlock** so Arabic
   questions reach the right English GACAR passage (today pure BM25 returns nothing for Arabic).
 - [ ] **Cross-encoder rerank** of the top-k before the answer step, for sharper passage choice.
-- [ ] **Parent-child chunks** — expand a hit to its full section so limits/tables aren't
-  truncated mid-rule (`retrieve.js` caps passages today).
-- [ ] **Citation precision** — harden `citationOf`/`sectionRefOf` against mangled PDF titles
-  (the "AIRCRAFTONTHEWATER" class already noted in `bm25.js`).
+- [x] **Parent-child chunks** — the top 3 hits expand from their ~1200-char chunk to the full
+  GACAR section (capped at 4000 chars) so limits/tables aren't truncated mid-rule. ON by
+  default in `retrieve.js`; `ADEL_PARENT_CHILD=off` reverts.
+- [x] **Citation precision** — `citationOf`/`sectionRefOf` hardened against mangled PDF titles.
+  The audit found a bigger problem than the "AIRCRAFTONTHEWATER" class: **"GACAR " was prefixed
+  onto every doc badge**, so 15,242 guidance-handbook chunks cited as "GACAR Handbook — …" and
+  23,863 foreign-reference chunks (FAA, 14 CFR, ICAO, NTSB) as "GACAR FAA Handbook — …" —
+  presenting foreign material as the Kingdom's regulations, across 39,105 of 47,361 chunks.
+  Now only a numbered Part is "GACAR"; everything else is named as itself. Also recovers 409
+  section numbers hidden behind LaTeX/OCR noise (`mathbf§121.139`, `\$139.145`, `l07.107`) and
+  quotes a clean section title where no § exists (Part 1's defined terms, tables, figures) —
+  Part-level-only citations fell 42%. Every number recovered from a title is checked against
+  its document's own Part first, so annex clause numbering can't be misread as a section.
+- [ ] **Carry-forward citations for continuation chunks** — ~11.7k primary chunks are untitled
+  mid-rule continuations whose `st` is just the Part banner, so they can only cite Part-level.
+  Their section is recoverable from the preceding chunk in document order, but a continuation
+  may equally belong to the *next* section, and a wrong § is worse than none — this needs the
+  corpus builder to emit the parent section id per chunk rather than a load-time guess.
 
 ### 🧪 Evaluation
-- [ ] **Grow the case set** — per-Part coverage, numeric-limit precision, more AR cases, an
-  expanded adversarial/injection suite.
+- [x] **Grow the case set — per-Part coverage** — 30 `coverage` cases took `citesPart` from
+  3 Parts (91/61/67) to **30**; 113 cases total. Every English case was written against real
+  `retrieve()` output so its assertion is reachable from the bundled corpus. The 4 Arabic ones
+  assert `answerLang` + keywords only, deliberately: the corpus is English, so a pure-Arabic
+  query scores zero BM25 hits until the cross-lingual unlock above ships.
+- [ ] **Grow the case set — the rest** — numeric-limit precision and an expanded
+  adversarial/injection suite.
 - [ ] **LLM-as-judge grader** for groundedness + citation correctness (beyond keyword heuristics).
 - [ ] **Citation-faithfulness check** — verify the cited section actually contains the claimed
   text; flag/strip uncited claims post-hoc.
 - [ ] **Multi-agent eval-case drafting** — a `claude-sonnet-5`-lead/`claude-haiku-4-5`-worker swarm
   grounds itself in real `retrieve()` hits and drafts candidate cases for human review, targeting
-  GACAR Parts with zero coverage today (only 91/61/67 have any `citesPart` cases). Built and
+  GACAR Parts with thin coverage (the 30 hand-written `coverage` cases above are the floor, not
+  the ceiling — they give each Part one assertion, not depth). Built and
   structurally verified in `evals/gen-cases/`; a live run to confirm real drafting quality is
   still pending. See `docs/multi-agent-orchestrator.md`.
 

@@ -152,3 +152,117 @@ test('listChanges: sinceVersion filters numerically, unknown part returns []', (
   assert.equal(floored.filter((e) => bm25.versionNumber(e.version) != null).length,
     versioned.filter((e) => bm25.versionNumber(e.version) > 0).length);
 });
+
+/* ---- citation shaping ----------------------------------------------------
+ *
+ * The corpus `st` (section title) field is raw PDF-extracted text. These tests
+ * pin the two halves of the contract: a section number is recovered when it is
+ * genuinely present (even behind LaTeX/OCR noise), and is refused whenever it
+ * cannot be verified against the document's own Part — a wrong § is worse than
+ * no §. See the note above citationOf in src/brain/bm25.js. */
+
+test('cleanSectionTitle: quotes a clean title, refuses mangled PDF text', () => {
+  const clean = (st, docTitle) => bm25.cleanSectionTitle({ st }, docTitle);
+
+  // Clean titles survive.
+  assert.equal(clean('ACAS-Passive surveillance'), 'ACAS-Passive surveillance');
+  assert.equal(clean('Section 2. Aerodrome Classification'), 'Section 2. Aerodrome Classification');
+  assert.equal(clean('II. Time-Recording Devices.'), 'II. Time-Recording Devices.');
+  assert.equal(clean('Figure H-9. VOR Aerodrome checkpoint marking.'),
+    'Figure H-9. VOR Aerodrome checkpoint marking.');
+
+  // Glued-together PDF words — the class this guard exists for.
+  assert.equal(clean('AIRCRAFTONTHEWATER'), '');
+  assert.equal(clean('RATINGCOURSE'), '');
+  // The whole-document banner repeated as a section title.
+  assert.equal(clean('GACAR PART 91 - GENERAL OPERATING AND FLIGHT RULES'), '');
+  // LaTeX/extraction noise.
+  assert.equal(clean('mathbf§121.139 Preparation.'), '');
+  assert.equal(clean('\\$107.109 Training and Procedures Manual.'), '');
+  // A mid-word column fragment (starts lowercase).
+  assert.equal(clean('dures for the Notification of Aeronautical Facility Info'), '');
+  assert.equal(clean('that—'), '');
+  // Cut off mid-clause, or ending on a one-character fragment.
+  assert.equal(clean('Ground-Ground Communications (Aeronautical Fixed :'), '');
+  assert.equal(clean('75.139 Aeronautical information product updates: Data set u'), '');
+  // A prose sentence is not a section title.
+  assert.equal(clean('Part 139 prescribes the regulations governing the certification of aerodromes.'), '');
+  // An echo of the document's own title adds nothing.
+  assert.equal(clean('Surveillance', 'Surveillance'), '');
+  assert.equal(clean(''), '');
+});
+
+test('sectionRefOf: recovers a § hidden behind LaTeX/OCR noise in the title', () => {
+  const ref = (c) => bm25.sectionRefOf(c);
+  assert.equal(ref({ ds: 'part-121', st: 'mathbf§121.139 Preparation.' }), '§121.139');
+  assert.equal(ref({ ds: 'part-139', st: '\\$139.145 Authorization of Aerodromes' }), '§139.145');
+  assert.equal(ref({ ds: 'part-107', st: 'bf§107.9 Accident reporting.' }), '§107.9');
+  // PDF extraction reads the leading 1 of a section number as l or I.
+  assert.equal(ref({ ds: 'part-107', st: 'mathbf§l07.107 Advertising Limitations.' }), '§107.107');
+  assert.equal(ref({ ds: 'part-139', st: 'mathbf§l39.147 Application for Aerodrome Authorization' }),
+    '§139.147');
+  // `gr` and the body prefix still win, in that order.
+  assert.equal(ref({ ds: 'part-91', gr: '91.155', st: 'mathbf§91.999 Wrong.' }), '§91.155');
+  assert.equal(ref({ ds: 'part-91', t: '§91.155 Basic VFR weather minimums' }), '§91.155');
+});
+
+test('sectionRefOf: refuses a number it cannot tie to the document Part', () => {
+  const ref = (c) => bm25.sectionRefOf(c);
+  // Advisory annexes inside a Part number their own clauses: "1.1 Purpose"
+  // inside Part 137 is NOT §137.1, and must not be cited as a section.
+  assert.equal(ref({ ds: 'part-137', st: '1.1 Purpose' }), '');
+  assert.equal(ref({ ds: 'part-137', st: '2.0 Applicability' }), '');
+  assert.equal(ref({ ds: 'part-139', st: '7.1.4.1 PURPOSE.' }), '');
+  // A dropped leading digit ("75.139" in Part 175) is a mismatch, not a fix.
+  assert.equal(ref({ ds: 'part-175', st: '75.139 Aeronautical information product updates' }), '');
+  // No Part to check against — refuse rather than guess.
+  assert.equal(ref({ ds: 'surveillance', st: '2.1 Inspection' }), '');
+});
+
+test('citationOf: never labels a guidance handbook as GACAR', () => {
+  bm25.warmUp();
+  // GACAR is the regulations; the bundled handbooks are guidance. Calling one
+  // "GACAR Handbook" would present guidance as binding rule.
+  const hb = bm25.citationOf({
+    ds: 'surveillance', db: 'Handbook',
+    st: 'Section 2. Inspection Practices and Procedures',
+  });
+  assert.ok(!/GACAR/.test(hb), `handbook citation must not say GACAR: ${hb}`);
+  assert.match(hb, /^Handbook: /);
+  assert.match(hb, /"Section 2\. Inspection Practices and Procedures"/);
+});
+
+test('citationOf: falls back from § to a quoted title, then to the Part', () => {
+  bm25.warmUp();
+  // A recovered section number is the preferred form.
+  assert.equal(
+    bm25.citationOf({ ds: 'part-107', db: 'Part 107', st: 'mathbf§107.65 Eligibility.' }),
+    'GACAR Part 107, §107.65');
+  // No § exists for a defined term, so the term itself carries the citation.
+  assert.equal(
+    bm25.citationOf({ ds: 'part-1', db: 'Part 1', st: 'ACAS-Coordination' }),
+    'GACAR Part 1, "ACAS-Coordination"');
+  // A banner title is refused, leaving the Part + document title.
+  const banner = bm25.citationOf({
+    ds: 'part-1', db: 'Part 1',
+    st: 'GACAR PART 1 - DEFINITIONS, ABBREVIATIONS AND EDITORIAL CONVENTIONS',
+  });
+  assert.ok(!banner.includes('"'), `no quoted title expected: ${banner}`);
+  assert.match(banner, /^GACAR Part 1 — /);
+});
+
+test('citationOf: every corpus hit cites something, and nothing mangled', () => {
+  const queries = ['medical certificate', 'aerodrome certification', 'unmanned aircraft',
+    'VFR weather minimums', 'aeronautical information', 'inspection practices'];
+  for (const q of queries) {
+    for (const h of bm25.searchLibrary(q, 8)) {
+      assert.ok(h.citation, `every hit carries a citation (query: ${q})`);
+      assert.ok(!/GACAR Handbook/.test(h.citation),
+        `guidance must not be cited as GACAR: ${h.citation}`);
+      assert.ok(!/mathbf|textbf|\\\$/.test(h.citation),
+        `no extraction noise in a citation: ${h.citation}`);
+      assert.ok(!/[A-Z]{12,}/.test(h.citation.replace(/[^A-Za-z]/g, '')),
+        `no glued-word run in a citation: ${h.citation}`);
+    }
+  }
+});

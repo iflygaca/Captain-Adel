@@ -30,7 +30,8 @@
     "jais:smoke": "node evals/jais-smoke.js",
     "build:embeddings": "node scripts/build-embeddings.js",
     "fixtures:sse": "node scripts/record-sse-fixtures.js",
-    "smoke": "node -e \"require('./src/server'); console.log('server module loads OK')\""
+    "smoke": "node -e \"require('./src/server'); console.log('server module loads OK')\"",
+    "smoke:frontend": "node scripts/frontend-smoke.js"
   },
   "dependencies": {
     "@google/genai": "^1.0.0",

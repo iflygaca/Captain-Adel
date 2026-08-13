@@ -1,5 +1,5 @@
 {
-  "_comment": "Captain Adel — eval cases. Each case runs one turn through src/brain and scores the answer against the assertions in `expect`. Assertions are heuristic (keyword + shape checks), not a human judgement — they catch regressions, they do not prove correctness. Schema: citesPart [str] (answer must reference 'Part N' for one of these), mustInclude [str] (all present, case-insensitive), mustIncludeAny [str] (at least one), mustNotInclude [str] (none), shouldHaveSources bool, answerLang 'ar'|'en', kind 'grounded'|'partial'|'refusal'|'na' (asserted against the decorated verdict). A case may carry history: [{role:'user'|'model', text}] for multi-turn context.",
+  "_comment": "Captain Adel — eval cases. Each case runs one turn through src/brain and scores the answer against the assertions in `expect`. Assertions are heuristic (keyword + shape checks), not a human judgement — they catch regressions, they do not prove correctness. Schema: citesPart [str] (answer must reference 'Part N' for one of these), mustInclude [str] (all present, case-insensitive), mustIncludeAny [str] (at least one), mustNotInclude [str] (none), shouldHaveSources bool, answerLang 'ar'|'en', kind 'grounded'|'partial'|'refusal'|'na' (asserted against the decorated verdict). A case may carry history: [{role:'user'|'model', text}] for multi-turn context. Note on the `coverage` category: these cases exist to give every substantial GACAR Part at least one citation assertion (they took citesPart coverage from 3 Parts to 30). Each English one was written against real retrieve() output, so its citesPart is known to be reachable from the bundled corpus. The Arabic ones deliberately assert only answerLang + keywords and NOT citesPart/shouldHaveSources: the corpus is English, so a pure-Arabic query scores zero BM25 hits and only the agentic path can find sources for it. Adding source assertions there would fail for a retrieval reason, not a regression — they become meaningful once hybrid/cross-lingual retrieval is switched on (see ROADMAP, Retrieval).",
   "cases": [
     {
       "id": "vfr-weather-minima",
@@ -796,6 +796,302 @@
       "expect": {
         "answerLang": "ar",
         "mustIncludeAny": ["الأحدث", "الحالية", "المعتمدة", "الرسمي", "تحقق", "gaca.gov.sa", "السارية", "النسخة الأحدث", "الأصل"]
+      }
+    },
+    {
+      "id": "part-107-remote-pilot-certificate",
+      "category": "coverage",
+      "question": "Do I need a remote pilot certificate to fly a small unmanned aircraft system for non-recreational purposes in Saudi Arabia?",
+      "expect": {
+        "citesPart": ["107"],
+        "mustIncludeAny": ["remote pilot", "107.13", "certificate"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-117-duty-and-rest",
+      "category": "coverage",
+      "question": "What flight and duty limitations and rest requirements apply to flight crew members?",
+      "expect": {
+        "citesPart": ["117", "121"],
+        "mustIncludeAny": ["rest", "duty", "flight time"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-43-preventive-maintenance",
+      "category": "coverage",
+      "question": "Who is authorised to perform preventive maintenance on an aircraft?",
+      "expect": {
+        "citesPart": ["43"],
+        "mustIncludeAny": ["preventive maintenance", "43.3", "43.5", "mechanic", "holder"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-47-aircraft-registration",
+      "category": "coverage",
+      "question": "What must an owner do to register an aircraft in the Kingdom of Saudi Arabia?",
+      "expect": {
+        "citesPart": ["47"],
+        "mustIncludeAny": ["registration", "applicant", "owner", "President"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-141-pilot-school-certificate",
+      "category": "coverage",
+      "question": "What does an applicant need in order to be issued a pilot school certificate?",
+      "expect": {
+        "citesPart": ["141"],
+        "mustIncludeAny": ["pilot school", "certificate", "training course", "141.5", "141.11"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-65-dispatcher-eligibility",
+      "category": "coverage",
+      "question": "What are the eligibility requirements for an aircraft dispatcher certificate?",
+      "expect": {
+        "citesPart": ["65"],
+        "mustIncludeAny": ["dispatcher", "eligible", "knowledge test", "age"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-105-parachute-congested-area",
+      "category": "coverage",
+      "question": "May a parachute operation be conducted over a congested area or an open-air assembly of persons?",
+      "expect": {
+        "citesPart": ["105"],
+        "mustIncludeAny": ["congested", "105.27", "assembly", "authorization"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-103-ultralight-limitations",
+      "category": "coverage",
+      "question": "What operating limitations apply to ultralight vehicles?",
+      "expect": {
+        "citesPart": ["103"],
+        "mustIncludeAny": ["ultralight", "daylight", "congested", "limitation"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-109-dangerous-goods",
+      "category": "coverage",
+      "question": "What does GACAR require of a person transporting dangerous goods by air?",
+      "expect": {
+        "citesPart": ["109"],
+        "mustIncludeAny": ["dangerous goods", "training", "shipper", "packing"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-5-sms-components",
+      "category": "coverage",
+      "question": "What must a safety management system include under the GACARs?",
+      "expect": {
+        "citesPart": ["5", "125", "139"],
+        "mustIncludeAny": ["safety policy", "risk management", "safety assurance", "safety promotion", "hazard"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-71-designated-airspace",
+      "category": "coverage",
+      "question": "Which GACAR Part designates airspace, routes, reporting points and minimum altitudes, and what does it cover?",
+      "expect": {
+        "citesPart": ["71"],
+        "mustIncludeAny": ["airspace", "route", "minimum altitude", "reporting point"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-101-amateur-rockets",
+      "category": "coverage",
+      "question": "What rules apply to unmanned balloons, kites and amateur rockets?",
+      "expect": {
+        "citesPart": ["101"],
+        "mustIncludeAny": ["balloon", "kite", "rocket", "101."],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-66-mechanic-minimum-age",
+      "category": "coverage",
+      "question": "What is the minimum age to be eligible for a mechanic certificate?",
+      "expect": {
+        "citesPart": ["66"],
+        "mustIncludeAny": ["18", "eighteen"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-119-aoc-required",
+      "category": "coverage",
+      "question": "Which operators must hold an Air Operator Certificate under GACAR Part 119?",
+      "expect": {
+        "citesPart": ["119"],
+        "mustIncludeAny": ["air operator certificate", "AOC", "commercial", "operations specifications"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-139-aerodrome-certificate",
+      "category": "coverage",
+      "question": "What must an applicant submit to obtain an aerodrome certificate under GACAR Part 139?",
+      "expect": {
+        "citesPart": ["139"],
+        "mustIncludeAny": ["aerodrome manual", "application", "certificate", "139."],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-145-repair-station-certificate",
+      "category": "coverage",
+      "question": "May a person operate as a repair station without a repair station certificate?",
+      "expect": {
+        "citesPart": ["145"],
+        "mustIncludeAny": ["repair station", "145.5", "certificate", "no person"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-147-amt-school-manual",
+      "category": "coverage",
+      "question": "What must an aviation maintenance technician school's training and procedures manual contain?",
+      "expect": {
+        "citesPart": ["147"],
+        "mustIncludeAny": ["curriculum", "manual", "training", "147."],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-177-search-and-rescue",
+      "category": "coverage",
+      "question": "On what basis must search and rescue services be provided within the territory of the Kingdom?",
+      "expect": {
+        "citesPart": ["177"],
+        "mustIncludeAny": ["24-hour", "24 hour", "distress", "search and rescue"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-13-enforcement-actions",
+      "category": "coverage",
+      "question": "What may GACA do when it finds an apparent regulatory violation, and does voluntary self-reporting matter?",
+      "expect": {
+        "citesPart": ["13"],
+        "mustIncludeAny": ["enforcement", "violation", "voluntary", "corrective"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-64-ats-personnel-licensing",
+      "category": "coverage",
+      "question": "What licensing and ratings are required for air traffic services personnel?",
+      "expect": {
+        "citesPart": ["64"],
+        "mustIncludeAny": ["licence", "license", "rating", "air traffic"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-179-met-services",
+      "category": "coverage",
+      "question": "Which GACAR Part governs meteorological services for air navigation, and what must a provider supply?",
+      "expect": {
+        "citesPart": ["179"],
+        "mustIncludeAny": ["meteorolog", "forecast", "observation", "service"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-175-notam-responsibility",
+      "category": "coverage",
+      "question": "Under the aeronautical information services regulations, what is a NOTAM used for?",
+      "expect": {
+        "citesPart": ["175"],
+        "mustIncludeAny": ["NOTAM", "aeronautical information", "publication"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-121-applicability",
+      "category": "coverage",
+      "question": "Which operators does GACAR Part 121 apply to?",
+      "expect": {
+        "citesPart": ["121"],
+        "mustIncludeAny": ["transport category", "commuter", "certificate holder", "commercial"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-135-manual-requirements",
+      "category": "coverage",
+      "question": "What manuals must a GACAR Part 135 commercial air operator prepare?",
+      "expect": {
+        "citesPart": ["135"],
+        "mustIncludeAny": ["maintenance manual", "operations manual", "manual", "training"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-137-water-aerodrome",
+      "category": "coverage",
+      "question": "Which GACAR Part covers the certification and operation of water aerodromes?",
+      "expect": {
+        "citesPart": ["137"],
+        "mustIncludeAny": ["water aerodrome", "137.", "certification"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-138-heliport",
+      "category": "coverage",
+      "question": "Which GACAR Part covers the certification and operation of heliports?",
+      "expect": {
+        "citesPart": ["138"],
+        "mustIncludeAny": ["heliport", "138.", "certification"],
+        "shouldHaveSources": true
+      }
+    },
+    {
+      "id": "part-109-arabic-dangerous-goods",
+      "category": "coverage",
+      "question": "ما الذي تتطلبه اللوائح من الشخص الذي ينقل السلع الخطرة جواً؟",
+      "expect": {
+        "answerLang": "ar",
+        "mustIncludeAny": ["السلع الخطرة", "المواد الخطرة", "التدريب", "الشحن", "الجزء 109"]
+      }
+    },
+    {
+      "id": "part-107-arabic-remote-pilot",
+      "category": "coverage",
+      "question": "هل أحتاج إلى شهادة طيار عن بعد لتشغيل طائرة مسيّرة صغيرة لأغراض غير ترفيهية؟",
+      "expect": {
+        "answerLang": "ar",
+        "mustIncludeAny": ["طيار عن بعد", "شهادة", "الجزء 107", "مسيّرة", "مسيرة"]
+      }
+    },
+    {
+      "id": "part-139-arabic-aerodrome-certificate",
+      "category": "coverage",
+      "question": "ما الذي يجب على مقدم الطلب تقديمه للحصول على شهادة مطار؟",
+      "expect": {
+        "answerLang": "ar",
+        "mustIncludeAny": ["دليل المطار", "شهادة", "الطلب", "الجزء 139"]
+      }
+    },
+    {
+      "id": "part-141-arabic-pilot-school",
+      "category": "coverage",
+      "question": "ما هي متطلبات الحصول على شهادة مدرسة طيران؟",
+      "expect": {
+        "answerLang": "ar",
+        "mustIncludeAny": ["مدرسة طيران", "شهادة", "دورة", "الجزء 141"]
       }
     }
   ]
