@@ -21,6 +21,11 @@ jobs:
           node-version: '20'
       - run: npm ci
       - run: npm run smoke
+      # public/ has no build step — hand-written HTML loading classic scripts —
+      # so a renamed asset, a dropped chrome block (.disclaimer-strip and
+      # .site-nav are copy-pasted across all 8 pages) or a reordered <script>
+      # only breaks in the browser. This gates that class of regression.
+      - run: npm run smoke:frontend
       # Unit tests for the deterministic brain: guards, routing, rate limiter and
       # the BM25 retriever (runs against the bundled corpus — no API key needed).
       # Coverage is reported (report-only — it never fails the build) so the

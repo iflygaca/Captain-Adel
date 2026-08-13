@@ -1,17 +1,15 @@
 /* Captain Adel — sitewide chrome behaviours. Vanilla ES2022, classic script,
    loaded with defer on every page.
-   1) Footer year (#year) — replaces the per-page inline one-liner.
-   2) Mobile nav disclosure: .nav-burger toggles .site-nav.nav-open (the ≤820px
-      dropdown in adel.css) with aria-expanded; Escape, an outside click, or
-      following a link closes it. The button label follows the i18n engine's
-      captadel:langchange since aria-labels are outside i18n.js's scope. */
+   Mobile nav disclosure: .nav-burger toggles .site-nav.nav-open (the ≤820px
+   dropdown in adel.css) with aria-expanded; Escape, an outside click, or
+   following a link closes it. The button label follows the i18n engine's
+   captadel:langchange since aria-labels are outside i18n.js's scope.
+   The footer year is NOT here: footer.js owns the whole footer now, renders
+   #year into it and stamps the year itself. */
 (() => {
   'use strict';
 
   const isAr = () => document.documentElement.lang === 'ar';
-
-  const year = document.getElementById('year');
-  if (year) year.textContent = new Date().getFullYear();
 
   const burger = document.querySelector('.nav-burger');
   const nav = burger && burger.closest('.site-nav');
