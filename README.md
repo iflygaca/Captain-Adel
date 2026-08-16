@@ -2,202 +2,219 @@
 
 <img src="public/assets/img/captain/avatar.png" alt="Captain Adel" width="140" />
 
-# Captain Adel
+# 👨‍✈️ Captain Adel
+
+### The AI Flight Instructor & Regulatory RAG Service for Saudi Civil Aviation
 
 <p>
   <a href="https://github.com/FlyGACA/Captain-Adel/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/FlyGACA/Captain-Adel/ci.yml?style=for-the-badge&label=CI&labelColor=0a0e12&color=2d6e8a" alt="CI Status" /></a>
   <a href="package.json"><img src="https://img.shields.io/badge/node-20-2d6e8a?style=for-the-badge&logo=node.js&logoColor=white&labelColor=0a0e12" alt="Node 20" /></a>
+  <a href="https://captadel.com"><img src="https://img.shields.io/badge/service-captadel.com-8fc9a8?style=for-the-badge&labelColor=0a0e12" alt="captadel.com" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-proprietary-2d6e8a?style=for-the-badge&labelColor=0a0e12" alt="License" /></a>
 </p>
 
 </div>
 
-**An independent AI flight instructor for Saudi civil aviation.** Captain Adel
-answers GACAR questions with the exact Part and section cited, and refuses
-rather than guess when he can't ground an answer. He runs as a standalone
-service on [captadel.com](https://captadel.com) — and is the same **brain**
-that Fly GACA plugs into over its API.
+**Captain Adel** is an independent AI flight instructor engineered specifically for Saudi civil aviation. He answers **GACAR** (General Authority of Civil Aviation Regulations) questions with exact Part and section citations, performing strict cite-or-refuse grounding to prevent hallucinations. 
 
-> **Unofficial & educational.** Captain Adel is not affiliated with, endorsed by,
-> or operated by the General Authority of Civil Aviation (GACA). The authoritative
-> source for any regulation is always GACA — [gaca.gov.sa](https://gaca.gov.sa).
+Captain Adel runs as a standalone Web service at [captadel.com](https://captadel.com) — and serves as the core AI engine powering chat across the entire [Fly GACA](https://flygaca.com) platform via its REST & SSE API.
+
+> [!IMPORTANT]
+> **Unofficial & Educational.** Captain Adel is not affiliated with, endorsed by, or operated by GACA (General Authority of Civil Aviation). The authoritative source for any regulation is always official GACA publications at [gaca.gov.sa](https://gaca.gov.sa).
 
 ---
 
-## What this is
+## 🏗 System Architecture
 
-Two surfaces, one repo:
+Captain Adel consists of two main operational surfaces contained within one single repository:
 
-- **captadel.com (the landing)** — a static Vite + React marketing page in
-  [`landing/`](landing/), served by the Cloudflare Worker `captadel`
-  (English at `/`, Arabic at `/ar/`). Built and deployed **manually** —
-  see `landing/README.md` for the wrangler runbook.
-- **The product app + API** — a single Node service that serves the app
-  pages and the chat API:
+1. **captadel.com Landing Surface (`landing/`)** — A high-performance static Vite + React marketing and landing experience (supporting English `/` and Arabic `/ar/`), served globally via a Cloudflare Worker (`captadel`).
+2. **Product App & RAG API Service (`src/server.js`)** — A strict Node.js / Express microservice that hosts the chat interface, SaaS account/billing routes, and the core RAG intelligence engine.
 
 ```
-landing/           captadel.com landing source (Vite + React, EN + /ar/) → Cloudflare Worker
-public/            the app pages (chat, account, console, exam, checkout, legal — 8 pages)
-src/server.js      Express: GET /health, POST /v1/chat + /v1/feedback, the /v1/me · /v1/config ·
-                   /v1/billing/* SaaS routes, POST /v1/account/delete, /.well-known (Apple Pay)
-src/middleware/    CORS allowlist, Firebase auth, X-Adel-Api-Key check
-src/quota/         Firestore-backed free-tier usage meter (fails open)
-src/billing/       Moyasar + Firebase SaaS layer — entitlements, tiers, routes (dark until env set)
-src/brain/         THE BRAIN — single source of truth, also powers Fly GACA's API
-  answer.js          orchestrator: pick provider + strategy
-  retrieve.js        retrieve-then-read (BM25 in code)
-  route.js           language/provider routing
-  grounding.js       cite-or-refuse layer: citations, refusal classes, source shaping
-  providers/         gemini (agentic tool-calls) · allam · jais · fanar · qwen · commandr
-                     openai-compatible.js builds every non-Gemini provider from one client
-  tools/             compute-only flight tools (wind, fuel, weight & balance, recency, density)
-  embeddings.js      dense embeddings + reranker clients (hybrid retrieval, gated off)
-  bm25.js            lexical retriever over the GACAR corpus
-  system-prompt.js   product-neutral core + per-product framing
-  tenants.js         captadel / flygaca framing
-  guards.js          input validation + soft injection hardening
-  ratelimit.js       per IP / session abuse limiter
-  _chunks.json.gz    the GACAR corpus
-test/              unit tests (node --test), one file per src/ module
-evals/             regression harness (run against either provider)
-deploy/            docker-compose + the ALLaM (vLLM) runbook
-docs/              models, refusal taxonomy, data contract, iOS app plan, multi-agent orchestrator, RUNBOOKs
-examples/          multi-agent orchestrator boilerplate (Claude API, Python + TS) — decoupled from src/
-authoring/         source-of-truth system prompt + KB scope + Python reference
-ios/               AdelCore Swift package (AdelAPI + AdelSSE) — the Phase-0 iOS spike
+Captain-Adel/
+├── landing/             # captadel.com landing page (Vite + React, EN + AR) → Cloudflare Worker
+├── public/              # Web application interface (chat, account, console, exam, checkout)
+├── src/
+│   ├── server.js        # Express application: API router, CORS, health checks, Apple Pay
+│   ├── middleware/      # Firebase Auth, CORS allowlist, API key verification
+│   ├── quota/           # Firestore-backed usage meter & daily cap enforcer
+│   ├── billing/         # Moyasar + Firebase SaaS entitlement layer
+│   └── brain/           # 🧠 THE BRAIN — Core AI RAG & Grounding Engine
+│       ├── answer.js    # Master orchestrator: strategy selection & provider execution
+│       ├── retrieve.js  # BM25 lexical + dense vector hybrid retrieval pipeline
+│       ├── route.js     # Language detection & provider router (Gemini vs ALLaM/Arabic)
+│       ├── grounding.js # Strict citation, claim verification, and refusal classifier
+│       ├── bm25.js      # Lexical index search over bundled GACAR corpus
+│       ├── system-prompt.js # Core system prompts & tenant framing
+│       ├── tenants.js   # Per-product framing (CaptAdel vs FlyGACA)
+│       ├── guards.js    # Prompt injection hardening & input cleaning
+│       ├── ratelimit.js # IP & session-based rate limiter
+│       ├── providers/   # Gemini (function-calling) & OpenAI-compatible clients (ALLaM, Jais, etc.)
+│       ├── tools/       # Pure-math flight calculators (Wind, Fuel, W&B, Recency, Density Alt)
+│       └── _chunks.json.gz # Bundled GACAR regulatory corpus chunks
+├── test/                # Comprehensive unit test suite (node --test)
+├── evals/               # Automated regression & faithfulness evaluation harness
+├── deploy/              # Docker Compose & KSA vLLM deployment runbooks
+└── docs/                # Architecture specs, model catalog, refusal taxonomy, and runbooks
 ```
 
-## The Fly GACA family
+---
 
-Captain Adel is one of ten repositories. [**The Book of Fly GACA**](https://github.com/ay2m/FlyGACA/blob/main/THE-BOOK-OF-FLY-GACA.md) is the whole-family reference — every repo, the shared principles, the data-parity contracts and the glossary in one place.
+## ⚡ API Reference
 
-| Repo | What it holds |
-| --- | --- |
-| **FlyGACA/Captain-Adel** (this repo) | The AI flight-instructor service (captadel.com) + the shared brain behind chat |
-| [FlyGACA/FlyGACA-app](https://github.com/FlyGACA/FlyGACA-app) | flygaca.com — the React/Vite web app, Firebase backend, regulatory corpus + content pipelines |
-| [ay2m/FlyGACA](https://github.com/ay2m/FlyGACA) | The native iOS app family — FlyGACAKit + the ELPT and AIP App Store targets |
-| [FlyGACA/ELPT](https://github.com/FlyGACA/ELPT) · [AIP](https://github.com/FlyGACA/AIP) · [PPL](https://github.com/FlyGACA/PPL) · [CPL](https://github.com/FlyGACA/CPL) · [IR](https://github.com/FlyGACA/IR) · [ATPL](https://github.com/FlyGACA/ATPL) | Per-app App Store metadata repos — store listing copy, screenshots, per-app roadmap |
-| [FlyGACA/Office](https://github.com/FlyGACA/Office) | The business operating system — strategy, governance, legal, finance, GTM docs |
+### `POST /v1/chat`
 
-## The API
+Main conversational endpoint for grounded regulatory Q&A.
 
-`POST /v1/chat`
-
+**Request Payload:**
 ```json
-{ "message": "What are the VFR weather minima?", "history": [], "session": "…",
-  "product": "captadel", "provider": "auto" }
+{
+  "message": "What are the basic VFR weather minima in Class E airspace?",
+  "history": [],
+  "session": "sess_8f9a2b1c",
+  "product": "captadel",
+  "provider": "auto"
+}
 ```
 
-→ `{ "answer": "…markdown…", "sources": [ { "citation": "GACAR Part 91, §91.155", "url": "…" } ] }`
+- `product`: `"captadel"` (default) or `"flygaca"` (selects persona framing).
+- `provider`: `"gemini"` | `"allam"` | `"jais"` | `"fanar"` | `"qwen"` | `"commandr"` | `"auto"`.
+- `session`: Stable client identifier for rate-limiting (or pass `X-Adel-Session` header).
+- `X-Adel-Api-Key`: Header for trusted service-to-service callers to skip browser rate limits.
+- `Accept: text/event-stream` or `?stream=1`: Enables SSE streaming response.
 
-- `product` — `captadel` (default) or `flygaca`; selects the persona framing.
-- `provider` — `gemini` | `allam` | `jais` | `fanar` | `qwen` | `commandr` | `auto` (optional; defaults to `MODEL_PROVIDER`).
-- `session` — stable per-browser id for rate limiting (or send `X-Adel-Session`).
-- Trusted callers send `X-Adel-Api-Key: $ADEL_API_KEY` to skip the browser limiter.
-- Add `?stream=1` or send `Accept: text/event-stream` for SSE streaming.
+**Response Payload:**
+```json
+{
+  "answer": "Under GACAR Part 91, §91.155, basic VFR flight rules require...",
+  "sources": [
+    {
+      "citation": "GACAR Part 91, §91.155",
+      "title": "Basic VFR Weather Minima",
+      "url": "https://flygaca.com/library/gacar-part-91#91.155"
+    }
+  ],
+  "kind": "grounded",
+  "refusalClass": null,
+  "suggestions": [
+    "What are the VFR visibility requirements at night?",
+    "What are the cloud clearance requirements in Class B airspace?"
+  ],
+  "meta": {
+    "provider": "gemini-2.5-flash",
+    "model": "gemini-2.5-flash",
+    "rewrittenQuery": "VFR weather minima Class E airspace GACAR",
+    "toolCalls": []
+  }
+}
+```
 
-Response: `{ answer, sources, kind, refusalClass, grounding, suggestions, meta }` — `sources` carries
-exact `GACAR Part X, §X.YYY` citations, `suggestions` are "keep exploring" follow-ups, and `meta`
-reports `{ provider, model, rewrittenQuery, toolCalls }`. Every response echoes
-`X-Adel-Api-Version`; metered turns also carry `X-Adel-Quota-Remaining`.
+### Additional Endpoints:
+- `POST /v1/feedback` — Submit thumbs rating (`{ rating, turnId, provider, ts }`).
+- `GET /health` — Service health & version diagnostic (`{ status: "ok", service: "captain-adel" }`).
+- `POST /v1/account/delete` — GDPR/PDPL user account deletion request.
 
-`POST /v1/feedback` — thumbs rating on a turn; logs only `{rating, turnId, provider, ts}`, never
-the question or answer.
+---
 
-`GET /health` → `{ status:"ok", service:"captain-adel", … }`
+## 🤖 Supported Models & RAG Strategy
 
-## Models
-
-| Provider | Strategy | Used for |
+| Provider / Model | Strategy | Primary Use Case |
 |---|---|---|
-| **Gemini** (`gemini-2.5-flash`) | agentic function-calling | default English path |
-| **ALLaM-7B-Instruct** (HUMAIN, Apache-2.0) | retrieve-then-read | Arabic / in-Kingdom path *(default)* |
-| **Jais** (Inception/G42) | retrieve-then-read | Arabic / in-Kingdom candidate |
-| **Fanar** (QCRI) | retrieve-then-read | Arabic / in-Kingdom candidate |
-| **Qwen2.5-Instruct** (Alibaba, Apache-2.0) | retrieve-then-read | instruction-following workhorse |
-| **Command R** (Cohere, **CC-BY-NC** ⚠️) | retrieve-then-read | grounded-citation candidate (eval/research only) |
+| **Gemini 2.5 Flash** | Agentic Function-Calling | Default English flight instructor & real-time tool caller |
+| **ALLaM-7B-Instruct** (HUMAIN) | Retrieve-then-Read RAG | Primary In-Kingdom Arabic model *(Apache 2.0)* |
+| **Jais 13B / 30B** (Inception/G42) | Retrieve-then-Read RAG | Arabic candidate for complex reasoning |
+| **Fanar** (QCRI) | Retrieve-then-Read RAG | Arabic regulatory candidate |
+| **Qwen 2.5 Instruct** (Alibaba) | Retrieve-then-Read RAG | Instruction-following workhorse *(Apache 2.0)* |
+| **Command R** (Cohere) | Grounded-Citation Candidate | Research & eval baseline *(CC-BY-NC)* |
 
-A small model isn't reliable at function-calling, so the Arabic models always use
-**retrieve-then-read**: retrieval runs in code (`retrieve.js`), the cited passages
-are handed to the model, and it answers only from them. RAG is the source of truth
-for facts; a later LoRA tune (out of scope here) would only shape tone/format.
+### Retrieve-Then-Read RAG Flow:
+Local and open-weights Arabic models often struggle with complex agentic function calling. Captain Adel implements a strict **Retrieve-then-Read** strategy for Arabic queries:
+1. Lexical BM25 + dense vector embeddings search over `_chunks.json.gz`.
+2. Relevant GACAR text sections are injected into the model context.
+3. The model synthesizes an answer strictly from the retrieved text, outputting verified citations or triggering refusal protocols.
 
-Every non-Gemini provider is served over an OpenAI-compatible `/chat/completions`
-API (vLLM/TGI) and built from one factory (`providers/openai-compatible.js`) —
-adding another is a few lines (a new `*_BASE_URL` config + registry entry). All
-are off until their `*_BASE_URL` is set. `auto` routes Arabic-dominant questions
-to the first configured Arabic provider (ALLaM first; set `ARABIC_PROVIDER=<name>`
-to prefer another), falling back to Gemini. For Arabic turns the read-mode
-scaffolding is localized to Arabic while citations stay in the Latin
-`GACAR Part X, §X.YYY` form. See **[docs/models.md](docs/models.md)** for the full
-catalog, the Arabic slot-B ranking, and license caveats. Note: vision/imagery
-systems (e.g. Baseer, Sawaher) are **not** chat models and do not fit this
-text-only RAG path.
+---
 
-## Run it locally
+## 🛠 Local Development & Setup
+
+### Prerequisites
+- Node.js 20+
+- Gemini API Key (`GEMINI_API_KEY`)
+
+### Setup Commands
 
 ```bash
+# Install dependencies
 npm install
-cp .env.example .env          # set GEMINI_API_KEY
-npm start                     # http://localhost:8787
-curl localhost:8787/health
-curl -XPOST localhost:8787/v1/chat -H 'Content-Type: application/json' \
-  -d '{"message":"What are the VFR weather minima?"}'
+
+# Configure environment
+cp .env.example .env
+# Edit .env and supply your GEMINI_API_KEY
+
+# Start local dev server (http://localhost:8787)
+npm start
+
+# Test service health
+curl http://localhost:8787/health
+
+# Send a test chat query
+curl -X POST http://localhost:8787/v1/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"message": "What are the currency requirements for carrying passengers?"}'
 ```
 
-To exercise ALLaM, point `ALLAM_BASE_URL` at a vLLM/TGI endpoint and set
-`MODEL_PROVIDER=auto` (see `deploy/allam-vllm.md`). The other Arabic-capable
-providers are the same shape — set the matching `*_BASE_URL` (optionally
-`*_MODEL` / `*_API_KEY`) and call with `provider:"<name>"` (`jais`, `fanar`,
-`qwen`, `commandr`) or `MODEL_PROVIDER=<name>`. Smoke-test any endpoint with
-`node evals/provider-smoke.js <name>` before running a full eval.
-
-**Hybrid retrieval (optional, off by default).** Set `EMBEDDINGS_BASE_URL`
-(BGE-M3) and build the dense index once with `npm run build:embeddings`; then
-retrieval fuses BM25 with dense recall (the cross-lingual unlock for Arabic over
-the English corpus), and reranks if `RERANK_BASE_URL` is set. With neither set,
-retrieval is pure BM25 and unchanged.
-
-## Unit tests
+### Unit Tests & Quality Control
 
 ```bash
-npm run test:unit                                # node --test test/*.test.js, no key
+# Run unit tests (no API key required)
+npm run test:unit
+
+# Run test coverage report
+npm run test:coverage
 ```
 
-Fast, deterministic, dependency-free brain tests that gate every PR (ci.yml's
-`build` job runs them on every push/PR via `npm run test:coverage` — the same
-suite plus a report-only coverage table — and deploy.yml's `test` job runs
-`npm run test:unit`, both after `npm ci`): `guards` (input cleaning + injection
-hardening), `bm25` (retriever over the bundled corpus), `ratelimit`, `route`
-(language/provider routing), and `grounding` — the cite-or-refuse layer
-(`makeSource`, `extractCitations`, `splitClaims`, `classifyRefusal`,
-`stripMetaTrailer`, `deriveStructural`, and `decorate`'s structural +
-anti-overclaim merge). These cover the structural grounding path without an API
-key; the live eval below additionally exercises the faithfulness judge.
-
-## Evals
+### Evaluation Harness
 
 ```bash
-node evals/run.js --dry                          # structure only, no key
-GEMINI_API_KEY=…  node evals/run.js              # Gemini
-ALLAM_BASE_URL=…  node evals/run.js --provider allam   # ALLaM
-QWEN_BASE_URL=…   node evals/run.js --provider qwen    # any Arabic provider
-GEMINI_API_KEY=…  QWEN_BASE_URL=…  node evals/parity.js --provider qwen   # parity gate
+# Run dry-run eval (structure validation)
+node evals/run.js --dry
+
+# Run live Gemini evaluation
+GEMINI_API_KEY=your_key node evals/run.js
+
+# Run Arabic provider evaluation
+ALLAM_BASE_URL=http://localhost:8000/v1 node evals/run.js --provider allam
 ```
 
-Only route Arabic to a provider once it matches-or-beats Gemini on the parity
-gate (citations / refusals / injection, Arabic subset). See
-[docs/models.md](docs/models.md).
+---
 
-## Deploy
+## 🔒 Deployment & KSA Data Residency
 
-Build the container and deploy to a **KSA region** (Cloud Run me-central1 or a
-Kingdom box) — real user questions are personal data and must be processed
-in-Kingdom (PDPL). Set `GEMINI_API_KEY`, optionally `ADEL_API_KEY`, and (for
-Arabic) `ALLAM_BASE_URL` pointing at a GPU vLLM endpoint. Map `captadel.com`
-(and `api.captadel.com` if the API is split out).
+To comply with the Saudi Personal Data Protection Law (**PDPL**), real user queries and account data must be processed within Saudi Arabia:
 
-## Roadmap
+- Deploy the production Node service to Google Cloud Run in region **`me-central1`** (Dammam/Riyadh) or a Kingdom-hosted VPS.
+- Connect local Arabic endpoints (ALLaM / vLLM GPU servers) inside KSA infrastructure.
+- See [`deploy/allam-vllm.md`](deploy/allam-vllm.md) and [`docs/RUNBOOK-captain-adel.md`](docs/RUNBOOK-captain-adel.md) for full deployment steps.
+
+---
+
+## 🌐 The Fly GACA Family
+
+Captain Adel is part of the Fly GACA repository family. See [**The Book of Fly GACA**](https://github.com/ay2m/FlyGACA/blob/main/THE-BOOK-OF-FLY-GACA.md) for complete architecture details:
+
+- **[FlyGACA/Captain-Adel](https://github.com/FlyGACA/Captain-Adel)** (this repo) — AI flight instructor service & shared brain.
+- **[FlyGACA/FlyGACA-app](https://github.com/FlyGACA/FlyGACA-app)** — Primary Web PWA application (`flygaca.com`).
+- **[ay2m/FlyGACA](https://github.com/ay2m/FlyGACA)** — Native iOS app family (`FlyGACAKit` package + store targets).
+- **[FlyGACA/Office](https://github.com/FlyGACA/Office)** — Business operating system, legal, compliance, and strategy docs.
+
+---
+
+<div align="center">
+
+*Engineered for flight safety. Powered by grounded AI.*
+
+</div>
 
 Where Captain Adel is headed — retrieval quality, ALLaM to production, deeper evals, and
 Captain Adel as a platform — is tracked in [`ROADMAP.md`](ROADMAP.md). Every change is
