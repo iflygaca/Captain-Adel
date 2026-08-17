@@ -160,11 +160,23 @@ src/
                        density; index.js = registry + the Gemini function declarations
     _chunks.json.gz    Bundled GACAR corpus (BM25 index source)
   quota/               Firestore-backed free-tier usage meter (fails open)
-  billing/             Moyasar + Firebase SaaS layer (dark until env set)
+    quota-core.js      Pure KSA-calendar period math (UTC+3, day or month window)
+    quota.js           The Firestore counter that consumes those stamps
+  billing/             Moyasar + Firebase SaaS layer (dark until env set) — same
+                       core/wrapper split as the brain:
+    moyasar-core.js    Pure pricing/renewal math (ported from Fly GACA's billing-core.ts)
+    entitlements-core.js  Pure entitlement mutators ({plan, source, startedAt, expiresAt})
+    entitlements.js    The ONLY writer of users/{uid}.entitlement (Admin SDK, transactional)
+    tier-core.js       Caller tier resolution, order load-bearing:
+                       trusted (X-Adel-Api-Key) -> launch (ADEL_LAUNCH_MODE=free)
+                       -> pro (live entitlement) -> free (metered)
+    routes.js          Thin Express router: /v1/billing/*, /v1/me, /v1/config,
+                       /v1/account/delete (mounted under /v1 in server.js)
 public/                Vanilla bilingual HTML/CSS/JS site (index/chat/account/console/
-                       checkout/exam/privacy/terms — 8 pages), plus assets/js (14 files;
+                       checkout/exam/privacy/terms — 8 pages), plus assets/js (16 files;
                        exam.js + exam-core.js are the mock-exam pair, chat-core.js is
-                       shared by chat/console/exam), assets/css,
+                       shared by chat/console/exam, and landing.js + boot-inline.js are
+                       index.html-only), assets/css,
                        assets/data/quiz.json (the exam bank), assets/img/captain/,
                        and .well-known/ (Apple Pay)
 test/                  Unit tests ({component}.test.js, node --test)
@@ -173,7 +185,8 @@ scripts/               One-off scripts (build-embeddings.js, record-sse-fixtures
 deploy/                docker-compose.yml, deploy.sh (Cloud Run), allam-vllm.md (vLLM GPU
                        endpoint runbook) — the Dockerfile itself lives at the repo root
 docs/                  models, refusal-taxonomy, data-contract, ios-app-plan, multi-agent-orchestrator,
-                       RUNBOOKs, mockups/
+                       brand-audit-2026-08, the RUNBOOKs (arabic-provider, captadel-deploy,
+                       captadel-saas), mockups/
 examples/              Runnable reference code, decoupled from src/ — multi-agent-orchestrator/ is the
                        Claude API orchestrator–worker boilerplate (Python + TS, own package.json)
 ios/                   AdelCore local Swift package (AdelAPI + AdelSSE) — the Phase-0 iOS spike;
@@ -183,7 +196,13 @@ authoring/             Source-of-truth system prompt + KB scope + Python referen
 .claude/               Claude Code tooling (not shipped): skills/diagram-design/ — vendored MIT
                        editorial-diagram skill, skinned to the Captain Adel palette — plus its
                        /export-diagram, /import-drawio, /import-mermaid commands. Provenance and
-                       the local skin delta: .claude/skills/THIRD_PARTY_NOTICES.md
+                       the local skin delta: .claude/skills/THIRD_PARTY_NOTICES.md.
+                       agents/ defines four subagents scoped to this repo —
+                       brain-retrieval (src/brain), eval-warden (evals/),
+                       prompt-steward (system-prompt/tenants/authoring) and
+                       site-chrome (public/*.html + the CSP); agents/README.md
+                       explains when each is the right one. settings.json holds the
+                       repo's Claude Code settings.
 ```
 
 Diagrams from that skill are **documentation artifacts** for `docs/` — they are never served by
@@ -194,7 +213,7 @@ signal a grounded or verified answer, mirroring `public/assets/css/adel.css`.
 
 ## Testing & evals
 
-- **Unit tests** (`test/*.test.js`, 40+ files) use Node's built-in `node:test` +
+- **Unit tests** (`test/*.test.js`, 43 files) use Node's built-in `node:test` +
   `assert`, run against the bundled corpus with no keys/network.
   `{component}.test.js` maps to a `src/` module (e.g. `route.test.js` ↔
   `src/brain/route.js`); larger modules split by aspect (`answer-stream`,
@@ -221,6 +240,10 @@ keys, origins, SaaS); the brain's own tuning vars are read directly from
 reload. `.env.example` covers the service + provider + SaaS vars; the brain's
 advanced switches (`ADEL_REWRITE*`, `ADEL_GROUNDING`, `ADEL_PARENT_CHILD`,
 `MAX_BODY_BYTES`) are documented only in their module headers. Key groups:
+
+> ⚠️ `.env.example` is committed and is meant to hold **placeholders only**. It currently ships a
+> real-looking `GEMINI_API_KEY` value (added in `75e6003`); that key should be rotated and the line
+> blanked. Never paste a live credential into it — put it in `.env` (gitignored) or Secret Manager.
 
 - **Service:** `PORT` (default 8787), `MAX_BODY_BYTES` (default 64 KiB → 413).
 - **Provider:** `MODEL_PROVIDER` (`gemini|allam|jais|fanar|qwen|commandr|auto`),
@@ -252,12 +275,14 @@ advanced switches (`ADEL_REWRITE*`, `ADEL_GROUNDING`, `ADEL_PARENT_CHILD`,
   `checkoutIntents/{uuid}` + `moyasarPayments/{paymentId}` (billing), and
   `adelQuota/...` (TTL-purged usage). `POST /v1/account/delete` erases the
   uid-keyed set (payment markers are tombstoned, not deleted — webhook-replay guard).
-- **CI** (`.github/workflows/`): `ci.yml`'s `build` job runs `smoke` + `test:coverage`
-  + `eval:dry` on push/PR (live `eval` only weekly/dispatch, gated on
-  `GEMINI_API_KEY`). `deploy.yml` re-runs `smoke` + `test:unit` + `eval:dry` as its
-  gate, then deploys on push to `main` (gated on `GCP_SA_KEY`), health-checks
-  `/health`, and optionally posts the result to Slack (`SLACK_WEBHOOK_URL`, dark
-  until set).
+- **CI** (`.github/workflows/`, two files): `ci.yml`'s `build` job runs `smoke` +
+  `smoke:frontend` + `test:coverage` + `eval:dry` on push/PR, then a report-only
+  `npm audit --omit=dev` (live `eval` is a separate job, weekly/dispatch, gated on
+  `GEMINI_API_KEY`). `deploy.yml` re-runs `smoke` + `smoke:frontend` + `test:unit` +
+  `eval:dry` as its gate, then deploys on push to `main` (gated on `GCP_SA_KEY`),
+  health-checks `/health`, and optionally posts the result to Slack
+  (`SLACK_WEBHOOK_URL`, dark until set). The landing app in `landing/` is **not**
+  in either workflow — it deploys by hand via wrangler.
 
 ## Conventions & gotchas
 
@@ -290,8 +315,13 @@ advanced switches (`ADEL_REWRITE*`, `ADEL_GROUNDING`, `ADEL_PARENT_CHILD`,
   The animated Captain (`adel-character.js`/`.css`, chat page only) is a layered
   SVG driven by `data-state`, decoupled from chat via an `adel:state`
   CustomEvent so chat still works if it's absent. Auth/billing frontend
-  (`auth.js`, `firebase-config.js`, `billing.js`, `checkout.js`, `account.js`)
-  are ES modules (`type="module"`), unlike the classic `defer` chrome scripts.
+  (`auth.js`, `firebase-config.js`, `billing.js`, `checkout.js`, `account.js`,
+  `boot-inline.js`) are ES modules (`type="module"`), unlike the classic `defer`
+  chrome scripts. The landing page owns two of its own: `landing.js` (classic,
+  after `site.js` — scroll-reveal + pointer spotlight, both no-ops under
+  `prefers-reduced-motion` or without IntersectionObserver) and `boot-inline.js`
+  (module — wires the `#pricing [data-plan]` buttons to `startProCheckout`).
+  `npm run smoke:frontend` is what keeps this load order honest.
 - **Page chrome — disclaimer strip and header are copy-pasted, footer is not:**
   the `.disclaimer-strip` and the `.site-nav` header are hand-duplicated across
   all 8 `public/*.html` pages — there is no build step, and a JS include would
