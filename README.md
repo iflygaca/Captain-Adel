@@ -191,9 +191,9 @@ gate (citations / refusals / injection, Arabic subset). See
 
 ## Deploy
 
-Build the container and deploy to a **KSA region** (Cloud Run me-central1 or a
-Kingdom box) — real user questions are personal data and must be processed
-in-Kingdom (PDPL). Set `GEMINI_API_KEY`, optionally `ADEL_API_KEY`, and (for
+Build the container and deploy to a **KSA region** (Cloud Run me-central2, with
+me-central1 as fallback, or a Kingdom box) — real user questions are personal
+data and must be processed in-Kingdom (PDPL). Set `GEMINI_API_KEY`, optionally `ADEL_API_KEY`, and (for
 Arabic) `ALLAM_BASE_URL` pointing at a GPU vLLM endpoint. Map `captadel.com`
 (and `api.captadel.com` if the API is split out).
 
