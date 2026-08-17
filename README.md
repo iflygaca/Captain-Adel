@@ -193,7 +193,7 @@ ALLAM_BASE_URL=http://localhost:8000/v1 node evals/run.js --provider allam
 
 To comply with the Saudi Personal Data Protection Law (**PDPL**), real user queries and account data must be processed within Saudi Arabia:
 
-- Deploy the production Node service to Google Cloud Run in region **`me-central1`** (Dammam/Riyadh) or a Kingdom-hosted VPS.
+- Deploy the production Node service to Google Cloud Run in region **`me-central2`**, with **`me-central1`** as fallback, or a Kingdom-hosted VPS.
 - Connect local Arabic endpoints (ALLaM / vLLM GPU servers) inside KSA infrastructure.
 - See [`deploy/allam-vllm.md`](deploy/allam-vllm.md) and [`docs/RUNBOOK-captain-adel.md`](docs/RUNBOOK-captain-adel.md) for full deployment steps.
 
