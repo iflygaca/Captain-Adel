@@ -195,8 +195,12 @@ ios/                   AdelCore local Swift package (AdelAPI + AdelSSE) — the 
 authoring/             Source-of-truth system prompt + KB scope + Python reference (rag.py, captain_adel.py)
 .claude/               Claude Code tooling (not shipped): skills/diagram-design/ — vendored MIT
                        editorial-diagram skill, skinned to the Captain Adel palette — plus its
-                       /export-diagram, /import-drawio, /import-mermaid commands. Provenance and
-                       the local skin delta: .claude/skills/THIRD_PARTY_NOTICES.md.
+                       /export-diagram, /import-drawio, /import-mermaid commands; and eight
+                       vendored Apache-2.0 cybersecurity skills (prompt-injection + RAG
+                       injection, LLM guardrails, system-prompt leakage, agentic tool
+                       invocation, security headers, OWASP API Top 10, gitleaks) curated for
+                       this service's surface. Provenance, the local skin delta and the
+                       curation rationale: .claude/skills/THIRD_PARTY_NOTICES.md.
                        agents/ defines four subagents scoped to this repo —
                        brain-retrieval (src/brain), eval-warden (evals/),
                        prompt-steward (system-prompt/tenants/authoring) and

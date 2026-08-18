@@ -6,6 +6,12 @@
         "source": "github",
         "repo": "cathrynlavery/diagram-design"
       }
+    },
+    "anthropic-cybersecurity-skills": {
+      "source": {
+        "source": "github",
+        "repo": "mukul975/Anthropic-Cybersecurity-Skills"
+      }
     }
   }
 }
