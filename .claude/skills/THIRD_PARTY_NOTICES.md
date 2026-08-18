@@ -99,3 +99,61 @@ edited first.**
 
 The colour semantics above are load-bearing: teal is links/focus only and must never stand for a
 grounded or verified answer in a diagram, mirroring the rule in `public/assets/css/adel.css`.
+
+## Anthropic-Cybersecurity-Skills
+
+- **Project:** Anthropic-Cybersecurity-Skills (a community project — **not affiliated with
+  Anthropic PBC**, despite the name)
+- **Author:** Mahipal Jangra (@mukul975)
+- **Source:** https://github.com/mukul975/Anthropic-Cybersecurity-Skills
+- **License:** Apache License 2.0 (each vendored skill folder retains its upstream `LICENSE`)
+- **Pinned upstream commit:** `4c0b700ac5d280ba46695062077f0fe922ce3602`
+
+### What was vendored, and why these
+
+Upstream ships 817 skills across 29 domains. Only a defensive subset that maps onto this service's
+actual attack surface was taken — an LLM-backed Express API with a RAG brain, a hand-maintained CSP
+and card payments. The other domains (malware analysis, forensics, OT/ICS, red teaming) have no
+bearing on it and were **not** vendored.
+
+| Vendored skill | Maps to in this repo |
+| --- | --- |
+| `detecting-indirect-prompt-injection` | `src/brain/guards.js` soft-injection detection |
+| `testing-prompt-injection-in-rag-pipelines` | `src/brain/retrieve.js` retrieve-then-read over `_chunks.json.gz` |
+| `defending-llms-with-guardrails` | `src/brain/grounding.js` — the cite-or-refuse layer |
+| `testing-for-system-prompt-leakage` | `src/brain/system-prompt.js` + `authoring/` — validates that no credentials or routing logic live in the prompt |
+| `securing-agentic-ai-tool-invocation` | `src/brain/tools/` and the Gemini agentic function-calling path |
+| `performing-security-headers-audit` | the hand-maintained CSP in `src/server.js` |
+| `testing-api-security-with-owasp-top-10` | `/v1/chat`, `/v1/billing/*`, the `X-Adel-Api-Key` trusted tier |
+| `implementing-secret-scanning-with-gitleaks` | `.env.example` — see the CLAUDE.md warning about the committed `GEMINI_API_KEY` |
+
+### What was intentionally omitted
+
+For each vendored skill, only `SKILL.md`, `references/**`, and the upstream `LICENSE` were copied.
+The bundled `scripts/` and `assets/` were **deliberately excluded** to avoid introducing unreviewed
+third-party executables — every one of the 817 upstream skills ships a `scripts/` directory. If a
+skill's workflow refers to a helper script, consult the pinned upstream commit above rather than
+running anything from here.
+
+### Updating from upstream
+
+`.claude/settings.json` registers the upstream repo as a Claude Code marketplace, so
+`/plugin install cybersecurity-skills@anthropic-cybersecurity-skills` pulls the full 817-skill set
+on demand. As with `diagram-design`, it is **registered but not enabled** on purpose: enabling it
+alongside these vendored copies would put two skills of each vendored name on the path. Use the
+plugin to review what changed upstream, or to reach a skill outside the curated set, then port any
+delta into the vendored copy rather than running both.
+
+### Captain Adel guardrail
+
+These skills are **advisory developer tooling**. Where any of them conflicts with this repo's
+`CLAUDE.md` conventions, **CLAUDE.md wins** — in particular the PDPL in-Kingdom hosting rule, the
+fail-open quota behaviour, and the rule that suspicious turns are *flagged* (a hardening note
+appended to the system instruction) rather than rejected, and that `/v1/chat` never 401s on bad
+auth. A generic hardening recommendation must not be applied in a way that turns those into hard
+failures.
+
+`testing-for-system-prompt-leakage` and `testing-prompt-injection-in-rag-pipelines` are written for
+red-team engagements. Use them **only against this service's own endpoints**, and prefer a local
+run or the eval harness (`evals/`) over probing production — real user questions are personal data
+under PDPL.
