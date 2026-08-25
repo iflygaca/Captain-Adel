@@ -1,7 +1,7 @@
 # RUNBOOK — Captain Adel SaaS (accounts, billing & quota on captadel.com)
 
 > **Note (2026-06-13):** Captain Adel now lives in its own repo,
-> **[`FlyGACA/Captain-Adel`](https://github.com/FlyGACA/Captain-Adel)**. The code referenced as
+> **[`ay2m/Captain-Adel`](https://github.com/ay2m/Captain-Adel)**. The code referenced as
 > `captadel/…` below now sits at that repo's root.
 
 Stand up the pilot-subscription layer on captadel.com: a **separate Captadel

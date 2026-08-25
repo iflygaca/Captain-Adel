@@ -1,7 +1,7 @@
 # RUNBOOK — Deploy captadel.com (Captain Adel standalone)
 
 > **Note (2026-06-13):** Captain Adel now lives in its own repo,
-> **[`FlyGACA/Captain-Adel`](https://github.com/FlyGACA/Captain-Adel)**. Run these steps from
+> **[`ay2m/Captain-Adel`](https://github.com/ay2m/Captain-Adel)**. Run these steps from
 > that repo (its root is the former `captadel/`); a `captadel/…` path below maps to that root.
 > Deploys now run from the repo's own `.github/workflows/deploy.yml` once `GCP_SA_KEY` is set.
 

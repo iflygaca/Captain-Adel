@@ -57,7 +57,7 @@ export default function Footer() {
           </div>
           <div className="font-mono2 text-[11px] leading-7 tracking-[0.08em] text-[#8b98ad]">
             <div className="text-[#22d3ee] tracking-[0.24em] uppercase text-[10px] mb-3">{isAr ? 'السرب' : 'Squadron'}</div>
-            <a className="block hover:text-[#22d3ee] transition-colors" href="https://github.com/FlyGACA" target="_blank" rel="noreferrer">{isAr ? 'Fly GACA على GitHub' : 'Fly GACA on GitHub'}</a>
+            <a className="block hover:text-[#22d3ee] transition-colors" href="https://github.com/ay2m" target="_blank" rel="noreferrer">{isAr ? 'Fly GACA على GitHub' : 'Fly GACA on GitHub'}</a>
             <a className="block hover:text-[#22d3ee] transition-colors" href="https://flygaca.com" target="_blank" rel="noreferrer">{isAr ? 'Fly GACA — مكتبة الطيران' : 'Fly GACA — the aviation library'}</a>
             <a className="block hover:text-[#22d3ee] transition-colors" href="https://github.com/ay2m/FlyGACA/blob/main/THE-BOOK-OF-FLY-GACA.md" target="_blank" rel="noreferrer">{isAr ? 'كتاب Fly GACA' : 'The Book of Fly GACA'}</a>
           </div>
