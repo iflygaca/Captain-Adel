@@ -110,7 +110,7 @@ function writeBinaryIndex(vectors, fullDim, format, targetDim, started) {
 
   // Header: magic (4) + version (4) + num_vectors (4) + dims (4)
   const header = Buffer.alloc(16);
-  header.writeUInt32LE(0xADEL2026, 0);  // magic "ADEL" in hex
+  header.writeUInt32LE(0xADEF0001, 0);  // magic "ADEF" version 1
   header.writeUInt32LE(1, 4);            // version
   header.writeUInt32LE(vectors.length, 8);  // num_vectors
   header.writeUInt32LE(actualDim, 12);      // dims

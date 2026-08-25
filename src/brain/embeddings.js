@@ -118,7 +118,7 @@ function loadBinaryIndex(filePath) {
     const numVectors = buf.readUInt32LE(8);
     const dims = buf.readUInt32LE(12);
 
-    if (magic !== 0xADEL2026 || version !== 1) {
+    if (magic !== 0xADEF0001 || version !== 1) {
       console.warn(`Invalid binary index magic=${magic.toString(16)} version=${version}`);
       return null;
     }
