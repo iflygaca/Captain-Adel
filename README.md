@@ -42,17 +42,19 @@ Captain-Adel/
 │   ├── billing/         # Moyasar + Firebase SaaS entitlement layer
 │   └── brain/           # 🧠 THE BRAIN — Core AI RAG & Grounding Engine
 │       ├── answer.js    # Master orchestrator: strategy selection & provider execution
-│       ├── retrieve.js  # BM25 lexical + dense vector hybrid retrieval pipeline
+│       ├── retrieve.js  # Hybrid retrieval: BM25 + dense embeddings + RRF + reranking
+│       ├── embeddings.js # Dense embedding client (Qwen3, TEI, cross-encoder reranker)
 │       ├── route.js     # Language detection & provider router (Gemini vs ALLaM/Arabic)
 │       ├── grounding.js # Strict citation, claim verification, and refusal classifier
-│       ├── bm25.js      # Lexical index search over bundled GACAR corpus
+│       ├── bm25.js      # Lexical index + Arabic normalization + aviation synonyms
 │       ├── system-prompt.js # Core system prompts & tenant framing
 │       ├── tenants.js   # Per-product framing (CaptAdel vs FlyGACA)
 │       ├── guards.js    # Prompt injection hardening & input cleaning
 │       ├── ratelimit.js # IP & session-based rate limiter
 │       ├── providers/   # Gemini (function-calling) & OpenAI-compatible clients (ALLaM, Jais, etc.)
 │       ├── tools/       # Pure-math flight calculators (Wind, Fuel, W&B, Recency, Density Alt)
-│       └── _chunks.json.gz # Bundled GACAR regulatory corpus chunks
+│       ├── _chunks.json.gz # Bundled GACAR regulatory corpus chunks (~47k chunks)
+│       └── _embeddings.bin # Binary index of Qwen3 embeddings (Matryoshka MRL format)
 ├── test/                # Comprehensive unit test suite (node --test)
 ├── evals/               # Automated regression & faithfulness evaluation harness
 ├── deploy/              # Docker Compose & KSA vLLM deployment runbooks
@@ -127,12 +129,102 @@ Main conversational endpoint for grounded regulatory Q&A.
 | **Fanar** (QCRI) | Retrieve-then-Read RAG | Arabic regulatory candidate |
 | **Qwen 2.5 Instruct** (Alibaba) | Retrieve-then-Read RAG | Instruction-following workhorse *(Apache 2.0)* |
 | **Command R** (Cohere) | Grounded-Citation Candidate | Research & eval baseline *(CC-BY-NC)* |
+| **Qwen3-Embedding-0.6B** | Dense Cross-Lingual Embeddings | Corpus & query encoding for hybrid retrieval |
+
+### Hybrid Retrieval Architecture (Phase 1+)
+
+When embeddings are configured, Captain Adel runs a **full hybrid stack** for maximum recall:
+
+```
+Query (Arabic or English)
+    ↓
+    ├─→ [BM25 Search]           → Lexical hits ranked by term overlap
+    │   (bundled corpus)            (~1ms, no API call)
+    │
+    ├─→ [Dense Encoding]        → Query → Qwen3 embedding (TEI in KSA)
+    │   (via embeddings.base_url)   (~20-50ms, configurable endpoint)
+    │
+    ├─→ [Dense Search]          → Cosine similarity over corpus embeddings
+    │   (binary index)              (~10ms, vectorized)
+    │
+    └─→ [Reciprocal-Rank Fusion] → Merge BM25 + dense rankings
+        (RRF algorithm)             (~1ms, in-process)
+            ↓
+        [Top-K Passages] (e.g., 20 hits)
+            ↓
+        [Optional Cross-Encoder Reranker] → Re-score with task-specific model
+        (if reranker endpoint configured)  (~30-100ms, configurable)
+            ↓
+        [Final Result] → Top-10 passages to LLM context
+```
+
+**Configuration** (in `.env`):
+```env
+# Optional: Dense embeddings (OFF by default)
+EMBEDDINGS_BASE_URL=http://localhost:8080      # TEI or compatible endpoint
+EMBEDDINGS_MODEL=Qwen/Qwen3-Embedding-0.6B     # Model hosted at endpoint
+
+# Optional: Cross-encoder reranking (OFF by default)
+RERANK_BASE_URL=http://localhost:8081          # TEI or compatible endpoint
+RERANK_MODEL=Alibaba-NLP/gte-multilingual-reranker-base
+
+# Disable parent-child expansion if needed
+ADEL_PARENT_CHILD=on                           # Default: expand chunks to full section
+```
+
+**Latency Breakdown** (returned in `/v1/chat` response):
+```json
+{
+  "timings": {
+    "embedMs": 45,          // Query embedding (dense)
+    "recallMs": 12,         // Dense similarity search
+    "bm25Ms": 3,            // Lexical search
+    "rrfMs": 1,             // RRF fusion
+    "rerankMs": 67,         // Cross-encoder reranking
+    "totalMs": 130,         // Wall-clock total
+    "strategy": "hybrid-rrf+rerank"
+  }
+}
+```
 
 ### Retrieve-Then-Read RAG Flow:
 Local and open-weights Arabic models often struggle with complex agentic function calling. Captain Adel implements a strict **Retrieve-then-Read** strategy for Arabic queries:
 1. Lexical BM25 + dense vector embeddings search over `_chunks.json.gz`.
 2. Relevant GACAR text sections are injected into the model context.
 3. The model synthesizes an answer strictly from the retrieved text, outputting verified citations or triggering refusal protocols.
+
+### 🤝 Hugging Face Integration: Cross-Lingual Retrieval Stack
+
+Captain Adel integrates a **4-phase cross-lingual retrieval enhancement** using Hugging Face:
+
+#### Phase 1: Retrieval Unlock
+- **Binary embedding index** format (0xADEF0001 magic, Matryoshka Representation Learning support)
+- **Hybrid retrieval pipeline**: BM25 + dense embeddings + reciprocal-rank fusion (RRF) + cross-encoder reranking
+- **In-Kingdom text embeddings inference** (TEI) for PDPL compliance — query encoding stays in KSA
+
+#### Phase 2: Retrieval Metrics & Ablations
+- Systematic evaluation framework comparing 6 retrieval configurations
+- Recall@5, @10, @20 measurement for Arabic/English queries
+- Latency breakdown instrumentation for production observability
+
+#### Phase 3: Fine-Tuned Embedder
+- **Training data**: 66 contrastive pairs mined from regulatory eval cases
+- **Model**: `flygaca/CaptAdel-finetuned` — Qwen3-Embedding-0.6B fine-tuned on GACAR
+- **Metric**: MRR@5 ≥ 0.55 on held-out test set (80/20 split)
+- **Expected improvement**: Arabic recall@5 from 44% → 54–60% baseline
+
+#### Phase 4: Public HF Spaces Demo
+- **Live demo**: https://huggingface.co/spaces/flygaca/captadel-proof-space
+- **Features**: Bilingual UI, A/B comparison (base vs. fine-tuned), latency visualization, citation transparency
+- **Tech**: Gradio web interface, hybrid retrieval pipeline, cross-lingual support
+
+#### Hugging Face Resources
+| Resource | Type | Link |
+|---|---|---|
+| **Corpus Dataset** | Chunked GACAR text | [captadel-corpus](https://huggingface.co/datasets/flygaca/captadel-corpus) |
+| **Fine-Tuned Model** | Qwen3-Embedding-0.6B | [CaptAdel-finetuned](https://huggingface.co/flygaca/CaptAdel-finetuned) |
+| **Public Demo** | Gradio Space | [captadel-proof-space](https://huggingface.co/spaces/flygaca/captadel-proof-space) |
+| **Implementation** | This repo | [GitHub `claude/captain-adel-hugging-face-*`](https://github.com/ay2m/Captain-Adel/pulls) |
 
 ---
 
@@ -185,7 +277,47 @@ GEMINI_API_KEY=your_key node evals/run.js
 
 # Run Arabic provider evaluation
 ALLAM_BASE_URL=http://localhost:8000/v1 node evals/run.js --provider allam
+
+# Run Phase 2 ablations (compare retrieval configurations)
+npm run eval:ablations
 ```
+
+### Phase 3: Fine-Tuning the Embedder
+
+After annotating eval cases with ground-truth chunks:
+
+```bash
+# Mine 66 contrastive training pairs from eval cases
+python3 scripts/export-training-pairs.py
+
+# Fine-tune Qwen3-Embedding-0.6B on GACAR
+EMBEDDINGS_MODEL=Qwen/Qwen3-Embedding-0.6B \
+EMBED_DIMS=1024 \
+EPOCHS=3 \
+BATCH_SIZE=32 \
+LEARNING_RATE=2e-5 \
+HF_TOKEN=hf_YOUR_TOKEN_HERE \
+  python3 scripts/finetune-embedder.py
+
+# Re-run ablations with fine-tuned model
+EMBEDDINGS_MODEL=flygaca/CaptAdel-finetuned npm run eval:ablations
+```
+
+### Phase 4: Deploy to Hugging Face Spaces
+
+Push the Gradio demo to a public Space on Hugging Face:
+
+```bash
+# Gradio app location: src/gradio_app.py
+# Uploads hybrid retrieval pipeline with bilingual UI, A/B comparison, and latency breakdown
+
+# Expected HF Space structure:
+# - app.py (copy from src/gradio_app.py)
+# - Requirements: gradio, sentence-transformers, numpy
+# - Data files: _chunks.json.gz, _embeddings.bin (optional, downloads from repo)
+```
+
+See [`docs/phase-3-implementation.md`](docs/phase-3-implementation.md) for full fine-tuning workflow.
 
 ---
 
