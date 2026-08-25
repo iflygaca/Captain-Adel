@@ -33,8 +33,8 @@ Ask a general-purpose chatbot about Saudi aviation regulations and it will confi
 |  | |
 |---|---|
 | 🎯 **Cite or refuse** | Every claim traces to a real Part and section. No passage, no answer — refusals are classified, not improvised. |
-| 🌍 **Arabic-first, genuinely** | Arabic queries route to in-Kingdom Arabic models over a retrieve-then-read pipeline, with Arabic normalization baked into the lexical index. |
-| 🇸🇦 **PDPL by design** | Real user questions are personal data. Production inference runs in-Kingdom (`me-central2`), not on someone else's GPU. |
+| 🌍 **Arabic-first, genuinely** | Arabic queries route to Arabic-native models (ALLaM by default) over a retrieve-then-read pipeline, with Arabic normalization baked into the lexical index. |
+| 🇸🇦 **PDPL by design, not yet in fact** | Real user questions are personal data, so production inference *must* run in-Kingdom — `deploy/deploy.sh` targets `me-central2` (Dammam). That region has **not been granted to this account**: it sells only through CNTXT, Google's exclusive KSA reseller, to registered organizations. The requirement is designed in and enforced nowhere yet; see [Deployment & data residency](#-deployment--data-residency). |
 | 🧠 **One brain, many surfaces** | `src/brain/` is the single source of truth for this service — it powers captadel.com, the exam engine, and the evals. It does **not** yet serve the Fly GACA platform API, which runs its own implementation of the same contract; see [`contracts/flygaca-family.json`](contracts/flygaca-family.json). |
 | ✈️ **Compute that isn't hallucinated** | Wind, fuel, weight & balance, recency and density altitude run as real functions, then deep-link to the matching calculator. |
 | 🔬 **Eval-gated** | 138 regression cases across 31 GACAR Parts in both languages. A provider doesn't ship until it match-or-beats the incumbent. |
@@ -193,8 +193,9 @@ python3 scripts/export-training-pairs.py  # → evals/training-pairs.jsonl (66 c
 EPOCHS=3 BATCH_SIZE=32 LEARNING_RATE=2e-5 HF_TOKEN=… python3 scripts/finetune-embedder.py
 ```
 
-The Space is a **public demo over the public corpus** — it is not the production path and carries no
-in-Kingdom guarantee. Production inference stays in KSA — see **Deployment & data residency** below.
+The Space is a **public demo over the public corpus** — it is not the production path. Note that no
+path is in-Kingdom today; the residency requirement and why it is unmet are under **Deployment & data
+residency** below.
 
 > [!NOTE]
 > **No retrieval numbers are published yet.** The pipeline, the 66 mined training pairs and the
@@ -227,7 +228,9 @@ src/
     providers/        gemini (agentic) + openai-compatible factory (allam/jais/fanar/qwen/commandr)
     tools/            compute-only: wind · fuel · W&B · recency · density altitude
     _chunks.json.gz   bundled GACAR corpus — 47,361 chunks across 95 documents
-test/             43 files, 496 tests — node:test, no keys, no network
+test/             44 files, 510 tests — node:test, no keys, no network
+contracts/        flygaca-family.json — the cross-repo family contract, byte-identical here,
+                  in ay2m/FlyGACA and in ay2m/Office; gated by test/family-contract.test.js
 evals/            regression harness: cases.json (138 cases) · run.js · parity.js · ablations.js
 docs/             architecture specs, model catalog, refusal taxonomy, runbooks
 ```
@@ -240,7 +243,7 @@ docs/             architecture specs, model catalog, refusal taxonomy, runbooks
 ```bash
 npm run smoke            # server module loads (no keys) — CI-safe
 npm run smoke:frontend   # static audit of public/*.html: chrome, script order, DOM hooks
-npm run test:unit        # 496 tests, deterministic, no network
+npm run test:unit        # 510 tests, deterministic, no network
 npm run eval:dry         # validate evals/cases.json structure
 ```
 
@@ -266,12 +269,20 @@ There is **no eslint/prettier** — style is convention and review. Match the su
 <summary><b>🔒 Deployment & data residency — PDPL, Cloud Run, container specs</b></summary>
 
 Saudi **PDPL** treats real user questions as personal data, so the chat model must run in-Kingdom
-for production:
+for production. That is the requirement; it is **not yet met**.
 
 - Node service → **Google Cloud Run, `me-central2`** (`me-central1` fallback), secrets from Secret Manager
 - Arabic endpoints (ALLaM / vLLM) → inside KSA infrastructure
 - HF / US / EU endpoints are fine for **dev and evals only**
 - Embeddings see only the public corpus → no residency constraint
+
+> [!WARNING]
+> **`me-central2` has not been granted to this account.** Dammam sells only through **CNTXT**,
+> Google's exclusive KSA reseller, to registered **organizations** on Invoiced Billing —
+> individuals get an open-ended waiting list. Unblocking it needs a KSA legal entity and a
+> billing migration: a corporate step, not an engineering one. Until then no deployment target
+> is in-Kingdom, so **do not state in-Kingdom residency as fact** in product copy, legal
+> documents or investor material. The default Gemini path also processes globally.
 
 Container: `node:20-slim`, port `8787`, **≥2 GiB RAM** (the BM25 index is resident).
 Runbooks: [`deploy/allam-vllm.md`](deploy/allam-vllm.md) · [`docs/RUNBOOK-captadel-deploy.md`](docs/RUNBOOK-captadel-deploy.md) · [`docs/RUNBOOK-arabic-provider.md`](docs/RUNBOOK-arabic-provider.md)

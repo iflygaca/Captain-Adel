@@ -6,11 +6,17 @@ retrieval the running service uses) and fans a `claude-sonnet-5`-lead /
 [`evals/cases.json`](../cases.json) entries. Design:
 [`docs/multi-agent-orchestrator.md`](../../docs/multi-agent-orchestrator.md).
 
-**Why it exists:** `citesPart` in `evals/cases.json` today only ever names
-Parts **91**, **61**, and **67** — every other GACAR Part, including 12 of the
-15 "daily-use" T1 Parts (121 air-carrier ops, 135 commuter/on-demand, 141
-pilot schools, 145 maintenance orgs, and more), has zero eval coverage. This
-tool targets that gap.
+**Why it exists:** eval coverage was once only Parts **91**, **61** and **67**.
+That gap has narrowed a long way — `evals/cases.json` now asserts `citesPart`
+across **31 distinct Part sets**, including T1 daily-use Parts such as 121, 141,
+137, 43, 47, 65, 71 and 117. It is still heavily weighted: Part 91 alone carries
+32 of the 138 cases and Part 61 another 16, while most other Parts have one case
+each. This tool exists to keep widening and deepening that tail, one Part at a
+time.
+
+> Keep this paragraph honest when you use the tool — it is the kind of claim
+> that rots. `evals/README.md` describes the assertion keys; the counts above
+> come straight from `cases.json`.
 
 **Unlike** [`examples/multi-agent-orchestrator/`](../../examples/multi-agent-orchestrator/)
 (deliberately decoupled from `src/`), this tool imports the real brain's

@@ -20,5 +20,7 @@ repo as the deployed brain (`src/brain/system-prompt.js`, `tenants.js`).
 > before running the prototype here. These files are **reference**, not part of the
 > deployed Node service.
 
-The brand/character art and the visual `CHARACTER_SHEET.md` remain in the Fly GACA
-repo (`flygaca/assistant/`), as Fly GACA product branding.
+The brand/character art stays in the Fly GACA product repo as Fly GACA branding — today that is
+[`ay2m/FlyGACA`](https://github.com/ay2m/FlyGACA) under `public/img/captain/` (avatars, poses and
+the `scenes/` set). The `flygaca/assistant/` path this file used to name is from the original
+pre-rebuild layout and no longer exists.

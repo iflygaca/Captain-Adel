@@ -246,7 +246,7 @@ signal a grounded or verified answer, mirroring `public/assets/css/adel.css`.
 
 ## Testing & evals
 
-- **Unit tests** (`test/*.test.js`, 43 files) use Node's built-in `node:test` +
+- **Unit tests** (`test/*.test.js`, 44 files) use Node's built-in `node:test` +
   `assert`, run against the bundled corpus with no keys/network.
   `{component}.test.js` maps to a `src/` module (e.g. `route.test.js` ↔
   `src/brain/route.js`); larger modules split by aspect (`answer-stream`,

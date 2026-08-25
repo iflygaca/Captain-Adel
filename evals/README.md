@@ -20,6 +20,16 @@ stops refusing out-of-scope questions, or stops answering in Arabic.
   in a couple of seconds on a bad URL / wrong auth, instead of after 20 calls.
 - `parity.js` — runs the suite through Gemini AND ALLaM, computes the gate
   that decides whether `MODEL_PROVIDER=auto` is safe to enable.
+- `provider-smoke.js` / `jais-smoke.js` — the same one-turn ping for any
+  configured provider, and for Jais specifically.
+- `metrics.js` — the scoring metrics `run.js` and `parity.js` report on.
+- `ablations.js` — compares retrieval configurations (BM25 vs dense vs hybrid vs
+  rerank). Needs an embeddings endpoint; not part of the gate.
+- `checks/citation-faithfulness.js` — the per-claim LLM judge used when
+  `ADEL_GROUNDING=faithfulness`, rather than the default structural check.
+- `gen-cases/` — tooling for authoring new cases; see its own README.
+- `training-pairs.jsonl` — 66 mined contrastive pairs, output of
+  `scripts/export-training-pairs.py`, for embedder fine-tuning. Not a test input.
 
 ## Running it
 
