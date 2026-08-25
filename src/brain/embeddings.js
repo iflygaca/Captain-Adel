@@ -57,10 +57,16 @@ const EMBEDDINGS_MODEL = process.env.EMBEDDINGS_MODEL || 'BAAI/bge-m3';
 
 const embedder = {
   MODEL: EMBEDDINGS_MODEL,
-  configured() { return !!trimUrl(process.env.EMBEDDINGS_BASE_URL); },
+  configured() {
+    // Phase 1+: EMBEDDINGS_QUERY_BASE_URL is for query embedding (in-Kingdom, PDPL-safe).
+    // Falls back to EMBEDDINGS_BASE_URL for backward compat.
+    return !!trimUrl(process.env.EMBEDDINGS_QUERY_BASE_URL || process.env.EMBEDDINGS_BASE_URL);
+  },
   async embed(texts, opts = {}) {
-    const base = trimUrl(process.env.EMBEDDINGS_BASE_URL);
-    if (!base) throw new Error('EMBEDDINGS_BASE_URL is not configured');
+    // Query embedding: use EMBEDDINGS_QUERY_BASE_URL (in-Kingdom) if available,
+    // otherwise fall back to EMBEDDINGS_BASE_URL (may be HF Inference Endpoints, etc.)
+    const base = trimUrl(process.env.EMBEDDINGS_QUERY_BASE_URL || process.env.EMBEDDINGS_BASE_URL);
+    if (!base) throw new Error('EMBEDDINGS_QUERY_BASE_URL or EMBEDDINGS_BASE_URL is not configured');
     const data = await postJSON(`${base}/embeddings`, {
       model: opts.model || EMBEDDINGS_MODEL,
       input: Array.isArray(texts) ? texts : [texts],
@@ -93,12 +99,64 @@ const reranker = {
 /* ----- prebuilt dense index ---------------------------------------------- */
 
 const DENSE_PATH = path.join(__dirname, '_embeddings.json.gz');
+const BINARY_INDEX_PATH = path.join(__dirname, '_embeddings.bin');
 let _dense; // undefined = not tried; null = absent/failed; array = loaded
+
+/** Load binary index with header parsing and MRL support. */
+function loadBinaryIndex(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return null;
+    const buf = fs.readFileSync(filePath);
+    if (buf.length < 16) {
+      console.warn(`Binary index too small: ${buf.length} bytes`);
+      return null;
+    }
+
+    // Parse header
+    const magic = buf.readUInt32LE(0);
+    const version = buf.readUInt32LE(4);
+    const numVectors = buf.readUInt32LE(8);
+    const dims = buf.readUInt32LE(12);
+
+    if (magic !== 0xADEL2026 || version !== 1) {
+      console.warn(`Invalid binary index magic=${magic.toString(16)} version=${version}`);
+      return null;
+    }
+
+    const vectors = [];
+    let offset = 16;
+    const byteSize = 4;  // Assume float32 for now
+
+    for (let i = 0; i < numVectors; i++) {
+      const vec = new Float32Array(dims);
+      for (let j = 0; j < dims; j++) {
+        vec[j] = buf.readFloatLE(offset);
+        offset += byteSize;
+      }
+      vectors.push(vec);
+    }
+
+    return vectors;
+  } catch (err) {
+    console.warn(`Failed to load binary index: ${err.message}`);
+    return null;
+  }
+}
 
 /** Float-vector array aligned to the BM25 corpus by chunk index, or null. */
 function denseIndex() {
   if (_dense !== undefined) return _dense;
   try {
+    // Try binary format first (Phase 1+)
+    if (fs.existsSync(BINARY_INDEX_PATH)) {
+      const loaded = loadBinaryIndex(BINARY_INDEX_PATH);
+      if (loaded) {
+        _dense = loaded;
+        return _dense;
+      }
+    }
+
+    // Fall back to JSON format (legacy)
     if (!fs.existsSync(DENSE_PATH)) { _dense = null; return _dense; }
     const raw = JSON.parse(zlib.gunzipSync(fs.readFileSync(DENSE_PATH)));
     const vectors = Array.isArray(raw) ? raw : (raw.vectors || null);
@@ -149,4 +207,6 @@ module.exports = {
   cosine,
   rrf,
   DENSE_PATH,
+  BINARY_INDEX_PATH,
+  loadBinaryIndex,
 };
