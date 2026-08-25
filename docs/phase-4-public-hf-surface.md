@@ -2,6 +2,22 @@
 
 **Status:** Specification (ready to implement)
 
+> [!WARNING]
+> **Every metric, screenshot and sample output in this document is illustrative.** The
+> latency figures, similarity scores and mock UI transcripts are invented to show what
+> the surface should look like — **none are measured**, and no ablation or fine-tuning
+> run has produced real numbers to replace them.
+>
+> **What actually exists today:** the Gradio app source (`src/gradio_app.py`) and a Space
+> at [`flygaca/captain-adel`](https://huggingface.co/spaces/flygaca/captain-adel).
+> The fine-tuned embedder this document assumes **does not exist** — no weights are
+> published — so the A/B "base vs. fine-tuned" comparison described below cannot run yet.
+>
+> **Naming:** `scripts/finetune-embedder.py` defaults `HUB_MODEL_ID` to
+> `flygaca/CaptAdel-finetuned`, which is not on the Hub. The model repo that does exist
+> is [`flygaca/CaptAdel`](https://huggingface.co/flygaca/CaptAdel). Decide which name is
+> canonical before the first push.
+
 **Why this matters:** Phases 1–3 unlock cross-lingual retrieval and fine-tune it for GACAR. Phase 4 is the **public proof and marketing anchor** — a Hugging Face Space that demonstrates the retrieval engine live, with citation transparency, latency breakdown, and bilingual UI. This is what pilots and flight schools see when they ask "does this actually work?"
 
 It also serves as the **integration proof** for Fly GACA's adoption of the CaptAdel retrieval stack (Qwen3-Embedding, RRF, reranking, fine-tuning).
@@ -10,7 +26,7 @@ It also serves as the **integration proof** for Fly GACA's adoption of the CaptA
 
 ## Surface: Hugging Face Spaces app
 
-**Repo:** `flygaca/captadel-proof-space` (public Gradio app)
+**Repo:** `flygaca/captain-adel` (public Gradio app)
 
 **Audience:** Pilots, flight schools, regulators, aviation AI researchers — anyone validating that cross-lingual retrieval on aviation regulations works.
 
@@ -416,12 +432,12 @@ if __name__ == "__main__":
 
 ### Prerequisites
 
-1. **Create repo:** `flyaca/captadel-proof-space` on Hub (public)
+1. **Create repo:** `flygaca/captain-adel` on Hub (public)
 2. **Clone and structure:**
 
 ```bash
-git clone https://huggingface.co/spaces/flygaca/captadel-proof-space
-cd captadel-proof-space
+git clone https://huggingface.co/spaces/flygaca/captain-adel
+cd captain-adel
 
 # Copy corpus and binaries
 cp /path/to/captain-adel/src/brain/_chunks.json.gz .
@@ -438,29 +454,44 @@ numpy==1.24.3
 torch==2.0.1
 EOF
 
-# Add README
+# Add README.
+#
+# This is a PUBLIC card — it must describe what the Space actually runs, not what
+# this plan hopes it will run. Two rules:
+#   1. List a model only once it is genuinely wired in. Do NOT advertise a fine-tuned
+#      embedder until weights are published and the Space is using them.
+#   2. Keep the unaffiliated/educational disclaimer. Every public Captain Adel surface
+#      carries it, and this one answers regulatory questions.
 cat > README.md <<EOF
 # Captain Adel Retrieval Proof Surface
 
-Cross-lingual hybrid retrieval on GACAR (General Authority of Civil Aviation Regulations).
+Cross-lingual hybrid retrieval over GACAR (General Authority of Civil Aviation
+Regulations), from the Fly GACA project.
+
+## Unofficial & educational
+
+Independent — **not** affiliated with, endorsed by, or operated by the General Authority
+of Civil Aviation (GACA). This is a retrieval demo, not official guidance, not legal
+advice, and not for operational use. The authoritative source for any regulation is
+always GACA: https://gaca.gov.sa
 
 ## Features
 - Arabic queries → English GACAR passages
-- Dense embeddings (fine-tuned Qwen3-Embedding-0.6B)
-- BM25 + RRF + cross-encoder reranking
+- BM25 + dense embeddings + RRF fusion + cross-encoder reranking
 - Latency breakdown + citation transparency
 
 ## Models
-- **Base:** `Qwen/Qwen3-Embedding-0.6B`
-- **Fine-tuned:** `flygaca/CaptAdel-finetuned`
-- **Reranker:** `Alibaba-NLP/gte-multilingual-reranker-base`
+- **Embedder:** \`Qwen/Qwen3-Embedding-0.6B\` (off-the-shelf)
+- **Reranker:** \`Alibaba-NLP/gte-multilingual-reranker-base\`
+- A GACAR-fine-tuned embedder is planned but **not yet published** — add it here, and
+  enable the A/B toggle, only once its weights are live.
 
 ## Data
-- Corpus: GACAR aviation regulations (47k chunks)
-- Evaluation: 138 multilingual test cases
+- Corpus: GACAR regulations, 47,361 chunks across 95 documents
+- Regression suite: 138 bilingual cases (in the Captain Adel repo)
 
 ## Try it
-[https://huggingface.co/spaces/flygaca/captadel-proof-space](https://huggingface.co/spaces/flygaca/captadel-proof-space)
+[https://huggingface.co/spaces/flygaca/captain-adel](https://huggingface.co/spaces/flygaca/captain-adel)
 EOF
 
 # Deploy
@@ -491,9 +522,12 @@ In Hugging Face Spaces settings:
    [Retrieve ▶]
    ```
 
-2. **Results:** 
+2. **Results:** — 🧪 *mockup. Every latency and similarity score below is invented to
+   show the layout; none were measured, and the passage text is paraphrased rather than
+   quoted from GACAR.*
+
    ```
-   Query: "ما هي متطلبات المعدات الدنيا؟"
+   Query: "ما هي متطلبات المعدات الدنيا؟"      ← MOCKUP, ALL NUMBERS ARE PLACEHOLDERS
    Model: CaptAdel-finetuned
    
    ⏱ Latency: 850 ms total
@@ -558,22 +592,26 @@ def log_retrieval(query, model, num_passages, total_latency_ms):
 
 ## Gate for Phase 4 completion
 
-Phase 4 is complete when:
+Phase 4 is complete when all of the following hold. **Only the first is done** — the
+✅ marks that used to head this list were a formatting choice, not a status:
 
-1. ✅ Gradio app deployed to `flygaca/captadel-proof-space` (public, live)
-2. ✅ App loads & displays retrieval results in <2s
-3. ✅ A/B toggle works (base vs. fine-tuned models shown side-by-side)
-4. ✅ Latency breakdown is accurate (measured wall-clock time)
-5. ✅ Citations are anchored to Part/section (clickable or visible)
-6. ✅ Bilingual UI works (Arabic/English toggle)
-7. ✅ Example queries demonstrate Arabic→English retrieval
-8. ✅ Space is shared with Fly GACA team for feedback
+1. [x] Gradio app written (`src/gradio_app.py`) and a Space exists at
+       `flygaca/captain-adel`
+2. [ ] Space verified running, loading and returning retrieval results
+3. [ ] A/B toggle works — **blocked**: needs a fine-tuned model, and no weights are
+       published
+4. [ ] Latency breakdown shows real measured wall-clock time
+5. [ ] Citations are anchored to Part/section (clickable or visible)
+6. [ ] Bilingual UI works (Arabic/English toggle)
+7. [ ] Example queries demonstrate Arabic→English retrieval end to end
+8. [ ] Space shared with the Fly GACA team for feedback
 
-**Final deliverable:** A public, live demo proving:
-- Cross-lingual retrieval works (Arabic questions get English GACAR passages)
-- Fine-tuned embedder improves recall (A/B comparison quantifies it)
-- System is transparent (latency breakdown + citation anchors)
-- User-friendly (bilingual, fast, intuitive)
+**Intended deliverable:** a public demo that would show:
+- Cross-lingual retrieval working (Arabic questions returning English GACAR passages)
+- Whether the fine-tuned embedder improves recall — the A/B comparison is what would
+  answer that; until it runs, the improvement is an open question, not a claim
+- Transparency (latency breakdown + citation anchors)
+- A usable bilingual interface
 
 Once Phase 4 gates pass, the **full 4-phase delivery is complete**.
 
