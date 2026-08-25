@@ -2,6 +2,18 @@
 
 **Status:** Specification (ready to implement)
 
+> [!WARNING]
+> **Every number in this document is illustrative.** The tables, latency figures and
+> decision blocks below are *templates showing the shape of the report Phase 2 will
+> produce* — they are placeholders, filled with plausible-looking values so the format
+> is reviewable before the runs happen. **None of them are measured results.**
+>
+> As of this writing no ablation has been run: `src/brain/_embeddings.bin` does not
+> exist, so there is no dense index to ablate against. Do not quote any figure from
+> this file as a baseline, and do not copy them into the README, a model card or a
+> dataset card. Real results replace these blocks when `node evals/ablations.js` runs
+> against a live embeddings endpoint.
+
 **Why this matters:** Phase 1 enables cross-lingual dense retrieval, but we don't yet know:
 - Does Arabic query → English passage retrieval actually work? (recall %)
 - Does reranking help or hurt? (gte-multilingual-reranker-base worth the latency?)
@@ -215,10 +227,12 @@ function avg(arr) {
 
 ## Report: Per-language comparison
 
-Phase 2 produces a detailed ablation report:
+Phase 2 will produce an ablation report in the shape below.
+
+> 🧪 **Template — placeholder numbers, not results.** Nothing here has been measured.
 
 ```markdown
-# Ablation Results
+# Ablation Results  ← EXAMPLE OUTPUT, NUMBERS ARE PLACEHOLDERS
 
 ## Recall @ 5 (% of ground-truth chunks in top-5)
 
@@ -242,8 +256,10 @@ Phase 2 produces a detailed ablation report:
 
 ## Citation accuracy by language
 
+> 🧪 **Template — placeholder numbers, not results.**
+
 ```markdown
-## Citation Match (% of answers citing correct Part)
+## Citation Match (% of answers citing correct Part)  ← EXAMPLE OUTPUT
 
 | Configuration | English | Arabic |
 |---|---|---|
@@ -262,8 +278,12 @@ Phase 2 produces a detailed ablation report:
 
 ## Dimension ablation
 
+> 🧪 **Template — placeholder numbers, not results.** The resident-memory column is the
+> only part that can be derived without running anything (dimensions × chunk count ×
+> bytes-per-value); the recall columns and the resulting "decision" are placeholders.
+
 ```markdown
-## Memory vs Recall Trade-off
+## Memory vs Recall Trade-off  ← EXAMPLE OUTPUT
 
 | Dimension | Resident | Recall@5 EN | Recall@5 AR | Use case |
 |---|---|---|---|---|
@@ -326,9 +346,12 @@ async function retrieveSmart(query, opts = {}) {
 
 Log timings for each request (Cloud Logging):
 
+> 🧪 **Template — the millisecond values are invented**, illustrating the log record's
+> shape. Real timings depend on the endpoint, region and hardware in use.
+
 ```
 {
-  "retrieval": {
+  "retrieval": {          // ← EXAMPLE RECORD, TIMINGS ARE PLACEHOLDERS
     "query_len": 42,
     "dense_ms": 850,      // Query embedding
     "recall_ms": 25,      // Dense recall (brute-force cosine)
@@ -345,10 +368,18 @@ Log timings for each request (Cloud Logging):
 
 ## Phase 2 output: Decision document
 
-At end of Phase 2, produce a decision document:
+At end of Phase 2, produce a decision document.
+
+> [!CAUTION]
+> 🧪 **Template — this is the most misread block in the file.** It is written in the
+> past tense, carries "(achieved: …)" annotations and ends in an approval stamp, so it
+> reads like a completed sign-off. It is not one. No ablation has run, nothing has been
+> achieved, and nothing has been approved. This block is the *form* the decision
+> document should take once there are real numbers to put in it.
 
 ```markdown
 # Phase 2 Conclusion: Retrieval Config Recommendation
+# ← EXAMPLE OUTPUT. EVERY FIGURE AND VERDICT BELOW IS A PLACEHOLDER.
 
 Based on ablation studies across 138 cases (113 EN + 25 AR):
 
@@ -417,13 +448,19 @@ npm run eval -- --phase2-ablations
 
 ## Gate for Phase 2 completion
 
-Phase 2 is complete when:
+Phase 2 is complete when all of the following hold. **None are met yet** — these are
+targets to hit, not a checklist of finished work:
 
-1. ✅ Ablation report generated (English + Arabic metrics)
-2. ✅ Recall ≥ 40% for Arabic (was ~5% with BM25)
-3. ✅ Citation accuracy ≥ 75% for Arabic (was ~45%)
-4. ✅ No regression on English
-5. ✅ Decision document signed (config + production gates)
+1. [ ] Ablation report generated (English + Arabic metrics)
+2. [ ] Recall ≥ 40% for Arabic
+3. [ ] Citation accuracy ≥ 75% for Arabic
+4. [ ] No regression on English
+5. [ ] Decision document signed (config + production gates)
+
+The Arabic thresholds above are aspirations chosen before measurement. The BM25-only
+baseline they are meant to improve on has not been measured either — it is expected to
+be very low, because the corpus is English and a pure-Arabic query scores few or no
+lexical hits, but "expected to be low" is not a number.
 
 Once Phase 2 gates pass → **Phase 3: Fine-tuned embedder** (not just inference; training on GACAR-specific retrieval tasks).
 

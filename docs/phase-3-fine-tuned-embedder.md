@@ -2,7 +2,24 @@
 
 **Status:** Specification (ready to implement)
 
-**Why this matters:** Phase 2 establishes that off-the-shelf Qwen3-Embedding-0.6B + RRF + reranking achieves 44% recall@5 for Arabic. Phase 3 fine-tunes the embedder on GACAR-specific retrieval tasks to push that further — target is 54–64% recall@5 (additional 10–20% gain), unlocking harder cases where the query requires inference over domain concepts.
+> [!WARNING]
+> **Every number in this document is illustrative.** The improvement tables and gate
+> thresholds below are *targets and placeholders*, not measurements. **Nothing here has
+> been trained, run or verified.**
+>
+> In particular, the "Phase 2 baseline" figures this document builds on **do not
+> exist**. They come from the template blocks in
+> [`phase-2-retrieval-metrics.md`](phase-2-retrieval-metrics.md), which are themselves
+> placeholders. No ablation has run (`src/brain/_embeddings.bin` is absent) and no
+> embedder has been fine-tuned. Do not quote any figure from this file as a baseline or
+> a result, and do not copy them into the README, a model card or a dataset card.
+
+**Why this matters:** *if* off-the-shelf Qwen3-Embedding-0.6B + RRF + reranking lands
+somewhere around the Phase 2 target for Arabic recall@5, fine-tuning the embedder on
+GACAR-specific retrieval tasks should push it further — unlocking harder cases where the
+query requires inference over domain concepts. The size of that gain is unknown until
+Phase 2 produces a real baseline; the ranges quoted throughout this document are
+hypotheses to test, not forecasts to rely on.
 
 **Training data source:** The eval suite itself (138 cases with groundTruthChunks) becomes the training signal.
 
@@ -17,7 +34,8 @@ Qwen3-Embedding-0.6B is trained on web corpora. GACAR retrieval has unique chall
 3. **Citation anchoring:** A question like "What Part covers minimum altitudes?" should strongly prefer chunks citing Part 91, §91.119 over general altitude discussion.
 4. **Negative pairs:** Some passages are close but wrong (Part 135 when Part 91 is correct; a similar rule in a different operational context).
 
-**Expected lift:** Fine-tuning on 100+ hand-curated retrieval pairs should recover 10–20% of the remaining gap (from 44% → 54–64%), especially for:
+**Hoped-for lift** (untested — no baseline exists to measure a lift against): fine-tuning
+on 100+ curated retrieval pairs should help most on:
 - Hard cross-lingual cases (Arabic question + English passage)
 - Edge cases near Part boundaries
 - Questions requiring interpretation of regulatory intent
@@ -417,38 +435,57 @@ if __name__ == '__main__':
 Once fine-tuned model is on Hub, re-run Phase 2 ablations with the new embedder:
 
 ```bash
-# Phase 2 with fine-tuned embedder
-EMBEDDINGS_MODEL=flygaca/CaptAdel-finetuned \
+# Phase 2 with fine-tuned embedder.
+# NOTE: scripts/finetune-embedder.py defaults HUB_MODEL_ID to
+# "flygaca/CaptAdel-finetuned", which does NOT exist on the Hub. The repo that
+# does exist is "flygaca/CaptAdel" (weights not yet published). Pushing with the
+# default would create a second, differently-named repo. Decide which name is
+# canonical before the first push, and set HUB_MODEL_ID accordingly.
+EMBEDDINGS_MODEL="${HUB_MODEL_ID:-flygaca/CaptAdel}" \
 EMBEDDINGS_DIMS=1024 \
-  npm run eval:ablations > evals/phase-3-ablation-results.json
+  node evals/ablations.js > evals/phase-3-ablation-results.json
 ```
 
-**Expected improvements:**
+**Hypothesised improvements:**
 
-| Config | Phase 2 Baseline | Phase 3 Fine-tuned | Δ |
+> [!CAUTION]
+> 🧪 **Template — both columns are invented.** The "Phase 2 Baseline" column is *not a
+> baseline*: those values are copied from the placeholder tables in
+> `phase-2-retrieval-metrics.md` and were never measured. The "Phase 3" column is a
+> guess relative to a guess. This table exists to show what the A/B comparison will look
+> like; it carries no evidential weight whatsoever.
+
+| Config | "Phase 2 Baseline" *(placeholder)* | "Phase 3 Fine-tuned" *(guess)* | Δ *(meaningless until both are real)* |
 |---|---|---|---|
 | Dense-512d-no-rerank (AR) | 36% | 44–48% | +8–12% |
 | Dense-512d-with-rerank (AR) | 42% | 50–56% | +8–14% |
 | Hybrid-RRF-512d-rerank (AR) | 44% | 54–60% | +10–16% |
 | English (hybrid) | 70% | 72–75% | +2–5% (polish) |
 
-**Hard-case lift:** Focus on the 25 hardest cases (cross-lingual, multi-Part ambiguity) — fine-tuned model should lift 20+ percentage points on those.
+**Hard-case focus:** the cross-lingual and multi-Part-ambiguity cases are where a
+fine-tuned model should help most. By how much is unknown.
 
 ---
 
 ## Shipping decision
 
-Phase 3 is complete when:
+Phase 3 is complete when all of the following hold. Only the first is done — the rest
+are outstanding, and the ✅ marks that used to head this list were a formatting choice,
+not a status:
 
-1. ✅ Training pairs exported (evals/training-pairs.jsonl, ~138 examples)
-2. ✅ Fine-tuning script converges (loss decays, MRR@5 on test set ≥ 0.55)
-3. ✅ Model pushed to `flygaca/CaptAdel-finetuned` on Hub
-4. ✅ Re-run Phase 2 ablations with fine-tuned embedder
-5. ✅ Verify: Arabic recall@5 ≥ 54% (was 44% baseline)
-6. ✅ Verify: English recall ≥ 72% (no regression)
-7. ✅ Citation accuracy Arabic ≥ 85% (was 81% baseline)
+1. [x] Training pairs exported — `evals/training-pairs.jsonl`, **66 pairs** from 99
+       annotated cases (not ~138; 39 cases are Arabic-only and returned no BM25 hits)
+2. [ ] Fine-tuning script converges (loss decays, MRR@5 on held-out test set ≥ 0.55)
+3. [ ] Weights published to [`flygaca/CaptAdel`](https://huggingface.co/flygaca/CaptAdel)
+       on the Hub — the repo exists but ships no weights, and its base model is still TBD
+4. [ ] Re-run the Phase 2 ablations with the fine-tuned embedder
+5. [ ] Arabic recall@5 clears its threshold
+6. [ ] English recall shows no regression
+7. [ ] Arabic citation accuracy clears its threshold
 
-**Gate for Phase 3:** Fine-tuned embedder must beat all three gates.
+Thresholds for 5–7 cannot be set responsibly yet: each was written as "≥ X (was Y
+baseline)", and every Y traces back to a placeholder. **Set them from the real Phase 2
+numbers once those exist**, then treat them as the gate.
 
 Once Phase 3 gates pass → **Phase 4: Public HF proof surface** (demo app showcasing retrieval, side-by-side Arabic↔English, latency breakdown, citation transparency).
 
