@@ -95,16 +95,25 @@ function retrieve(question, { topK = 6 } = {}) {
 // Fuse a pool this many times larger than topK before dedup/rerank.
 const POOL_FACTOR = 8;
 
-async function denseRanking(question, pool) {
+async function denseRanking(question, pool, timings) {
   const dense = embeddings.denseIndex();
   if (!dense || !dense.length) return [];
+
+  // Time query embedding
+  const embedStart = Date.now();
   const [qVec] = await embeddings.embedder.embed([question]);
+  if (timings) timings.embedMs = Date.now() - embedStart;
   if (!qVec) return [];
+
+  // Time dense recall (cosine similarity)
+  const recallStart = Date.now();
   const scored = [];
   for (let i = 0; i < dense.length; i++) {
     scored.push([i, embeddings.cosine(qVec, dense[i])]);
   }
   scored.sort((a, b) => b[1] - a[1]);
+  if (timings) timings.recallMs = Date.now() - recallStart;
+
   return scored.slice(0, pool).map((x) => x[0]);
 }
 
@@ -123,11 +132,14 @@ function dedupHits(orderedIndices, limit) {
   return out;
 }
 
-async function maybeRerank(question, hits, topK) {
+async function maybeRerank(question, hits, topK, timings) {
   if (!embeddings.reranker.configured() || hits.length <= 1) return hits.slice(0, topK);
   const docs = hits.map((h) => String(h.text || '').slice(0, MAX_PASSAGE_CHARS));
   try {
+    const rankStart = Date.now();
     const ranked = await embeddings.reranker.rerank(question, docs);
+    if (timings) timings.rerankMs = Date.now() - rankStart;
+
     if (ranked && ranked.length) {
       return ranked
         .filter((r) => Number.isInteger(r.index) && hits[r.index])
@@ -140,28 +152,74 @@ async function maybeRerank(question, hits, topK) {
   return hits.slice(0, topK);
 }
 
-async function retrieveSmart(question, { topK = 6 } = {}) {
-  if (!embeddings.hybridAvailable()) return retrieve(question, { topK });
+async function retrieveSmart(question, { topK = 6, trackTimings = false } = {}) {
+  const startTime = Date.now();
+  const timings = trackTimings ? { queryLen: String(question || '').length } : null;
+
+  if (!embeddings.hybridAvailable()) {
+    const result = retrieve(question, { topK });
+    if (timings) {
+      timings.totalMs = Date.now() - startTime;
+      timings.strategy = 'bm25-only';
+      result.timings = timings;
+    }
+    return result;
+  }
 
   // Direct Part+section citation still wins outright.
   const direct = directCitationHit(question);
-  if (direct) return buildResult([direct]);
+  if (direct) {
+    const result = buildResult([direct]);
+    if (timings) {
+      timings.totalMs = Date.now() - startTime;
+      timings.strategy = 'direct-citation';
+      result.timings = timings;
+    }
+    return result;
+  }
 
   const pool = topK * POOL_FACTOR;
   let denseTop = [];
   try {
-    denseTop = await denseRanking(question, pool);
+    denseTop = await denseRanking(question, pool, timings);
   } catch (err) {
     // Embedding the query failed — fall back to the proven BM25 path.
-    return retrieve(question, { topK });
+    const result = retrieve(question, { topK });
+    if (timings) {
+      timings.totalMs = Date.now() - startTime;
+      timings.strategy = 'bm25-fallback';
+      timings.error = String(err && err.message);
+      result.timings = timings;
+    }
+    return result;
   }
-  const bm25Top = bm25.searchChunkScores(question, pool).map((x) => x[0]);
 
+  // Time BM25
+  const bm25Start = Date.now();
+  const bm25Top = bm25.searchChunkScores(question, pool).map((x) => x[0]);
+  if (timings) timings.bm25Ms = Date.now() - bm25Start;
+
+  // Time RRF fusion
+  const rrfStart = Date.now();
   const fused = embeddings.rrf([bm25Top, denseTop]).map((x) => x[0]);
-  // Keep a pre-rerank pool a few × topK, then rerank down to topK.
+  if (timings) timings.rrfMs = Date.now() - rrfStart;
+
+  // Time dedup
+  const dedupStart = Date.now();
   const fusedHits = dedupHits(fused, Math.max(topK, topK * 3));
-  const hits = await maybeRerank(question, fusedHits, topK);
-  return buildResult(hits);
+  if (timings) timings.dedupMs = Date.now() - dedupStart;
+
+  const hits = await maybeRerank(question, fusedHits, topK, timings);
+  const result = buildResult(hits);
+
+  if (timings) {
+    timings.totalMs = Date.now() - startTime;
+    timings.strategy = 'hybrid-rrf';
+    if (embeddings.reranker.configured()) timings.strategy += '+rerank';
+    result.timings = timings;
+  }
+
+  return result;
 }
 
 module.exports = { retrieve, retrieveSmart };
