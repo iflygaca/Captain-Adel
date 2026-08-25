@@ -1,0 +1,4 @@
+question,expected_answer,cites_part,must_include,answer_lang,kind
+"What is the minimum cruise altitude over Saudi airspace?","GACAR Part 91, §91.119 requires...",Part 91,"minimum cruise altitude",en,grounded
+"ما هو الحد الأدنى لارتفاع الطيران؟","وفقاً لـ GACAR الجزء 91...",Part 91,"الحد الأدنى",ar,grounded
+"Can I fly with expired medical certificate?","No. GACAR Part 67 requires...",Part 67,"expired",en,grounded
