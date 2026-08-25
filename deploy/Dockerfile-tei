@@ -1,0 +1,13 @@
+FROM ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+
+# TEI runs on CPU with quantization to keep memory low for Cloud Run (4Gi)
+ENV MODEL_ID=Qwen/Qwen3-Embedding-0.6B
+ENV QUANTIZE=bfloat16
+ENV MAX_CLIENT_BATCH_SIZE=32
+ENV MAX_BATCH_TOKENS=8192
+
+# PDPL compliance: This endpoint runs in-Kingdom (me-central2 KSA) and handles
+# personal data (user questions). Corpus embedding (public data) runs separately
+# on HF Jobs and is cached in binary format locally.
+
+EXPOSE 8080

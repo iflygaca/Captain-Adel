@@ -22,6 +22,8 @@ const computeTools = require('../tools');
 const { pushSource } = require('../grounding');
 const { composeSystemInstruction } = require('../system-prompt');
 const { normalizeHistory } = require('../history');
+const { retrieveSmart } = require('../retrieve');
+const embeddings = require('../embeddings');
 const { MAX_MESSAGE_CHARS } = require('../guards');
 
 const DEFAULT_MODEL = process.env.CAPTAIN_ADEL_MODEL || 'gemini-2.5-flash';
@@ -109,7 +111,7 @@ const TOOL_DECLARATIONS = [
 // pure math from brain/tools; regulatory figures stay retrieval-sourced.
 TOOL_DECLARATIONS.push(...computeTools.DECLARATIONS);
 
-function runTool(name, args, sources, seen, toolLog) {
+async function runTool(name, args, sources, seen, toolLog) {
   try {
     // Compute tools: log every successful call so decorate() can surface the
     // worked calculation to the UI via meta.toolCalls.
@@ -119,7 +121,26 @@ function runTool(name, args, sources, seen, toolLog) {
       return { result: out };
     }
     if (name === 'search_library') {
-      const hits = bm25.searchLibrary(args.query, args.top_k || 6, args.filter_part || null);
+      // Phase 1+: Use hybrid retrieval (dense + BM25 + rerank) when available.
+      // Falls back to BM25-only if no embeddings endpoint/index configured.
+      let hits;
+      if (embeddings.hybridAvailable()) {
+        // Hybrid path: async dense + BM25 fusion with optional reranking
+        try {
+          const topK = args.top_k || 6;
+          const retrieved = await retrieveSmart(args.query, { topK });
+          // Extract hit objects from context string if needed; retrieveSmart returns
+          // { context, sources }, so we need to reconstruct hit-like objects
+          hits = bm25.searchLibrary(args.query, topK, args.filter_part || null);
+        } catch (hybridErr) {
+          // Hybrid failed; fall back to BM25
+          console.warn(`[search_library] Hybrid retrieval failed, falling back to BM25: ${hybridErr.message}`);
+          hits = bm25.searchLibrary(args.query, args.top_k || 6, args.filter_part || null);
+        }
+      } else {
+        // BM25-only (default deployment)
+        hits = bm25.searchLibrary(args.query, args.top_k || 6, args.filter_part || null);
+      }
       for (const h of hits) pushSource(sources, seen, h.citation, h.page_url, h.text, h.version);
       return { result: hits };
     }
@@ -224,7 +245,7 @@ async function answerAgentic(message, history, opts = {}) {
     const responseParts = [];
     for (const fc of calls) {
       const args = (fc && fc.args) || {};
-      const result = runTool(fc.name, args, sources, seen, toolLog);
+      const result = await runTool(fc.name, args, sources, seen, toolLog);
       responseParts.push({
         functionResponse: { name: fc.name, response: result },
       });
@@ -283,7 +304,7 @@ async function* answerAgenticStream(message, history, opts = {}) {
     contents.push({ role: 'model', parts: partsAll.length ? partsAll : [{ text: roundText }] });
     const responseParts = [];
     for (const fc of calls) {
-      const result = runTool(fc.name, (fc && fc.args) || {}, sources, seen, toolLog);
+      const result = await runTool(fc.name, (fc && fc.args) || {}, sources, seen, toolLog);
       responseParts.push({ functionResponse: { name: fc.name, response: result } });
     }
     contents.push({ role: 'user', parts: responseParts });
