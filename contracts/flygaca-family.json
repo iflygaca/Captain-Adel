@@ -1,0 +1,137 @@
+{
+  "$comment": [
+    "The Fly GACA family contract. Committed byte-identically to ay2m/Office, ay2m/FlyGACA and ay2m/Captain-Adel.",
+    "Each block names the repo that OWNS it. Only the owner edits its block; the other two copies are mirrors.",
+    "To change it: edit the owning repo's copy, run Office's tools/contracts/stamp-manifest.mjs to re-stamp `sha`, bump `version`, then copy the file verbatim into the other two repos and open all three PRs together.",
+    "Each repo has a parity test that asserts its own source of truth against this file and verifies `sha` (FlyGACA: tests/family-contract.test.ts; Captain-Adel: test/family-contract.test.js; Office: tools/print/check-facts.mjs).",
+    "LIMITATION: nothing offline can prove the three copies are the same revision. `version` + `sha` reduce that to a visible one-line diff; a scheduled cross-repo workflow would be needed to close it fully.",
+    "This file carries NO banking data. company-facts.md sets a hard rule that the IBAN and account number never leave ay2m/Office."
+  ],
+  "version": "1.0.0",
+  "generated": "2026-08-25",
+  "sha": "1f11bb3f8203843b82ca9570ddab2cd3b3291679a966a848534d2171cce1b833",
+  "entity": {
+    "owner": "ay2m/Office",
+    "source": "01-governance/company-facts.md",
+    "legalNameEn": "BDA Company International",
+    "legalNameAr": "شركة بدع الدولية",
+    "entityTypeEn": "Limited liability company",
+    "entityTypeAr": "شركة ذات مسؤولية محدودة",
+    "commercialRegistration": "7030976893",
+    "vatNumber": "311415259500003",
+    "tin": "3114152595",
+    "vatEffectiveDate": "2025-11-01",
+    "taxPeriod": "Quarterly",
+    "addressLocality": "Riyadh",
+    "addressLocalityAr": "الرياض",
+    "postalCode": "12965",
+    "addressCountry": "SA",
+    "jurisdiction": "Kingdom of Saudi Arabia",
+    "consumers": [
+      "ay2m/FlyGACA: src/lib/seo/jsonld.ts",
+      "ay2m/FlyGACA: src/i18n/en.json + ar.json (footer.legalEntity, legal.*)",
+      "ay2m/Captain-Adel: public/assets/js/footer.js",
+      "ay2m/Captain-Adel: public/terms.html + public/privacy.html",
+      "ay2m/Captain-Adel: package.json (author), LICENSE"
+    ]
+  },
+  "chat": {
+    "owner": "ay2m/FlyGACA",
+    "source": "server/src/contract.ts",
+    "$comment": "The answer contract both brains must honour. FlyGACA's server/src/contract.ts is the definition; Captain-Adel's /v1/chat is a superset (it additionally returns `suggestions`, `grounding` and a richer `meta`). Listed here so neither side can drop a field the other depends on. See ay2m/FlyGACA: docs/DESIGN-brain-consolidation.md.",
+    "tenants": [
+      "captadel",
+      "flygaca"
+    ],
+    "defaultTenantFlyGaca": "flygaca",
+    "defaultTenantCaptAdel": "captadel",
+    "requestFields": [
+      "message",
+      "history",
+      "product",
+      "provider",
+      "session"
+    ],
+    "responseFields": [
+      "answer",
+      "sources",
+      "kind",
+      "refusalClass",
+      "meta"
+    ],
+    "sourceFields": [
+      "citation",
+      "url",
+      "verbatim",
+      "section",
+      "part",
+      "subpart",
+      "paragraph",
+      "subParagraph",
+      "effectiveDate",
+      "corpusVersion"
+    ],
+    "groundingKinds": [
+      "grounded",
+      "partial",
+      "refusal",
+      "na"
+    ],
+    "streamEventTypes": [
+      "token",
+      "reset",
+      "final",
+      "error"
+    ],
+    "streamErrorCodes": {
+      "modelUnconfigured": "model_unconfigured",
+      "streamFailed": "stream_failed"
+    },
+    "errorCodes": {
+      "quotaExceeded": "quota_exceeded",
+      "rateLimited": "rate_limited"
+    },
+    "trustedTierHeader": "X-Adel-Api-Key"
+  },
+  "repos": {
+    "owner": "ay2m/Office",
+    "$comment": "The real roster. Supersedes any prose claiming a `FlyGACA/…` org or per-module App Store repos — those paths are dead.",
+    "members": [
+      {
+        "name": "ay2m/Office",
+        "visibility": "private",
+        "role": "The internal documents repository — strategy, governance, legal, finance, KSA compliance, HR, ops, GTM, IR, curriculum, brand. No product code.",
+        "authoritativeFor": [
+          "entity",
+          "repos"
+        ]
+      },
+      {
+        "name": "ay2m/FlyGACA",
+        "visibility": "private",
+        "role": "The product: the bilingual React 19 + Vite web app and its Express backend on Cloud Run, plus the regulatory corpus and content pipelines.",
+        "authoritativeFor": [
+          "chat"
+        ]
+      },
+      {
+        "name": "ay2m/Captain-Adel",
+        "visibility": "private",
+        "role": "The standalone AI flight instructor behind captadel.com. Its src/brain is the reference implementation of the retrieve → ground → cite contract.",
+        "authoritativeFor": []
+      },
+      {
+        "name": "ay2m/FlyGACA-ios",
+        "visibility": "public",
+        "role": "The native SwiftUI family — one shared package, one App Store app per exam module. ELPT and AIP ship; PPL, CPL, IR and ATPL are parked.",
+        "authoritativeFor": []
+      },
+      {
+        "name": "ay2m/FlyGACA-app",
+        "visibility": "public, archived",
+        "role": "The retired predecessor of ay2m/FlyGACA. Read-only, kept for its 1,005-commit history. Never cite as current.",
+        "authoritativeFor": []
+      }
+    ]
+  }
+}

@@ -25,9 +25,33 @@ second surface: one **Node.js 20 + Express** service that serves both:
   and a `/.well-known` static mount (`dotfiles: 'allow'`) for Apple Pay domain
   verification.
 
-The retrieval+answer engine in `src/brain/` is the **single source of truth** —
-the same brain also powers Fly GACA's API (called server-to-server with
-`X-Adel-Api-Key`). Keep `src/brain/` portable and dependency-light.
+The retrieval+answer engine in `src/brain/` is the **single source of truth for
+this service**. Keep it portable and dependency-light.
+
+> [!IMPORTANT]
+> This brain does **not** currently power Fly GACA. That claim stood here for a
+> long time and was never true: `ay2m/FlyGACA` has never called this service, and
+> there is no `X-Adel-Api-Key` anywhere in its `server/`. It runs its own second
+> implementation of the same contract (`server/src/captain-adel.ts` + `corpus.ts`
+> + `grounding-core.ts`) over its own copy of the GACAR corpus. The `flygaca`
+> tenant in `brain/tenants.js` is therefore framing that nothing reaches yet.
+>
+> Serving both products from this brain remains the intended destination, and
+> `ay2m/FlyGACA` now has the seam for it (`server/src/brain.ts`, gated on
+> `ADEL_REMOTE_BASE_URL`, off on every revision). What that switch would cost —
+> above all that the two decide grounding at different points in the request,
+> ours after the model call and theirs before — is specced in that repo's
+> `docs/DESIGN-brain-consolidation.md`. Until it lands, describe the two as
+> parallel implementations of one contract, never as one brain.
+
+What the two genuinely share today is pinned in **`contracts/flygaca-family.json`**
+— the family contract committed byte-identically to this repo, `ay2m/FlyGACA` and
+`ay2m/Office`. `test/family-contract.test.js` is our half of the check (it runs in
+`npm run test:unit`, so `ci.yml` and the `deploy.yml` gate both cover it): it
+asserts our tenant enum against the shared one, that `/v1/chat` still returns
+every field the other product depends on, and that the legal-entity facts
+`ay2m/Office` owns still match `footer.js`, `terms.html`, `privacy.html`,
+`package.json` and `LICENSE`.
 
 > Not affiliated with GACA. It cites and defers to GACA as the authority.
 
@@ -180,6 +204,11 @@ public/                Vanilla bilingual HTML/CSS/JS site (index/chat/account/co
                        assets/data/quiz.json (the exam bank), assets/img/captain/,
                        and .well-known/ (Apple Pay)
 test/                  Unit tests ({component}.test.js, node --test)
+contracts/             flygaca-family.json — the cross-repo family contract, committed
+                       byte-identically here, in ay2m/FlyGACA and in ay2m/Office. Gated by
+                       test/family-contract.test.js. ay2m/Office owns its `entity` block and
+                       ay2m/FlyGACA its `chat` block; both are mirrors here — do not edit
+                       them in this repo
 evals/                 Regression harness (cases.json, run.js, parity.js, lib.js, checks/)
 scripts/               One-off scripts (build-embeddings.js, record-sse-fixtures.js)
 deploy/                docker-compose.yml, deploy.sh (Cloud Run), allam-vllm.md (vLLM GPU
@@ -360,7 +389,11 @@ advanced switches (`ADEL_REWRITE*`, `ADEL_GROUNDING`, `ADEL_PARENT_CHILD`,
 
 ## Where to read more
 
-> 📖 **Family context:** [The Book of Fly GACA](https://github.com/ay2m/FlyGACA/blob/main/THE-BOOK-OF-FLY-GACA.md) is the whole-family reference — all ten repos, the shared tenets, and the glossary in one place.
+> 📖 **Family context:** [The Book of Fly GACA](https://github.com/ay2m/Office/blob/main/00-strategy/the-book-of-fly-gaca.html)
+> — the founder's canon: the origin story, the tenets, and the voice the family is written in. It
+> is a manifesto, not a spec. For the repo roster, the legal-entity facts and the shared chat
+> contract, see `contracts/flygaca-family.json` in this repo.
+> (It previously linked `FlyGACA/blob/main/THE-BOOK-OF-FLY-GACA.md`, which has never existed.)
 
 `README.md` (overview), `ROADMAP.md` (direction), `evals/README.md`, and
 `docs/` (`models.md`, `refusal-taxonomy.md`, `data-contract.md`, `ios-app-plan.md`,

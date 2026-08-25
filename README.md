@@ -9,8 +9,8 @@
 Grounded GACAR answers for Saudi civil aviation — in Arabic and English, with the Part and section cited every time.
 
 <p>
-  <a href="https://github.com/FlyGACA/Captain-Adel/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/FlyGACA/Captain-Adel/ci.yml?style=flat-square&label=CI&labelColor=0a0e12&color=C8A04A" alt="CI" /></a>
-  <a href="test/"><img src="https://img.shields.io/badge/tests-496_passing-C8A04A?style=flat-square&labelColor=0a0e12" alt="496 tests" /></a>
+  <a href="https://github.com/ay2m/Captain-Adel/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/ay2m/Captain-Adel/ci.yml?style=flat-square&label=CI&labelColor=0a0e12&color=C8A04A" alt="CI" /></a>
+  <a href="test/"><img src="https://img.shields.io/badge/tests-510_passing-C8A04A?style=flat-square&labelColor=0a0e12" alt="510 tests" /></a>
   <a href="package.json"><img src="https://img.shields.io/badge/node-20-57AEC9?style=flat-square&logo=node.js&logoColor=white&labelColor=0a0e12" alt="Node 20" /></a>
   <a href="https://captadel.com"><img src="https://img.shields.io/badge/live-captadel.com-57AEC9?style=flat-square&labelColor=0a0e12" alt="captadel.com" /></a>
   <a href="https://huggingface.co/spaces/flygaca/captain-adel"><img src="https://img.shields.io/badge/%F0%9F%A4%97-Spaces_demo-C8A04A?style=flat-square&labelColor=0a0e12" alt="Hugging Face Space" /></a>
@@ -35,7 +35,7 @@ Ask a general-purpose chatbot about Saudi aviation regulations and it will confi
 | 🎯 **Cite or refuse** | Every claim traces to a real Part and section. No passage, no answer — refusals are classified, not improvised. |
 | 🌍 **Arabic-first, genuinely** | Arabic queries route to in-Kingdom Arabic models over a retrieve-then-read pipeline, with Arabic normalization baked into the lexical index. |
 | 🇸🇦 **PDPL by design** | Real user questions are personal data. Production inference runs in-Kingdom (`me-central2`), not on someone else's GPU. |
-| 🧠 **One brain, many surfaces** | `src/brain/` is the single source of truth — it powers captadel.com, the Fly GACA platform API, the exam engine, and the evals. |
+| 🧠 **One brain, many surfaces** | `src/brain/` is the single source of truth for this service — it powers captadel.com, the exam engine, and the evals. It does **not** yet serve the Fly GACA platform API, which runs its own implementation of the same contract; see [`contracts/flygaca-family.json`](contracts/flygaca-family.json). |
 | ✈️ **Compute that isn't hallucinated** | Wind, fuel, weight & balance, recency and density altitude run as real functions, then deep-link to the matching calculator. |
 | 🔬 **Eval-gated** | 138 regression cases across 31 GACAR Parts in both languages. A provider doesn't ship until it match-or-beats the incumbent. |
 
@@ -44,7 +44,7 @@ Ask a general-purpose chatbot about Saudi aviation regulations and it will confi
 ## ⚡ Quickstart
 
 ```bash
-git clone https://github.com/FlyGACA/Captain-Adel.git && cd Captain-Adel
+git clone https://github.com/ay2m/Captain-Adel.git && cd Captain-Adel
 npm install
 cp .env.example .env          # add your GEMINI_API_KEY
 npm start                     # → http://localhost:8787
@@ -282,12 +282,19 @@ Runbooks: [`deploy/allam-vllm.md`](deploy/allam-vllm.md) · [`docs/RUNBOOK-capta
 
 ## 🌐 The Fly GACA family
 
-[**The Book of Fly GACA**](https://github.com/ay2m/FlyGACA/blob/main/THE-BOOK-OF-FLY-GACA.md) is the whole-family reference — all repos, shared tenets, and the glossary.
+[**The Book of Fly GACA**](https://github.com/ay2m/Office/blob/main/00-strategy/the-book-of-fly-gaca.html) —
+the founder's canon: the origin story, the tenets, and the voice the family is written in. For the
+repo roster, the legal-entity facts and the shared chat contract, see `contracts/flygaca-family.json`.
 
-- [**Captain-Adel**](https://github.com/FlyGACA/Captain-Adel) — this repo · the instructor & shared brain
-- [**FlyGACA-app**](https://github.com/FlyGACA/FlyGACA-app) — the web PWA (`flygaca.com`)
-- [**ay2m/FlyGACA**](https://github.com/ay2m/FlyGACA) — native iOS family
-- [**FlyGACA/Office**](https://github.com/FlyGACA/Office) — business, legal, compliance
+The roster below is the `repos` block of [`contracts/flygaca-family.json`](contracts/flygaca-family.json)
+in prose. Everything is under the **`ay2m`** account; the `FlyGACA/…` org these links used to point
+at does not exist.
+
+- [**ay2m/Captain-Adel**](https://github.com/ay2m/Captain-Adel) — this repo · the instructor behind `captadel.com`
+- [**ay2m/FlyGACA**](https://github.com/ay2m/FlyGACA) — the product: the bilingual web app (`flygaca.com`) and its Express backend, plus the regulatory corpus
+- [**ay2m/FlyGACA-ios**](https://github.com/ay2m/FlyGACA-ios) — the native SwiftUI family, one App Store app per exam module
+- [**ay2m/Office**](https://github.com/ay2m/Office) — business, legal, compliance
+- [**ay2m/FlyGACA-app**](https://github.com/ay2m/FlyGACA-app) — archived · the retired predecessor of `ay2m/FlyGACA`, kept for its history. Not current.
 
 ---
 
