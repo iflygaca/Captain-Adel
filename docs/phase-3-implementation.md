@@ -1,6 +1,21 @@
 # Phase 3: Implementation Guide
 
-**Goal:** Fine-tune Qwen3-Embedding-0.6B on GACAR-specific retrieval tasks to achieve 54–60% recall@5 for Arabic (up from 44% baseline).
+> [!WARNING]
+> **Every metric in this guide is a target or a placeholder — none are measured.** No
+> ablation has run (`src/brain/_embeddings.bin` does not exist, so there is no dense
+> index) and no embedder has been fine-tuned. The "baseline" figures quoted below
+> originate in the template blocks of
+> [`phase-2-retrieval-metrics.md`](phase-2-retrieval-metrics.md) and are illustrative.
+> Do not quote any figure from this file as a baseline or a result, and do not copy them
+> into the README, a model card or a dataset card.
+>
+> **Naming:** `scripts/finetune-embedder.py` defaults `HUB_MODEL_ID` to
+> `flygaca/CaptAdel-finetuned`, which does not exist on the Hub. The model repo that
+> does exist is [`flygaca/CaptAdel`](https://huggingface.co/flygaca/CaptAdel) (no weights
+> published yet). Commands below use the script's current default; decide which name is
+> canonical before the first push.
+
+**Goal:** Fine-tune Qwen3-Embedding-0.6B on GACAR-specific retrieval tasks to improve Arabic recall@5. The starting point and the achievable gain are both unknown until Phase 2 produces a real baseline.
 
 ---
 
@@ -128,10 +143,11 @@ HF_TOKEN=hf_xxx \
 | `LEARNING_RATE` | 2e-5 | Lower (1e-5) if loss is noisy; higher (5e-5) if convergence is slow |
 | `EMBED_DIMS` | 1024 | Set to 512 for MRL (Matryoshka Representation Learning) truncation |
 
-**Expected training progression:**
+**Expected training progression** — 🧪 *illustrative console output; the loss curve and
+the MRR@5 value are invented, showing only what a healthy run looks like:*
 
 ```
-Epoch 1/3, Step 10: loss=0.45
+Epoch 1/3, Step 10: loss=0.45          # ← EXAMPLE, NUMBERS ARE PLACEHOLDERS
 Epoch 1/3, Step 20: loss=0.38
 Epoch 1/3, Step 30: loss=0.32
 Epoch 2/3, Step 10: loss=0.28
@@ -153,14 +169,21 @@ Once the fine-tuned model is on Hub:
 
 ```bash
 # Test with fine-tuned embedder
-EMBEDDINGS_MODEL=flygaca/CaptAdel-finetuned \
+EMBEDDINGS_MODEL="${HUB_MODEL_ID:-flygaca/CaptAdel-finetuned}" \
 EMBED_DIMS=1024 \
-  npm run eval:ablations
+  node evals/ablations.js
 ```
 
-**Expected improvements (Arabic recall@5):**
+**Hypothesised improvements (Arabic recall@5):**
 
-| Config | Baseline (Phase 2) | Fine-tuned | Δ |
+> [!CAUTION]
+> 🧪 **Template — both columns are invented.** The "Baseline (Phase 2)" column is *not a
+> baseline*: those values come from the placeholder tables in
+> `phase-2-retrieval-metrics.md` and were never measured. The "Fine-tuned" column is a
+> guess relative to a guess, so every Δ is meaningless until both sides are real. This
+> table shows the shape of the A/B comparison, nothing more.
+
+| Config | "Baseline (Phase 2)" *(placeholder)* | "Fine-tuned" *(guess)* | Δ *(meaningless)* |
 |---|---|---|---|
 | Dense-512d-no-rerank | 36% | 44–48% | +8–12% |
 | Dense-512d-with-rerank | 42% | 50–56% | +8–14% |
@@ -172,13 +195,18 @@ EMBED_DIMS=1024 \
 
 Phase 3 is complete when:
 
-- [ ] Training pairs exported (evals/training-pairs.jsonl)
-- [ ] Fine-tuning converged (MRR@5 ≥ 0.55 on test set)
-- [ ] Model pushed to `flygaca/CaptAdel-finetuned` on Hub
-- [ ] Phase 2 ablations re-run with fine-tuned embedder
-- [ ] Arabic recall@5 ≥ 54% (was 44% baseline) ✅
-- [ ] English recall ≥ 72% (no regression) ✅
-- [ ] Citation accuracy Arabic ≥ 85% (was 81% baseline) ✅
+- [x] Training pairs exported — `evals/training-pairs.jsonl`, **66 pairs** from 99
+      annotated cases (39 Arabic-only cases returned no BM25 hits)
+- [ ] Fine-tuning converged (MRR@5 ≥ 0.55 on held-out test set)
+- [ ] Weights published to the Hub
+- [ ] Phase 2 ablations re-run with the fine-tuned embedder
+- [ ] Arabic recall@5 clears its threshold
+- [ ] English recall shows no regression
+- [ ] Arabic citation accuracy clears its threshold
+
+The last three were written as "≥ X (was Y baseline)", and every Y traces to a
+placeholder. **Set these thresholds from the real Phase 2 numbers once those exist**,
+then treat them as the gate.
 
 ---
 
@@ -230,12 +258,19 @@ Then Phase 4 builds a public demo on Hugging Face Spaces.
 ```bash
 python scripts/export-training-pairs.py
 
-# Output example:
-# ✅ Exported 98 training pairs
-#    EN: 73 | AR: 25
-#    Easy: 52 | Medium: 31 | Hard: 15
+# Actual output as of the last run:
+# ✅ Exported 66 training pairs
+#    EN: 66 | AR: 0
+#    Easy: 63 | Medium: 0 | Hard: 3
 #    Output: evals/training-pairs.jsonl
 ```
+
+Note the shape of that result. All 66 pairs are English: the 39 Arabic-only eval cases
+score no BM25 hits against an English corpus, so ground-truth mining finds nothing to
+annotate them with, and they contribute no pairs. **The training set therefore contains
+no Arabic queries at all** — which is a real limitation for a model whose whole purpose
+is cross-lingual retrieval. Worth solving (translated queries, manual annotation, or
+mining once dense retrieval is live) before reading much into any fine-tuning result.
 
 ### Inspect a training pair
 

@@ -1,5 +1,23 @@
 # Captain Adel: Cross-Lingual Retrieval Roadmap
 
+> [!WARNING]
+> **This is a plan, not a status report. Every metric in it is a target or a
+> placeholder — none are measured.**
+>
+> Read the ✅ marks below as "specified", never as "done and verified". No ablation has
+> been run (`src/brain/_embeddings.bin` does not exist, so there is no dense index), no
+> embedder has been fine-tuned, and no recall, citation-accuracy or latency figure here
+> has been observed. Numbers like "44% Arabic recall@5" originate in the template blocks
+> of [`phase-2-retrieval-metrics.md`](phase-2-retrieval-metrics.md) and are illustrative.
+> Do not quote any figure from this file as a baseline or a result, and do not copy them
+> into the README, a model card or a dataset card.
+>
+> **Naming:** `scripts/finetune-embedder.py` defaults `HUB_MODEL_ID` to
+> `flygaca/CaptAdel-finetuned`, which does not exist on the Hub. The model repo that
+> does exist is [`flygaca/CaptAdel`](https://huggingface.co/flygaca/CaptAdel) (no weights
+> published yet). References below use the script's current default; decide which name is
+> canonical before the first push.
+
 **Vision:** Enable Captain Adel to answer Arabic pilot questions by retrieving English GACAR regulations through cross-lingual dense retrieval, fine-tuned for aviation domain, and proven live.
 
 **4-phase delivery** (Aug 2026 – Dec 2026, est.)
@@ -53,9 +71,10 @@ npm run eval
 - Arabic cases that were unreachable via BM25 now retrieve correctly
 - No regression on English
 
-**Expected outcome:**
-- BM25-only Arabic recall: ~5% → Hybrid Arabic recall: ~44%
-- English recall stays strong (~70%)
+**Hoped-for outcome** *(targets, not measurements — nothing below has been observed)*:
+- Arabic recall rises materially off a BM25-only floor that is expected to be very low,
+  because the corpus is English and a pure-Arabic query scores few or no lexical hits
+- English recall stays strong
 - Both paths benefit from hybrid retrieval
 
 ---
@@ -102,21 +121,22 @@ npm run eval
 ```
 npm run eval -- --phase2-ablations
 ```
-- Arabic recall@5 ≥ 40% (achieved: 44%)
-- Citation accuracy Arabic ≥ 75% (achieved: 81%)
+- Arabic recall@5 ≥ 40% *(threshold to hit — not yet measured)*
+- Citation accuracy Arabic ≥ 75% *(threshold to hit — not yet measured)*
 - Latency p95 ≤ 2s (acceptable for agentic loop)
 - No regression on English
 
-**Expected outcome:**
-- Ablation report shows full hybrid stack wins (RRF + rerank)
-- Dimension trade-off: 512-d loses <3% vs. 1024-d, saves 50% memory
-- Decision: Ship 512-d by default, cut resident memory from 194 MB → 97 MB
+**Hypotheses to test** *(not findings — the ablation has not run)*:
+- The full hybrid stack (RRF + rerank) wins
+- Truncating to 512-d costs little recall relative to 1024-d while halving the index
+- If both hold, ship 512-d by default. The memory saving is arithmetic (half the
+  dimensions, half the bytes); the recall cost is the part that needs measuring
 
 ---
 
 ## Phase 3: Fine-tuned Embedder (6 weeks)
 
-**Goal:** Close the remaining gap via domain-specific fine-tuning. Train on GACAR-specific retrieval pairs. Target: additional 10–20% recall lift.
+**Goal:** Close the remaining gap via domain-specific fine-tuning. Train on GACAR-specific retrieval pairs. The size of the achievable lift is unknown until Phase 2 produces a real baseline.
 
 **Deliverables:**
 
@@ -124,8 +144,9 @@ npm run eval -- --phase2-ablations
    - Mine contrastive pairs from `evals/cases.json` groundTruthChunks
    - Positives: all ground-truth chunks
    - Negatives: stratified sampling (in-Part wrong-section, cross-Part hard)
-   - Output: `evals/training-pairs.jsonl` (~138 examples)
-   - Status: ✅ Spec ready
+   - Output: `evals/training-pairs.jsonl` — **66 pairs** from 99 annotated cases (39
+     Arabic-only cases returned no BM25 hits, so they carry no ground truth to mine)
+   - Status: ✅ implemented and run
 
 2. **Fine-tuning script** (`scripts/finetune-embedder.py`)
    - Load base Qwen3-Embedding-0.6B
@@ -140,25 +161,29 @@ npm run eval -- --phase2-ablations
    - Status: Spec ready, awaits Phase 1 foundation
 
 4. **Validation via Phase 2 re-run** (`evals/ablations.js` with fine-tuned model)
-   - Re-run ablations with `flygaca/CaptAdel-finetuned`
+   - Re-run ablations with the fine-tuned model
    - Compare side-by-side: base Qwen3 vs. fine-tuned CaptAdel
-   - Expected: Arabic recall@5 goes 44% → 54–60%
+   - Expected: a measurable Arabic lift. Size unknown — there is no baseline to lift from
+     until Phase 2 actually runs
    - Status: Spec ready
 
 **Phase 3 gate:**
 ```
 EMBEDDINGS_MODEL=flygaca/CaptAdel-finetuned npm run eval -- --phase2-ablations
 ```
-- Arabic recall@5 ≥ 54% (was 44% baseline)
-- English recall ≥ 72% (no regression)
-- Citation accuracy Arabic ≥ 85% (was 81% baseline)
-- Training converges (MRR@5 on test set ≥ 0.55)
+*Thresholds cannot be set responsibly yet — each was written as "≥ X (was Y baseline)"
+and every Y traces to a placeholder. Set them from the real Phase 2 numbers once those
+exist, then treat them as the gate.*
 
-**Expected outcome:**
-- Hard cases (cross-lingual, multi-Part ambiguity) lift 20+ percentage points
+- Arabic recall@5 clears its threshold
+- English recall shows no regression
+- Arabic citation accuracy clears its threshold
+- Training converges (MRR@5 on held-out test set ≥ 0.55)
+
+**Hoped-for outcome** *(untested)*:
+- Hard cases (cross-lingual, multi-Part ambiguity) improve most — by how much is unknown
 - Regulatory terminology (minimum equipment list, type ratings) better understood
 - Cross-lingual synonymy (Arabic intent → English regulation) captured
-- Production model ships as `flygaca/CaptAdel-finetuned`
 
 ---
 
@@ -186,7 +211,7 @@ EMBEDDINGS_MODEL=flygaca/CaptAdel-finetuned npm run eval -- --phase2-ablations
    - Hero with example queries in both languages
    - Status: ✅ Spec ready
 
-4. **Hugging Face Spaces deployment** (`flygaca/captadel-proof-space`)
+4. **Hugging Face Spaces deployment** (`flygaca/captain-adel`)
    - Public, live demo
    - Preload corpus & binary embeddings index
    - Inference-only (no writing, no DB)
@@ -201,7 +226,7 @@ EMBEDDINGS_MODEL=flygaca/CaptAdel-finetuned npm run eval -- --phase2-ablations
    - Status: Spec ready
 
 **Phase 4 gate:**
-- App deployed & live at `https://huggingface.co/spaces/flygaca/captadel-proof-space`
+- App deployed & live at `https://huggingface.co/spaces/flygaca/captain-adel`
 - Latency <2s per query
 - A/B comparison working
 - Bilingual UI functional
@@ -248,8 +273,8 @@ EMBEDDINGS_MODEL=flygaca/CaptAdel-finetuned npm run eval -- --phase2-ablations
 ┌─────────────────────────────────────────────────────────┐
 │ Phase 3: Fine-Tuned Embedder                            │
 │                                                          │
-│  flygaca/CaptAdel-finetuned (10–20% recall lift)        │
-│  Trained on 138 GACAR retrieval pairs                   │
+│  flygaca/CaptAdel-finetuned (lift unmeasured)           │
+│  Trained on 66 GACAR retrieval pairs                    │
 │  ✓ MultipleNegativesRankingLoss                         │
 │  ✓ MRR@5 ≥ 0.55 on held-out test                        │
 └─────────────────────────────────────────────────────────┘
@@ -273,8 +298,8 @@ EMBEDDINGS_MODEL=flygaca/CaptAdel-finetuned npm run eval -- --phase2-ablations
 │  4. Async tool loop (search_library → hybrid)           │
 │  5. In-Kingdom TEI (Cloud Run me-central2, PDPL-safe)   │
 │                                                          │
-│  ✓ BM25 (5% AR recall) → Hybrid (44% AR recall)         │
-│  ✓ No regression on English (70% recall)                │
+│  · BM25 weak for AR → Hybrid targets a lift             │
+│  · No regression on English (target)                    │
 └─────────────────────────────────────────────────────────┘
          ↑
 ┌─────────────────────────────────────────────────────────┐
@@ -305,38 +330,44 @@ EMBEDDINGS_MODEL=flygaca/CaptAdel-finetuned npm run eval -- --phase2-ablations
 
 3. **Phase 2 measures:** Can't measure Phase 1 without ablations. Phase 2 is the **decision gate** — should we ship, and at what config? (Answer: yes, 512-d recommended.)
 
-4. **Phase 3 improves:** Phase 2 shows the gap (44% vs. goal of 54%+). Phase 3 fine-tunes to close it. Can't train without Phase 1 foundation (can't run eval suite to generate training pairs).
+4. **Phase 3 improves:** Phase 2 is what reveals the gap between off-the-shelf retrieval and the goal; Phase 3 fine-tunes to close whatever that gap turns out to be. Can't train without the Phase 1 foundation (can't run the eval suite to generate training pairs).
 
 5. **Phase 4 proves:** Phase 3 model is ready. Phase 4 surfaces it live with transparency. This is the **public proof** and **Fly GACA integration anchor**.
 
 ---
 
-## Success Metrics
+## Success Criteria
+
+> These are the conditions each phase must satisfy to be called done. **None of the
+> measured ones are satisfied yet** — treat every box below as outstanding unless it is
+> ticked, and treat every number as a target rather than an observation.
 
 **End of Phase 1:**
-- ✅ 138 eval cases pass (Arabic cases newly measurable)
-- ✅ Arabic recall@5: 44% (was 5%)
-- ✅ English recall stays ≥70%
-- ✅ No regression
+- [x] Arabic eval cases written with real `citesPart` assertions
+- [ ] All 138 eval cases pass
+- [ ] Arabic recall@5 clears its threshold
+- [ ] English recall holds; no regression
 
 **End of Phase 2:**
-- ✅ Ablation report complete
-- ✅ Production config decided (512-d hybrid RRF + rerank)
-- ✅ Memory footprint halved (194 MB → 97 MB)
-- ✅ Latency acceptable for agentic loop (<2s p95)
+- [ ] Ablation report generated from a real run
+- [ ] Production config decided from those numbers
+- [ ] Memory footprint measured at the chosen dimension
+- [ ] Latency measured and acceptable for the agentic loop
 
 **End of Phase 3:**
-- ✅ Fine-tuned model trained and pushed to Hub
-- ✅ Arabic recall@5: 54–60% (was 44%)
-- ✅ Citation accuracy Arabic: ≥85% (was 81%)
-- ✅ No English regression (≥72%)
+- [x] Training pairs exported (66 pairs from 99 annotated cases)
+- [ ] Fine-tuned model trained and weights published to the Hub
+- [ ] Arabic recall@5 clears its threshold
+- [ ] Arabic citation accuracy clears its threshold
+- [ ] No English regression
 
 **End of Phase 4:**
-- ✅ Live Spaces app running
-- ✅ Arabic → English retrieval demonstrated
-- ✅ Latency & citation transparency visible
-- ✅ A/B comparison quantifies fine-tuning benefit
-- ✅ Shared with Fly GACA for integration planning
+- [x] Gradio app written (`src/gradio_app.py`) and a Space exists
+- [ ] Space verified running with the real retrieval stack wired in
+- [ ] Arabic → English retrieval demonstrated end to end
+- [ ] Latency & citation transparency visible in the UI
+- [ ] A/B comparison quantifies the fine-tuning benefit *(needs a fine-tuned model)*
+- [ ] Shared with Fly GACA for integration planning
 
 ---
 
