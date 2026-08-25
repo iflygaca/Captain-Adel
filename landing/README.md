@@ -15,7 +15,9 @@ fully static Vite app that only *documents* that API — it makes no live calls.
 - Vite 7 + React 19 + TypeScript, Tailwind CSS 3.4, shadcn/ui, Lenis smooth scroll
 - Two build entries: `index.html` (English, `/`) and `ar/index.html` (Arabic, `/ar/`)
 - Language is **path-driven** (`src/i18n.ts`): `/ar/…` renders RTL Arabic, everything else LTR English; strings live inline via `pick(en, ar)`
-- Sections in `src/sections/` (Hero, Ticker, Cinematic, Doctrine, MeetCaptain, Gallery, Brain, Models, FAQ, GacarQa, ApiSection, Footer); scroll/reveal/parallax/magnetic behaviour in `src/hooks/useReveal.ts`
+- Sections in `src/sections/` — content: Hero, HeroDemo, Ticker, Cinematic, Doctrine, MeetCaptain,
+  Gallery, Brain, Models, FaqSection, GacarQa, ApiSection; chrome: Header, MobileNav, StickyCta,
+  Loader, Footer. Scroll/reveal/parallax/magnetic behaviour in `src/hooks/useReveal.ts`
 - Media (captain art, cockpit video) in `public/media/`
 
 ## Develop
@@ -50,6 +52,17 @@ Auth: either `npx wrangler login` (browser) or set `CLOUDFLARE_API_TOKEN`
 rewrites extensionless paths to the right language shell (`/ar/…` → Arabic,
 otherwise English). If you ever edit the Worker in the Cloudflare dashboard,
 mirror the change into `worker/index.js` so this repo stays the source of truth.
+
+## Known issues
+
+Two links on this **public** page point at **private** repositories, so they 404 for every
+visitor and no organisation rename fixes them. Both need a decision about what a visitor should
+see instead:
+
+| Where | Link | Problem |
+|---|---|---|
+| `src/sections/Footer.tsx` | Squadron → "The Book of Fly GACA" | Points into `ay2m/FlyGACA`, where the file has never existed. `ay2m/Office` holds the canon, but that repo is private too. |
+| `src/sections/ApiSection.tsx` | the GitHub CTA | Points at `ay2m/Captain-Adel`, which is private. Its visible label also still reads `FlyGACA/Captain-Adel` — an organisation that does not exist. |
 
 ## Conventions
 

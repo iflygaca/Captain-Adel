@@ -4,6 +4,11 @@ Apple Pay (offered by the Moyasar checkout widget, `methods: [... 'applepay' ...
 requires this domain to host Apple's **domain-association file** so Apple can
 verify that `captadel.com` is authorised to present the Apple Pay sheet.
 
+> [!NOTE]
+> **The file is already here** — `apple-developer-merchantid-domain-association` (9,122 bytes) is
+> committed. The steps below are for re-provisioning it (a new domain, or a merchant re-issue),
+> not first-time setup.
+
 ## What to place here
 
 1. In the **Moyasar dashboard** → Apple Pay, register the production domain
