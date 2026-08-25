@@ -47,20 +47,28 @@ def load_corpus_chunks():
 
     try:
         with gzip.open(chunks_path, 'rt', encoding='utf-8') as f:
-            chunks_list = json.load(f)
+            data = json.load(f)
     except Exception as e:
         print(f"Error loading corpus: {e}", file=sys.stderr)
         return {}
 
+    # Extract chunks list from wrapper (may be direct list or {chunks: [...]} dict)
+    if isinstance(data, dict):
+        chunks_list = data.get('chunks', [])
+    else:
+        chunks_list = data
+
     # Index by chunk_id (zero-padded index)
+    # Corpus uses abbreviated keys: t=text, db=doc_badge, ds=doc_slug, si=section_id, etc.
     chunks = {}
     for i, chunk in enumerate(chunks_list):
         chunk_id = f"{i:05d}"
+        # Map abbreviated keys to readable names
         chunks[chunk_id] = {
-            'text': chunk.get('text', ''),
-            'part': chunk.get('part'),
-            'section': chunk.get('section'),
-            'citation': chunk.get('citation', ''),
+            'text': chunk.get('t', ''),  # 't' is the full section text
+            'part': chunk.get('db', ''),  # 'db' is doc_badge (e.g., "Part 91")
+            'section': chunk.get('si', ''),  # 'si' is section_id
+            'citation': chunk.get('st', ''),  # 'st' is subtitle (section title)
             'chunk_index': i
         }
 
