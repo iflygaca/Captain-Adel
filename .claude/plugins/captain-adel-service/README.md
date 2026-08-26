@@ -34,6 +34,16 @@ with a `git-subdir` source.
 | `/eval-parity` | The parity gate, and how to read it — the Arabic subset decides |
 | `/provider-smoke` | One-turn connectivity check, and the config to check first when it fails |
 | `/deploy-check` | Pre-deploy checklist: gate, secrets, region, resources, contract, health |
+| `/instructor-launch` | Sequences a curriculum change — corpus → curriculum → persona → learner data → gate |
+
+**Skills** (procedures the agents defer to; loaded on demand):
+
+| Skill | Covers |
+| --- | --- |
+| `aviation-pedagogy` | The `quiz.json` shape, what makes a question shippable, what `exam-core` actually does, and which pedagogy claims are implemented |
+| `flight-instructor-personas` | The tenant/body split, exam-mode framing, the GACA-relationship wording, bilingual testing |
+| `pdpl-learner-data` | The collections, the ordered erasure path and why markers are tombstoned, fail-open quota, residency stated honestly |
+| `captadel-deployment` | The gate as CI runs it, image sizing, secrets, region, the hand-maintained CSP, what sits outside the workflows |
 
 ## What it deliberately does not duplicate
 
@@ -43,6 +53,17 @@ Code loads them automatically for sessions in this checkout, and they cover
 `src/brain/`, `evals/`, the system prompt and the eight public pages. The
 plugin's four agents cover the surfaces those do not: curriculum, provider
 operations, the data layer, and deployment.
+
+The plugin's skills carry **procedures**; its agents carry **role context**.
+Where both touch a subject the skill states the steps and defers the "why it is
+shaped this way" to the named agent, so the two cannot drift into two accounts
+of one thing.
+
+There is deliberately **no `personalization-tuning` command**. The Phase 2 plan
+listed one for a learner-feedback → model-improvement loop, but confusion
+detection, mastery gating and the spaced-repetition schedule do not exist in
+this repo — see `aviation-pedagogy`. A command driving machinery that isn't
+there would be fiction.
 
 The vendored skills under `.claude/skills/` (the diagram-design skin and the
 eight cybersecurity skills) likewise stay where they are — see

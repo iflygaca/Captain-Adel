@@ -24,7 +24,7 @@ knowing which:
 | Route | What it gives you | Where it lives |
 | --- | --- | --- |
 | **This repo's own agents** | Loaded automatically in any session here | `.claude/agents/` |
-| **The `captain-adel-service` plugin** | The four flight-service agents and the workflow commands — install it to get them in a session outside this checkout | `.claude/plugins/captain-adel-service/` |
+| **The `captain-adel-service` plugin** | The four flight-service agents, four skills and the workflow commands — install it to get them in a session outside this checkout | `.claude/plugins/captain-adel-service/` |
 | **`ay2m/Office`'s agents** | Governance and compliance roles. They are **not** loaded by a session in this repo — they need the Office checkout, or the `office-governance` plugin from the family marketplace | `ay2m/Office/.claude/agents/` |
 
 Install the marketplace plugins with:
@@ -101,25 +101,49 @@ they are not ambiently available "from any repo".
 - **Audit trail:** Immutable, encrypted at rest, includes who/what/when/why for all mutations
 - **Retention:** Learner data 2–7 years post-completion per engagement; deleted or anonymized upon right-to-be-forgotten request
 - **Right to be forgotten:** Deletion procedure exists and tested; anonymization preserves aggregate metrics
-- **External inference:** Gemini API runs outside Kingdom (US/EU) — **open risk**, documented in curriculum, not hidden
+- **External inference:** `MODEL_PROVIDER` defaults to `gemini`, which calls
+  Google's Gemini Developer API via `@google/genai` — a global endpoint, no
+  region pinning in this repo, so the **English chat path leaves the Kingdom**.
+  The Arabic path reaches ALLaM only when `ALLAM_BASE_URL` is set (default
+  empty). **Open risk**, documented, not hidden — never assert in-Kingdom
+  processing of chat as present fact.
+- **Region conflict, open:** `deploy/deploy.sh` documents `me-central1` (Doha)
+  as a fallback while the residency rule below forbids it. Unresolved — a
+  compliance decision, not a code-comment fix.
 
 ### Curriculum & Pedagogy
 
 - **GACAR alignment:** Every learning objective and exam question cites GACAR section; never fabricate regulations
-- **Corpus tiers:**
+- **Corpus tiers** — *stated policy, not a mechanism.* These three identifiers
+  occur nowhere in this repo's code or data (nor in `ay2m/FlyGACA`'s). Apply them
+  as editorial policy when deciding what to host; do not write comments or docs
+  implying a tier field exists:
   - **HOST_SAFE_CORE:** Can appear on learning interface and exam (vetted, approved)
   - **HOST_ORIGINAL:** Can appear in study materials but not public (proprietary instructor notes)
   - **DO_NOT_HOST:** Cite only (external links, reference books, advisory circulars)
-- **AIRAC freshness:** Effective date + 28 days for content staleness; 7-day buffer for updates (35-day threshold)
-- **Mock exam design:** Three-tier progression (knowledge-check → skill-check → performance-check); mastery gates per level
-- **Knowledge retention:** Spaced-repetition schedule (1d, 3d, 7d, 30d); confusion detection flags topics for re-teaching
+- **AIRAC freshness:** *not a mechanism in this repo.* AIRAC appears here only as
+  exam **content** (a question about the 28-day cycle) and one line of the system
+  prompt. The staleness implementation lives in `ay2m/FlyGACA`
+  (`src/calc/airac.ts`: 28-day cycles anchored to AIRAC 2001; a 7-day due window
+  in `airacStatus()`). Quote those two numbers, not a combined "35-day threshold".
+- **Mock exam design** — *what actually ships:* one bank file,
+  `public/assets/data/quiz.json`, with an `exam` block of **25 questions,
+  30 minutes, 75% pass mark**, and **13 topic banks** (174 questions today).
+  `exam-core.js` does seeded selection, option-order randomisation with answer
+  remap, scoring and a weakest-first topic breakdown.
+- **Three-tier progression, mastery gates, spaced repetition (1d/3d/7d/30d) and
+  confusion detection are design intent, not implemented.** None of those terms
+  occurs anywhere in `src/` or `public/assets/js/`. Do not write code comments,
+  docs or learner-facing copy implying any of them is running.
 - **Safety-critical content:** Marked explicitly; never simplified or speculated; backed by SOP references
 
 ### Model & Persona
 
 - **Warm, challenging Saudi persona:** Encourages mastery; does not patronize; culturally aware (prayer times, holidays, values)
 - **Confusion detection:** Tracks conceptual gaps across attempts; re-teaches via analogy or first-principles
-- **Progression gating:** Learner cannot advance without demonstrating mastery (≥80% on skill-checks)
+- **Progression gating:** intended, not built. The shipped threshold is the
+  exam's **75%** pass mark in `quiz.json`; there is no skill-check gate and no
+  ≥80% rule in the code. Do not quote 80% as this product's threshold.
 - **Feedback loop:** Learner interactions → confusion signals → curriculum refinement (monthly review)
 - **Model fine-tuning:** Performed on curated mastery and confusion data; never on raw learner responses (PDPL safe)
 

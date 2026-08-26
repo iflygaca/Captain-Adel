@@ -31,12 +31,24 @@ that is supposed to stop a bad revision.
 ## Rules
 
 - **No secrets in code, ever.** All config comes from env; `.env` is gitignored
-  and `.env.example` holds **placeholders only**. It currently ships a
-  real-looking `GEMINI_API_KEY` value — that key should be rotated and the line
-  blanked, and nothing live may be pasted back into it.
-- **PDPL decides the region.** Real user questions are personal data, so the
-  chat model runs in-Kingdom for production. HF/US/EU endpoints are dev and eval
-  only.
+  and `.env.example` holds **placeholders only** — `GEMINI_API_KEY=` is blank
+  there and stays blank. (It once shipped a real-looking value; that has been
+  cleared. Nothing live may be pasted back into it.)
+- **PDPL decides the region — and today's answer is honest, not comfortable.**
+  Real user questions are personal data. The *service* deploys to `me-central2`
+  (Dammam), but the **English chat path leaves the Kingdom**: `MODEL_PROVIDER`
+  defaults to `gemini`, which calls Google's Gemini Developer API through
+  `@google/genai`, a global endpoint with no region pinning here. The Arabic
+  path reaches ALLaM only when `ALLAM_BASE_URL` is set, and it defaults to
+  empty; whether that endpoint is in-Kingdom is a hosting fact this repo cannot
+  attest to. In-Kingdom hosting of the model is the intent, not the current
+  state — never write code, comments or copy asserting it as present fact.
+  `CLAUDE.md` records external inference as a documented open risk; match it.
+- **An unresolved conflict, flagged not hidden.** `deploy/deploy.sh` documents
+  `me-central1` (Doha) as a fallback region, while `CLAUDE.md` says
+  "`me-central2` Dammam only — never `me-central1` (Doha, not PDPL-safe)".
+  Deploy to `me-central2` and raise the conflict; it is a compliance decision,
+  not something to settle in a code comment.
 - **Fail-open quota.** Any Firestore error allows the request. A deploy change
   must never turn a metering dependency into an availability dependency.
 - **Firestore is blanket-deny** (`firestore.rules`) — the browser never opens it

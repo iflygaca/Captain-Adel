@@ -1,8 +1,8 @@
 {
   "name": "captain-adel-service",
   "displayName": "Captain Adel — Flight Instruction Service",
-  "version": "0.1.0",
-  "description": "Agents and workflow commands for ay2m/Captain-Adel: the exam and curriculum surface, provider/model operations and the parity gate, the bundled GACAR corpus and embeddings, and the Cloud Run deployment path.",
+  "version": "0.2.0",
+  "description": "Agents, skills and workflow commands for ay2m/Captain-Adel: the curriculum and exam bank, the instructor persona and exam framing, provider operations and the parity gate, the learner-data and PDPL layer, and the Cloud Run deployment path.",
   "author": {
     "name": "Fly GACA",
     "url": "https://github.com/ay2m"
@@ -10,5 +10,13 @@
   "homepage": "https://github.com/ay2m/Captain-Adel/tree/main/.claude/plugins/captain-adel-service",
   "repository": "https://github.com/ay2m/Captain-Adel",
   "license": "UNLICENSED",
-  "keywords": ["captain-adel", "gacar", "rag", "evals", "cloud-run", "arabic", "aviation"]
+  "keywords": [
+    "captain-adel",
+    "gacar",
+    "rag",
+    "evals",
+    "cloud-run",
+    "arabic",
+    "aviation"
+  ]
 }
