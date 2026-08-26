@@ -235,7 +235,12 @@ authoring/             Source-of-truth system prompt + KB scope + Python referen
                        prompt-steward (system-prompt/tenants/authoring) and
                        site-chrome (public/*.html + the CSP); agents/README.md
                        explains when each is the right one. settings.json holds the
-                       repo's Claude Code settings.
+                       repo's Claude Code settings, and registers the flygaca-family
+                       marketplace. plugins/captain-adel-service/ is this repo's
+                       distributable plugin — curriculum, provider ops, the corpus
+                       data layer and deployment; ay2m/Office's marketplace points
+                       at it with a git-subdir source. Install it with
+                       /plugin install captain-adel-service@flygaca-family
 ```
 
 Diagrams from that skill are **documentation artifacts** for `docs/` — they are never served by
