@@ -12,6 +12,12 @@
         "source": "github",
         "repo": "mukul975/Anthropic-Cybersecurity-Skills"
       }
+    },
+    "flygaca-family": {
+      "source": {
+        "source": "github",
+        "repo": "ay2m/Office"
+      }
     }
   }
 }
