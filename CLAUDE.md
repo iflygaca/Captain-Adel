@@ -13,19 +13,52 @@ Guidance for Claude Code in the Captain Adel flight instructor service repositor
 
 Governance, strategy, financial, and legal material live in the separate `ay2m/Office` repo.
 
-## Shared Agents (from ay2m/Office)
+## Agents
 
-All agents below are defined in `ay2m/Office/.claude/agents/` and available to this repo via the family contract
-(`contracts/flygaca-family.json`, byte-identical across ay2m/Office, ay2m/FlyGACA, ay2m/Captain-Adel).
+**Where they actually come from.** The family contract
+(`contracts/flygaca-family.json`) carries entity facts, the chat contract and the
+repo roster — it distributes **no agents**, so an agent is never "available via
+the contract". Agents reach a session by one of three routes, and it is worth
+knowing which:
+
+| Route | What it gives you | Where it lives |
+| --- | --- | --- |
+| **This repo's own agents** | Loaded automatically in any session here | `.claude/agents/` |
+| **The `captain-adel-service` plugin** | The four flight-service agents and the workflow commands — install it to get them in a session outside this checkout | `.claude/plugins/captain-adel-service/` |
+| **`ay2m/Office`'s agents** | Governance and compliance roles. They are **not** loaded by a session in this repo — they need the Office checkout, or the `office-governance` plugin from the family marketplace | `ay2m/Office/.claude/agents/` |
+
+Install the marketplace plugins with:
+
+```
+/plugin marketplace add ay2m/Office
+/plugin install captain-adel-service@flygaca-family
+```
+
+The tables below name the roles by their canonical names. Where a role is served
+by this repo's plugin, the plugin agent's own name is given in brackets.
 
 ### Flight Service Agents
 
 | Agent | Use it for | Tools |
 | --- | --- | --- |
-| `flight-curriculum-designer` | Syllabus design, mock exam scope, learner progression paths, safety-critical aviation content | Read, Write, Edit, Bash |
-| `ml-instructor-trainer` | Model fine-tuning, instructor persona consistency, eval metrics, confusion detection | Read, Bash |
-| `flight-data-pipeline-engineer` | Learner data ingestion, flight-hour tracking, currency calculation, PDPL compliance, anonymization | Read, Bash |
-| `instructor-deployment-steward` | Cloud Run revision management, captadel.com hosting, webhook routing, version pinning, rollback procedures | Read, Bash |
+| `flight-curriculum-designer` [`curriculum-author`] | Syllabus design, mock exam scope, learner progression paths, safety-critical aviation content | Read, Write, Edit, Bash |
+| `ml-instructor-trainer` [`model-ops`] | Model fine-tuning, instructor persona consistency, eval metrics, confusion detection | Read, Bash |
+| `flight-data-pipeline-engineer` [`corpus-data`] | Learner data ingestion, flight-hour tracking, currency calculation, PDPL compliance, anonymization | Read, Bash |
+| `instructor-deployment-steward` [`deploy-runner`] | Cloud Run revision management, captadel.com hosting, webhook routing, version pinning, rollback procedures | Read, Bash |
+
+### This repo's own agents
+
+Loaded automatically here, no install needed — they are not in the tables above
+because they are Captain Adel's, not the family's:
+
+| Agent | Use it for |
+| --- | --- |
+| `brain-retrieval` | `src/brain` — retrieval, routing, grounding, providers, tools |
+| `eval-warden` | The regression suite in `evals/` — cases, assertions, parity gating |
+| `prompt-steward` | The deployed system prompt, exam-mode framing, tenant voice |
+| `site-chrome` | The `public/*.html` pages, shared frontend JS, the hand-maintained CSP |
+| `instructor-persona-steward` | Instructor persona consistency |
+| `conversion-engine-steward` | The conversion funnel |
 
 ### Cross-Repo Coordination Agents
 
@@ -42,9 +75,13 @@ All agents below are defined in `ay2m/Office/.claude/agents/` and available to t
 | `ksa-compliance` | PDPL, ZATCA, data residency, learner-data audit, curriculum compliance review | Read, Write, Edit, Glob, Grep, Bash |
 | `family-warden` | Family contract byte-identity, repo roster, cross-repo drift sweeps | Read, Edit, Glob, Grep, Bash |
 
-## Workflows (from ay2m/Office/.claude/skills/operations/)
+## Workflows
 
-Triggered via slash commands from any repo; coordinate across all three:
+These are **Office-hosted**: the workflow definitions live in
+`ay2m/Office/.claude/skills/operations/`, and the installable commands ship in
+Office's `family-orchestrators` plugin. A session in this repo gets them only by
+installing that plugin (`/plugin install family-orchestrators@flygaca-family`) —
+they are not ambiently available "from any repo".
 
 | Workflow | Trigger | Participants | Purpose |
 | --- | --- | --- | --- |
