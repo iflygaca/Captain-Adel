@@ -2,17 +2,22 @@
 # ============================================================================
 # Captain Adel — one-command Cloud Run deploy for captadel.com.
 #
-# Builds the standalone service image (Dockerfile, CPU-only) and deploys it to a
-# KSA region. Reads the model/embeddings credentials from Secret Manager, wiring
-# only the secrets that actually exist — so a Gemini-only first deploy works, and
-# ALLaM + cross-lingual embeddings light up the moment you add their secrets and
-# re-run. PDPL: real user questions are personal data — keep this in a Kingdom
-# region, and host ALLaM in-Kingdom for production (see RUNBOOK-captadel-deploy.md).
+# Builds the standalone service image (Dockerfile, CPU-only) and deploys it to
+# me-central2 (Dammam) — the only Google Cloud region inside the Kingdom of Saudi
+# Arabia, and therefore the only one that can satisfy PDPL's in-Kingdom processing
+# requirement for this service. me-central1 is Doha, Qatar — a different country
+# — and is never a valid deploy target for this service, whatever GCP calls it.
+# Reads the model/embeddings credentials from Secret Manager, wiring only the
+# secrets that actually exist — so a Gemini-only first deploy works, and ALLaM +
+# cross-lingual embeddings light up the moment you add their secrets and re-run.
 #
 # Usage:
 #   ./deploy/deploy.sh                 # deploy with current gcloud project
-#   REGION=me-central1 ./deploy/deploy.sh
 #   ./deploy/deploy.sh secrets         # create/update secrets from env vars, then exit
+#
+# If gcloud rejects me-central2 for your project (LOCATION_POLICY_VIOLATED), that
+# is a quota/allowlist problem to fix with Google, not a reason to deploy
+# elsewhere — see docs/RUNBOOK-captadel-deploy.md.
 #
 # Tunables (env, with defaults):
 #   SERVICE=captadel  REGION=me-central2  MEMORY=2Gi  CPU=2
@@ -23,7 +28,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."            # -> captadel/ (where the Dockerfile lives)
 
 SERVICE="${SERVICE:-captadel}"
-REGION="${REGION:-me-central2}"   # Dammam (target). Fall back: REGION=me-central1 (Doha).
+REGION="${REGION:-me-central2}"   # Dammam — the only in-Kingdom region. Not overridable to something else; see the guard below.
+[ "$REGION" = "me-central2" ] || {
+  printf '\033[1;31m✗ %s\033[0m\n' "PDPL requires in-Kingdom processing. me-central2 (Dammam) is the only Google Cloud region in Saudi Arabia; '$REGION' is not a valid deploy target for this service (me-central1 is Doha, Qatar — a different country). If me-central2 is rejected for your project, request quota — do not deploy elsewhere." >&2
+  exit 1
+}
 MEMORY="${MEMORY:-2Gi}"   # hybrid retrieval (EMBEDDINGS_BASE_URL + dense index) adds ~190 MB resident — keep ≥1Gi, 2Gi is safe
 CPU="${CPU:-2}"
 MIN_INSTANCES="${MIN_INSTANCES:-1}"   # keep one warm so the BM25 index stays resident
@@ -122,7 +131,7 @@ gcloud run deploy "$SERVICE" \
   --max-instances "$MAX_INSTANCES" \
   --set-secrets "$SECRET_ARGS" \
   --set-env-vars "$ENV_ARGS" \
-  || die "Deploy failed. If the region was rejected, retry with REGION=me-central1 ./deploy/deploy.sh"
+  || die "Deploy failed. If gcloud rejected me-central2 (LOCATION_POLICY_VIOLATED), that's a quota/allowlist issue — request access to me-central2 for this project. Do not deploy to another region."
 
 URL="$(gcloud run services describe "$SERVICE" --region "$REGION" --format='value(status.url)')"
 say "Deployed: $URL"

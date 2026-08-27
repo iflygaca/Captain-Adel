@@ -14,9 +14,9 @@ that is supposed to stop a bad revision.
 - **Image**: `node:20-slim`, `npm ci --omit=dev`, port `8787`, **≥2 GiB RAM**
   (the BM25 index is resident — do not size below that). The Dockerfile is at
   the repo root; `deploy/docker-compose.yml` is for local.
-- **Deploy**: `deploy/deploy.sh` builds and deploys to **Google Cloud Run in a
-  KSA region** (me-central2, me-central1 fallback) and pulls secrets from
-  Secret Manager.
+- **Deploy**: `deploy/deploy.sh` builds and deploys to **Google Cloud Run in
+  `me-central2`** (Dammam) — the only GCP region in the Kingdom — and pulls
+  secrets from Secret Manager. The script refuses any other `REGION`.
 - **CI** (`.github/workflows/`, two files): `ci.yml`'s `build` job runs
   `smoke` + `smoke:frontend` + `test:coverage` + `eval:dry`, then a report-only
   `npm audit --omit=dev`; the live `eval` is a separate weekly/dispatch job
@@ -44,11 +44,11 @@ that is supposed to stop a bad revision.
   attest to. In-Kingdom hosting of the model is the intent, not the current
   state — never write code, comments or copy asserting it as present fact.
   `CLAUDE.md` records external inference as a documented open risk; match it.
-- **An unresolved conflict, flagged not hidden.** `deploy/deploy.sh` documents
-  `me-central1` (Doha) as a fallback region, while `CLAUDE.md` says
-  "`me-central2` Dammam only — never `me-central1` (Doha, not PDPL-safe)".
-  Deploy to `me-central2` and raise the conflict; it is a compliance decision,
-  not something to settle in a code comment.
+- **The region is enforced, not configured.** `deploy/deploy.sh` hard-fails if
+  `REGION` isn't `me-central2` — `me-central1` (Doha) is Qatar, not a Saudi
+  region under any framing, and there is no compliant fallback. If `gcloud`
+  rejects `me-central2` for a project, that's a quota request to Google, never
+  a reason to point the deploy elsewhere.
 - **Fail-open quota.** Any Firestore error allows the request. A deploy change
   must never turn a metering dependency into an availability dependency.
 - **Firestore is blanket-deny** (`firestore.rules`) — the browser never opens it

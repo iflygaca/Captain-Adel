@@ -18,11 +18,15 @@ everything below explains what it does and the manual steps around it.
 > as the Captadel Firebase project.
 
 > **PDPL (load-bearing).** Real user questions are personal data and must be
-> processed in-Kingdom. Deploy the service to a KSA region (me-central2 Dammam —
-> target; me-central1 Doha — interim) and host the ALLaM model in-Kingdom for
+> processed in-Kingdom. **me-central2 (Dammam) is the only Google Cloud region
+> inside the Kingdom of Saudi Arabia**, and `deploy/deploy.sh` deploys there and
+> nowhere else — it hard-fails if `REGION` is set to anything other than
+> `me-central2`. me-central1 is Doha, **Qatar**, a different country; it is not
+> an in-Kingdom option under any framing and there is no compliant fallback
+> region to deploy to instead. Also host the ALLaM model in-Kingdom for
 > production. Hugging Face endpoints (US/EU) are great for **dev + evals** but are
 > outside the Kingdom — fine for the public GACAR corpus (embeddings), not for the
-> chat model on real traffic. See `RUNBOOK-pdpl-me-central2.md`.
+> chat model on real traffic.
 
 ---
 
@@ -91,9 +95,7 @@ Skip this for a BM25-only first deploy; run it and redeploy when your endpoint i
 
 ```bash
 cd captadel
-./deploy/deploy.sh                       # region defaults to me-central2 (Dammam)
-# if the region is rejected for your project:
-REGION=me-central1 ./deploy/deploy.sh    # interim (Doha)
+./deploy/deploy.sh                       # region is me-central2 (Dammam), enforced — see §7 if it's rejected
 ```
 The script builds from source, wires the present secrets, sets
 `MODEL_PROVIDER=auto` + `ARABIC_PROVIDER=allam`, runs `--min-instances 1` (keeps the BM25
@@ -148,7 +150,7 @@ Redeploy the `chat` function. The gateway sends `X-Adel-Api-Key` server-to-serve
 
 | Symptom | Fix |
 |---|---|
-| `LOCATION_POLICY_VIOLATED` / region rejected | Use `REGION=me-central1 ./deploy/deploy.sh` until me-central2 is granted. |
+| `LOCATION_POLICY_VIOLATED` / region rejected | Request me-central2 access/quota for this GCP project (Google Cloud console → IAM & Admin, or your account rep). There is no compliant fallback region — `deploy.sh` refuses any `REGION` other than `me-central2`, so the service cannot deploy until access is granted. |
 | `/health` shows `allam:false` | `ALLAM_BASE_URL` secret missing/empty, or the endpoint is down — Arabic falls back to Gemini. |
 | Arabic answers but weak/irrelevant sources | Cross-lingual recall is off — build the index (§2) + set `EMBEDDINGS_BASE_URL`, redeploy. |
 | First request slow / times out | Cold start builds the BM25 index; `--min-instances 1` (default) keeps one warm. |

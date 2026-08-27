@@ -76,10 +76,10 @@ So: **never assert in-Kingdom processing of chat as present fact.** `CLAUDE.md`
 records external inference as a documented open risk, and that is the accurate
 posture. Copy, comments and docs must match it.
 
-> Note a live contradiction: `deploy/deploy.sh` documents `me-central1` (Doha)
-> as a fallback region, while `CLAUDE.md` says "`me-central2` Dammam only —
-> never `me-central1` (Doha, not PDPL-safe)". Do not resolve this by quietly
-> picking a side in a code comment — it is a compliance decision. Raise it.
+> `deploy/deploy.sh` **enforces** `me-central2` and refuses to deploy to
+> `me-central1` (Doha, Qatar) — see the `captadel-deployment` skill. Don't
+> reopen that as a config knob; the region check is intentionally hard-coded,
+> not a default.
 
 ## Before you hand back
 

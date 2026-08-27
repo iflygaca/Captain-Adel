@@ -95,7 +95,10 @@ they are not ambiently available "from any repo".
 
 ### Data Residency & PDPL
 
-- **Data residency:** `me-central2` Dammam only — never `me-central1` (Doha, not PDPL-safe)
+- **Data residency:** `me-central2` Dammam only — enforced in code, not just policy.
+  `deploy/deploy.sh` hard-fails on any `REGION` other than `me-central2`.
+  `me-central1` is Doha, **Qatar** — a different country, not a Saudi region under
+  any framing — and there is no compliant fallback to deploy to instead.
 - **Learner data:** Name, email, progress only. No passport, address, biometrics, voice recordings, or face data
 - **Flight-hour log:** Timestamp, duration, aircraft type, instructor name, exam module — no flight route details, no ADS-B data
 - **Audit trail:** Immutable, encrypted at rest, includes who/what/when/why for all mutations
@@ -107,9 +110,13 @@ they are not ambiently available "from any repo".
   The Arabic path reaches ALLaM only when `ALLAM_BASE_URL` is set (default
   empty). **Open risk**, documented, not hidden — never assert in-Kingdom
   processing of chat as present fact.
-- **Region conflict, open:** `deploy/deploy.sh` documents `me-central1` (Doha)
-  as a fallback while the residency rule below forbids it. Unresolved — a
-  compliance decision, not a code-comment fix.
+- **Region conflict, resolved:** `deploy/deploy.sh`, its runbooks, the deploy
+  workflow and this file previously called `me-central1` a valid "interim"
+  fallback. It was never a compliant option — Doha is in Qatar, outside the
+  Kingdom, so no framing of it as in-Kingdom processing was ever accurate. Fixed
+  by hard-coding the region check into `deploy/deploy.sh` rather than leaving it
+  as a norm to remember. If `me-central2` is ever rejected for a GCP project,
+  that is a quota request to Google, not a reason to deploy elsewhere.
 
 ### Curriculum & Pedagogy
 

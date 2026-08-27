@@ -38,13 +38,15 @@ The Dockerfile is at the repo root — `deploy/docker-compose.yml` is local only
 
 ## Region
 
-`deploy/deploy.sh` defaults `REGION=me-central2` (Dammam). It also documents
-`me-central1` (Doha) as a fallback, while `CLAUDE.md` states "`me-central2`
-Dammam only — never `me-central1` (Doha, not PDPL-safe)".
+`deploy/deploy.sh` deploys to `me-central2` (Dammam) and refuses any other
+`REGION` value — the script exits before touching `gcloud` if you set it to
+anything else. This is deliberate, not a default that can be overridden: Doha
+(`me-central1`) is in Qatar, a different country, so it can never satisfy
+PDPL's in-Kingdom requirement, whatever a runbook or comment elsewhere claims.
 
-**That conflict is unresolved.** Do not settle it in a code comment or by
-quietly deploying to the fallback — it is a compliance call. Raise it, and
-deploy to `me-central2` in the meantime.
+If `gcloud` rejects `me-central2` for a project (`LOCATION_POLICY_VIOLATED`),
+that is a quota/allowlist request to Google — never a reason to point `REGION`
+somewhere else. The service cannot deploy until access is granted.
 
 ## Secrets
 

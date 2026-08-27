@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       region:
-        description: 'Cloud Run region (me-central2 default; me-central1 fallback)'
+        description: 'Cloud Run region — me-central2 only; deploy.sh rejects any other value (PDPL in-Kingdom requirement)'
         default: 'me-central2'
 
 permissions:

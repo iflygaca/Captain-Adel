@@ -140,7 +140,6 @@ gcloud run logs read captadel-embeddings --region me-central2 --limit=100
 
 - Check CPU allocation (2+ vCPU recommended)
 - Monitor batch queue depth in logs
-- Consider region fallback to me-central1
 
 ### Quota/Rate limits
 

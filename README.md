@@ -271,7 +271,7 @@ There is **no eslint/prettier** — style is convention and review. Match the su
 Saudi **PDPL** treats real user questions as personal data, so the chat model must run in-Kingdom
 for production. That is the requirement; it is **not yet met**.
 
-- Node service → **Google Cloud Run, `me-central2`** (`me-central1` fallback), secrets from Secret Manager
+- Node service → **Google Cloud Run, `me-central2`** (Dammam) only — the sole GCP region inside the Kingdom; `deploy/deploy.sh` refuses any other region — secrets from Secret Manager
 - Arabic endpoints (ALLaM / vLLM) → inside KSA infrastructure
 - HF / US / EU endpoints are fine for **dev and evals only**
 - Embeddings see only the public corpus → no residency constraint

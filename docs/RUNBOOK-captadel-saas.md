@@ -78,7 +78,7 @@ the Firebase project above.
 ```bash
 gcloud config set project captadel-app
 cd captadel && ./deploy/deploy.sh secrets     # re-create model secrets here
-./deploy/deploy.sh                            # deploy (me-central2; me-central1 fallback)
+./deploy/deploy.sh                            # deploy (me-central2 only — the script refuses any other region)
 ```
 
 Then map `captadel.com` (see `RUNBOOK-captadel-deploy.md §5`) and, if the service
@@ -185,7 +185,7 @@ paths `captadel/**`; or manual `workflow_dispatch`). It is inert until configure
 2. Repo → Settings → Secrets and variables → Actions:
    - **Secret** `GCP_SA_KEY` = the JSON key.
    - **Variables** `CAPTADEL_PROJECT_ID` = `captadel-app`, `CAPTADEL_REGION` =
-     `me-central2` (or `me-central1`).
+     `me-central2` — no other value is accepted; `deploy/deploy.sh` hard-fails on it.
 3. Push to main (touching `captadel/**`) or run the workflow manually. The health
    check asserts `/health` returns `status:ok`.
 

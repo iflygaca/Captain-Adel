@@ -56,7 +56,7 @@ EXPOSE 8080
 # Build & deploy to me-central2 (KSA region)
 gcloud run deploy captadel-embeddings \
   --source .              # Will build from Dockerfile above \
-  --region me-central2    # KSA (or me-central1 fallback) \
+  --region me-central2    # Dammam — the only GCP region in the Kingdom \
   --memory 4Gi            # TEI + model + buffers \
   --timeout 60s           # 10s embed + margin \
   --no-allow-unauthenticated  # Require API key \

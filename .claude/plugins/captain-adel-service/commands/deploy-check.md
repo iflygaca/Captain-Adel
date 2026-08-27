@@ -15,9 +15,11 @@ via `deploy.yml` when `GCP_SA_KEY` is set).
 2. **Secrets**: every var the change needs exists in Secret Manager, and none of
    them exists in the repo. `.env.example` holds placeholders only — confirm no
    live value was added to it in this diff.
-3. **Region**: Cloud Run in a KSA region (me-central2, me-central1 fallback).
-   PDPL means the chat model runs in-Kingdom for production; HF/US/EU endpoints
-   are dev and eval only.
+3. **Region**: Cloud Run in `me-central2` (Dammam) only — `deploy/deploy.sh`
+   refuses any other value. HF/US/EU endpoints are dev and eval only. Note the
+   English chat path itself (Gemini Developer API) still leaves the Kingdom —
+   that's a separate, still-open risk documented in `CLAUDE.md`, not something
+   the region enforcement fixes.
 4. **Resources**: ≥2 GiB RAM. The BM25 index is resident — an under-provisioned
    revision dies under load rather than at startup.
 5. **Surface diffs**: if `public/*.html` changed, `smoke:frontend` must be green
