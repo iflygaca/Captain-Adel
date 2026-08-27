@@ -16,14 +16,14 @@ API_BASE = "https://captadel.com"
 TIMEOUT = 30
 
 
-def ask_captain(question: str, language: str = "en") -> tuple[str, Optional[str]]:
+def ask_captain(question: str) -> tuple[str, Optional[str]]:
     """Send a question to Captain Adel and get a grounded answer."""
     try:
         with httpx.Client(timeout=TIMEOUT) as client:
             response = client.post(
                 f"{API_BASE}/v1/chat",
-                json={"q": question, "lang": language},
-                headers={"Accept": "application/json"}
+                json={"message": question, "product": "captadel"},
+                headers={"Accept": "application/json", "Content-Type": "application/json"}
             )
 
             if response.status_code != 200:
@@ -37,7 +37,10 @@ def ask_captain(question: str, language: str = "en") -> tuple[str, Optional[str]
             if data.get("sources"):
                 sources_html = "<h4>Sources cited:</h4><ul>"
                 for src in data["sources"][:5]:
-                    sources_html += f"<li><strong>{src.get('part', 'N/A')}</strong>: {src.get('section', '')}</li>"
+                    cite = src.get("citation") or f"GACAR Part {src.get('part', '')} §{src.get('section', '')}".strip()
+                    url = src.get("url") or f"https://flygaca.com/library/gacar-part-{src.get('part', '')}"
+                    title = src.get("title", "")
+                    sources_html += f"<li><a href='{url}' target='_blank'><strong>{cite}</strong></a> — {title}</li>"
                 sources_html += "</ul>"
 
             return answer, sources_html
@@ -48,9 +51,9 @@ def ask_captain(question: str, language: str = "en") -> tuple[str, Optional[str]
         return f"Error: {str(e)}", None
 
 
-def query_captain(question: str, language: str = "en") -> tuple[str, str]:
+def query_captain(question: str) -> tuple[str, str]:
     """Wrapper for Gradio that handles the response tuple."""
-    answer, sources = ask_captain(question, language)
+    answer, sources = ask_captain(question)
     sources_display = sources or "<p><em>No specific sources cited.</em></p>"
     return answer, sources_display
 
@@ -70,23 +73,13 @@ with gr.Blocks(title="Captain Adel", theme=gr.themes.Soft()) as demo:
     - 🔓 **Open API:** [API docs](https://captadel.com)
     """)
 
-    with gr.Row():
-        with gr.Column(scale=1):
-            language = gr.Radio(
-                choices=[("English", "en"), ("العربية", "ar")],
-                value="en",
-                label="Language / اللغة",
-                interactive=True
-            )
-        with gr.Column(scale=1):
-            submit_btn = gr.Button("Ask Captain ✈️", variant="primary", scale=1)
-
     question_input = gr.Textbox(
-        label="Your question / سؤالك",
-        placeholder="e.g., What is the minimum descent rate for a stabilized approach?",
+        label="Your question (English or Arabic) / سؤالك بالعربية أو الإنجليزية",
+        placeholder="e.g., What is the minimum descent rate for a stabilized approach? / ما هي متطلبات الطيران الليلي؟",
         lines=3,
         interactive=True
     )
+    submit_btn = gr.Button("Ask Captain ✈️ / اسأل الكابتن", variant="primary")
 
     with gr.Row():
         with gr.Column():
@@ -97,12 +90,12 @@ with gr.Blocks(title="Captain Adel", theme=gr.themes.Soft()) as demo:
     # Wire up the submission
     question_input.submit(
         fn=query_captain,
-        inputs=[question_input, language],
+        inputs=[question_input],
         outputs=[answer_output, sources_output]
     )
     submit_btn.click(
         fn=query_captain,
-        inputs=[question_input, language],
+        inputs=[question_input],
         outputs=[answer_output, sources_output]
     )
 

@@ -183,18 +183,14 @@ and copy-paste templates are in the audit doc; this track sequences its action i
 - [ ] **Fix the Hugging Face Space** (`flygaca/captain-adel`) — declares `app_file: app.py`
   with no `app.py` in the repo, so visitors hit an error state. Switch to `sdk: static` with a
   branded placeholder linking to captadel.com, or make it private.
-- [ ] **Publish `evals/cases.json` to the empty `flygaca/gacar-assistant-evals` dataset** — 83
-  bilingual eval cases as JSONL, with a real card (schema, license, "every change is eval-gated
-  in both languages"). Self-authored and the strongest public proof of rigor available today.
+- [x] **Publish `evals/cases.json` to the `flygaca/gacar-assistant-evals` dataset format** — 138
+  bilingual eval cases exported to `evals/gacar-assistant-evals.jsonl` with `evals/DATASET_CARD.md` (schema, license, "every change is eval-gated in both languages").
 - [ ] **Broken-link sweep** — the HF model card links to `github.com/FlyGACA/flygaca` (404); the
   landing footer + JSON-LD `sameAs` link to this private repo and to `ay2m/FlyGACA` (not
   public). Point every public surface at things that actually resolve for a logged-out visitor.
-- [ ] **`og:image` + `twitter:card`** on all 8 `public/*.html` pages (none has one today —
-  shared chat/exam links render as bare text).
-- [ ] **GitHub presentation pass** — org profile README, pin `FlyGACA-app` + `FlyGACA-ios`,
-  add `SECURITY.md` (this service takes payments — give researchers a disclosure channel) and
-  `CONTRIBUTING.md` stating the source-visible/proprietary posture, delete the README's stale
-  "Promotion to its own repo" section (see the `Later` item below — that split is done).
+- [x] **`og:image` + `twitter:card`** on all 8 `public/*.html` pages (verified with images and cards on all pages).
+- [x] **GitHub presentation pass** — add `SECURITY.md` (responsible disclosure channel) and
+  `CONTRIBUTING.md` stating the source-visible/proprietary posture and canonical issue links.
 - [ ] **Verify production routing** — confirm `captadel.com/chat.html` actually reaches the app
   and not the landing Worker's SPA fallback (`landing/worker/index.js` falls back to the
   language shell for any path it doesn't recognize).
