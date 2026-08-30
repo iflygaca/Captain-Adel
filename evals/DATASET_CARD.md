@@ -23,7 +23,7 @@ The official evaluation dataset for **Captain Adel** (captadel.com / Fly GACA) â
 
 Every prompt or model change to Captain Adel is eval-gated in both **English and Arabic** against this suite.
 
-- **Total Cases:** ${cases.length}
+- **Total Cases:** 138
 - **Domains Covered:** 30+ GACAR Parts (Part 1, 61, 67, 91, 107, 121, 135, 139, etc.)
 - **Categories:** `citation` (exact GACAR section reference), `refusal` (unanswerable / hallucination-resistance), `injection` (prompt-injection security), and `coverage` (per-Part grounding).
 
