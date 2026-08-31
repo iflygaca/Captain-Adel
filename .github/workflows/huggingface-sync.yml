@@ -1,0 +1,39 @@
+name: Sync to Hugging Face Spaces
+
+# Automatically mirrors Captain Adel to Hugging Face Spaces (flygaca/captain-adel)
+# whenever commits are pushed to main or triggered manually.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-huggingface-space
+  cancel-in-progress: true
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        if: ${{ env.HF_TOKEN != '' }}
+        run: |
+          git push --force https://flygaca:$HF_TOKEN@huggingface.co/spaces/flygaca/captain-adel main:main
+
+      - name: Report missing secret
+        if: ${{ env.HF_TOKEN == '' }}
+        run: |
+          echo "::warning::HF_TOKEN secret not configured in repository Actions secrets. Skipping auto-sync to Hugging Face Space."
+          echo "⚠️ Add HF_TOKEN (from https://huggingface.co/settings/tokens) to enable automatic sync to Hugging Face." >> "$GITHUB_STEP_SUMMARY"

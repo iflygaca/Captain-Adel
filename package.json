@@ -30,9 +30,12 @@
     "jais:smoke": "node evals/jais-smoke.js",
     "build:embeddings": "node scripts/build-embeddings.js",
     "build:landing": "node scripts/build-landing.js",
-    "fixtures:sse": "node scripts/record-sse-fixtures.js",
     "smoke": "node -e \"require('./src/server'); console.log('server module loads OK')\"",
-    "smoke:frontend": "node scripts/frontend-smoke.js"
+    "smoke:frontend": "node scripts/frontend-smoke.js",
+    "ios:generate": "cd ios && xcodegen generate",
+    "ios:build": "bash scripts/build-ios.sh",
+    "ios:open": "open ios/CaptainAdel.xcodeproj",
+    "ios:test": "swift test --package-path ios/AdelCore --build-path /tmp/AdelCore-build"
   },
   "dependencies": {
     "@google/genai": "^2.17.1",

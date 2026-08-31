@@ -1,3 +1,16 @@
+---
+title: Captain Adel AI Flight Instructor
+emoji: ✈️
+colorFrom: yellow
+colorTo: blue
+sdk: gradio
+sdk_version: 4.44.0
+app_file: app.py
+pinned: false
+license: mit
+short_description: Grounded Saudi Civil Aviation (GACAR & AIP) AI Flight Instructor
+---
+
 <div align="center">
 
 <img src="public/assets/img/captain/avatar.png" alt="Captain Adel" width="128" />

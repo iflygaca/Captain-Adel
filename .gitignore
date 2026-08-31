@@ -17,7 +17,11 @@ evals/gen-cases/drafts/*
 __pycache__/
 *.pyc
 
-# macOS
+# macOS & iOS
 .DS_Store
 .vercel
 .env*
+.build/
+ios/.build/
+*.xcodeproj
+!ios/project.yml

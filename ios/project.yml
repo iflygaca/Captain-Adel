@@ -1,0 +1,38 @@
+name: CaptainAdel
+options:
+  createIntermediateGroups: true
+  groupSortPosition: top
+  xcodeVersion: "16.0"
+
+packages:
+  AdelCore:
+    path: AdelCore
+
+targets:
+  CaptainAdel:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: App
+    dependencies:
+      - package: AdelCore
+        product: AdelUI
+      - package: AdelCore
+        product: AdelSSE
+      - package: AdelCore
+        product: AdelAPI
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.flygaca.captainadel
+        INFOPLIST_FILE: App/Info.plist
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: false
+        ENABLE_PREVIEWS: YES
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGN_IDENTITY: ""
