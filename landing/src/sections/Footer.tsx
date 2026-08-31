@@ -27,7 +27,7 @@ export default function Footer() {
                 {isAr ? 'آرو III على الساحة الليلية — والأسئلة لا تتوقف عند الغروب' : "Arrow III on the night ramp — the questions don't stop at sunset"}
               </p>
             </div>
-            <a href="#top" className="btn-swap magnetic font-mono2 text-[12px] tracking-[0.14em] uppercase px-6 py-3.5 bg-[#22d3ee] text-[#050810] font-semibold hover:bg-[#34d399] transition-colors duration-150 shrink-0">
+            <a href="/chat" className="btn-swap magnetic font-mono2 text-[12px] tracking-[0.14em] uppercase px-6 py-3.5 bg-[#22d3ee] text-[#050810] font-semibold hover:bg-[#34d399] transition-colors duration-150 shrink-0">
               <span className="bs-a">{isAr ? 'اسأل سؤالك الأول ←' : 'Ask your first question →'}</span>
               <span className="bs-b">{isAr ? 'إنه يصغي' : "He's listening"}</span>
             </a>
@@ -56,10 +56,12 @@ export default function Footer() {
             </div>
           </div>
           <div className="font-mono2 text-[11px] leading-7 tracking-[0.08em] text-[#8b98ad]">
-            <div className="text-[#22d3ee] tracking-[0.24em] uppercase text-[10px] mb-3">{isAr ? 'السرب' : 'Squadron'}</div>
-            <a className="block hover:text-[#22d3ee] transition-colors" href="https://github.com/ay2m" target="_blank" rel="noreferrer">{isAr ? 'Fly GACA على GitHub' : 'Fly GACA on GitHub'}</a>
-            <a className="block hover:text-[#22d3ee] transition-colors" href="https://flygaca.com" target="_blank" rel="noreferrer">{isAr ? 'Fly GACA — مكتبة الطيران' : 'Fly GACA — the aviation library'}</a>
-            <a className="block hover:text-[#22d3ee] transition-colors" href="https://github.com/ay2m/FlyGACA/blob/main/THE-BOOK-OF-FLY-GACA.md" target="_blank" rel="noreferrer">{isAr ? 'كتاب Fly GACA' : 'The Book of Fly GACA'}</a>
+            <div className="text-[#22d3ee] tracking-[0.24em] uppercase text-[10px] mb-3">{isAr ? 'التطبيقات والمراجع' : 'Applications & Tools'}</div>
+            <a className="block hover:text-[#22d3ee] transition-colors" href="/chat">{isAr ? 'كابتن عادل — المحادثة الذكية ↗' : 'Captain Adel — Smart Chat ↗'}</a>
+            <a className="block hover:text-[#22d3ee] transition-colors" href="/exam">{isAr ? 'اختبار GACAR التجريبي 🎓' : 'GACAR Mock Exam 🎓'}</a>
+            <a className="block hover:text-[#22d3ee] transition-colors" href="/tools">{isAr ? 'حاسبة الطيران الملاحية ✈️' : 'Aviation Flight Computer ✈️'}</a>
+            <a className="block hover:text-[#22d3ee] transition-colors" href="https://flygaca.com" target="_blank" rel="noreferrer">{isAr ? 'Fly GACA — مكتبة الطيران ↗' : 'Fly GACA — Aviation Library ↗'}</a>
+            <a className="block hover:text-[#22d3ee] transition-colors" href="https://github.com/ay2m" target="_blank" rel="noreferrer">{isAr ? 'Fly GACA على GitHub ↗' : 'Fly GACA on GitHub ↗'}</a>
           </div>
           <div className="font-mono2 text-[11px] leading-7 tracking-[0.08em] text-[#8b98ad]">
             <div className="text-[#22d3ee] tracking-[0.24em] uppercase text-[10px] mb-3">{isAr ? 'الجهة الرسمية' : 'Authority'}</div>

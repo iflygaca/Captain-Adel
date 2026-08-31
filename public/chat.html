@@ -8,6 +8,7 @@
   <meta name="theme-color" content="#090C10">
   <link rel="icon" type="image/png" sizes="512x512" href="assets/img/captain/logo.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/img/captain/favicon-32.png">
+  <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/img/captain/apple-touch-icon.png">
   <link rel="canonical" href="https://captadel.com/chat.html">
   <meta property="og:image" content="https://captadel.com/media/captain-adel.jpg">
@@ -15,10 +16,8 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://captadel.com/media/captain-adel.jpg">
   <link rel="stylesheet" href="assets/css/adel.css">
-  <link rel="stylesheet" href="assets/css/adel-character.css">
   <script src="assets/js/footer.js" defer></script>
   <script src="assets/js/i18n.js" defer></script>
-  <script src="assets/js/adel-character.js" defer></script>
 </head>
 <body>
   <a class="visually-hidden" href="#main" data-en="Skip to content">تخطَّ إلى المحتوى</a>
@@ -46,6 +45,8 @@
       <nav class="nav-links" id="site-menu" aria-label="رئيسية">
         <a href="/" data-en="Home">الرئيسية</a>
         <a href="chat.html" aria-current="page" data-en="Ask">اسأل</a>
+        <a href="exam.html" data-en="Exam">الاختبار</a>
+        <a href="tools.html" data-en="Flight Computer">حاسبة الطيران</a>
         <a href="https://gaca.gov.sa" target="_blank" rel="noopener" data-en="GACA ↗">الهيئة ↗</a>
       </nav>
       <div class="nav-actions">
@@ -61,12 +62,12 @@
       <section class="chat">
         <header class="chat-header">
           <div class="chat-id">
-            <div class="chat-avatar" data-adel-mount>
+            <div class="chat-avatar">
               <img src="assets/img/captain/avatar.png" alt="كابتن عادل" width="44" height="44">
             </div>
             <div>
               <span class="chat-name" data-en="Captain Adel">كابتن عادل</span>
-              <span class="chat-status"><span class="on-duty"></span> <span data-en="GACA ATPL · CFII · on duty">رخصة GACA ATPL · CFII · في الخدمة</span></span>
+              <span class="chat-status"><span class="on-duty"></span> <span data-en="GACA ATPL · CFII · ON FREQUENCY">رخصة GACA ATPL · CFII · في الخدمة</span></span>
             </div>
           </div>
           <div class="chat-head-actions">
@@ -78,10 +79,8 @@
 
         <div class="chat-log" id="chat-log" role="log" aria-live="polite" aria-label="محادثة مع كابتن عادل">
           <div class="chat-welcome" id="chat-welcome">
-            <!-- adel-character.js replaces the static avatar with the animated
-                 SVG Captain; the <img> stays as the no-JS fallback. -->
-            <div class="welcome-avatar" data-adel-mount>
-              <img src="assets/img/captain/avatar.png" alt="" width="96" height="96">
+            <div class="welcome-avatar">
+              <img src="assets/img/captain/avatar.png" alt="كابتن عادل" width="96" height="96">
             </div>
             <h1 data-en="Captain Adel — on duty.">الكابتن عادل — في الخدمة.</h1>
             <p data-en="GACA-licensed ATPL and flight instructor. Ask me about the GACAR regulations, Saudi airspace, licensing, or operations — I answer with the section citation.">طيّار نقل جوي ATPL ومرشد طيران مرخّص من الهيئة.
@@ -109,6 +108,30 @@
         </div>
 
         <div class="chat-input">
+          <div class="chat-quicktools" id="chat-quicktools">
+            <span class="quicktool-tag" data-en="Aviation Tools:">أدوات سريعة:</span>
+            <button type="button" class="quicktool-chip"
+              data-q="Calculate crosswind: Runway 24, wind 270 at 20 knots"
+              data-q-ar="احسب الرياح المتقاطعة: مدرج 24، والرياح 270 بسرعة 20 عقدة"
+              data-en="💨 Crosswind Calc">💨 حساب الرياح</button>
+            <button type="button" class="quicktool-chip"
+              data-q="What are the basic VFR weather minima under GACAR §91.155?"
+              data-q-ar="ما هي حدود طقس الطيران البصري VFR وفق GACAR §91.155؟"
+              data-en="⛅ VFR Minima §91.155">⛅ حدود VFR §91.155</button>
+            <button type="button" class="quicktool-chip"
+              data-q="What are the fuel reserve requirements for VFR flights under GACAR §91.151?"
+              data-q-ar="ما متطلبات احتياطي الوقود لرحلات VFR وفق GACAR §91.151؟"
+              data-en="⛽ Fuel Reserves §91.151">⛽ احتياطي الوقود</button>
+            <button type="button" class="quicktool-chip"
+              data-q="What are the 90-day passenger carriage currency requirements under GACAR §61.57?"
+              data-q-ar="ما هي شروط حداثة الخبرة لحمل الركاب وفق GACAR §61.57؟"
+              data-en="🛫 Recency §61.57">🛫 حداثة الخبرة §61.57</button>
+            <button type="button" class="quicktool-chip"
+              data-q="Calculate density altitude: pressure altitude 2,000 ft and temperature 38°C"
+              data-q-ar="احسب الارتفاع الكثافي: الارتفاع الضغطي 2000 قدم والحرارة 38 مئوية"
+              data-en="⛰️ Density Altitude">⛰️ الارتفاع الكثافي</button>
+            <a href="tools.html" class="quicktool-chip" style="border-color:var(--accent);color:var(--accent);background:rgba(87,174,201,.1)" data-en="✈️ Open Flight Computer ↗">✈️ حاسبة الطيران الكاملة ↗</a>
+          </div>
           <form class="chat-form" id="chat-form">
             <label class="visually-hidden" for="chat-text" data-en="Ask Captain Adel">اسأل كابتن عادل</label>
             <textarea id="chat-text" rows="1"

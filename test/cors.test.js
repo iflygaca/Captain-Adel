@@ -57,6 +57,14 @@ test('localhost and 127.0.0.1 are always allowed (any port, dev)', () => {
   }
 });
 
+test('vercel.app deployments and preview origins are allowed', () => {
+  for (const origin of ['https://test-captadel.vercel.app', 'https://test-captadel-preview.vercel.app']) {
+    const { res, nexted } = run({ origin }, ['https://captadel.com']);
+    assert.equal(nexted, true, `${origin} should pass`);
+    assert.equal(res.headers['Access-Control-Allow-Origin'], origin);
+  }
+});
+
 test('a disallowed origin is rejected with 403 and does not continue', () => {
   const { res, nexted } = run({ origin: 'https://evil.example' });
   assert.equal(nexted, false);

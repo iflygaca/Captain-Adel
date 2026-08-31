@@ -17,10 +17,14 @@ function isLocalhost(origin) {
     || /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin);
 }
 
+function isVercel(origin) {
+  return /^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)*\.vercel\.app$/i.test(origin);
+}
+
 function corsMiddleware(req, res, next) {
   const origin = req.headers.origin;
   if (origin) {
-    const allowed = config.allowedOrigins.includes(origin) || isLocalhost(origin);
+    const allowed = config.allowedOrigins.includes(origin) || isLocalhost(origin) || isVercel(origin);
     if (!allowed) {
       res.status(403).json({ error: 'origin_not_allowed' });
       return;

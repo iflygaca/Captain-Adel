@@ -92,10 +92,13 @@ function resolveLocal(pageFile, url) {
 
 for (const file of htmlFiles) {
   const html = fs.readFileSync(path.join(PUBLIC, file), 'utf8');
+  const isReactLanding = html.includes('id="root"');
 
-  // 3 + 4. hand-duplicated chrome and the footer mount.
-  for (const { needle, label } of REQUIRED_CHROME) {
-    if (!html.includes(needle)) err(file, `missing ${label}`);
+  // 3 + 4. hand-duplicated chrome and the footer mount (vanilla pages only).
+  if (!isReactLanding) {
+    for (const { needle, label } of REQUIRED_CHROME) {
+      if (!html.includes(needle)) err(file, `missing ${label}`);
+    }
   }
 
   // 1 + 2. every local asset and internal link resolves.
@@ -117,6 +120,8 @@ for (const file of htmlFiles) {
       err(file, `broken reference "${url}" -> ${path.relative(PUBLIC, abs)} does not exist`);
     }
   }
+
+  if (isReactLanding) continue;
 
   // 5. script load order + module typing.
   const scripts = [];

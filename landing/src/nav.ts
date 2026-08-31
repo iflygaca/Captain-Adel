@@ -12,6 +12,8 @@ export const NAV: NavItem[] = isAr
       { label: 'النماذج', href: '#models' },
       { label: 'الأسئلة', href: '#faq' },
       { label: 'GACAR', href: '#qa' },
+      { label: 'الاختبار', href: '/exam' },
+      { label: 'حاسبة الطيران', href: '/tools' },
       { label: 'API', href: '#api' },
     ]
   : [
@@ -21,6 +23,8 @@ export const NAV: NavItem[] = isAr
       { label: 'Models', href: '#models' },
       { label: 'FAQ', href: '#faq' },
       { label: 'GACAR Q&A', href: '#qa' },
+      { label: 'Mock Exam', href: '/exam' },
+      { label: 'Flight Computer', href: '/tools' },
       { label: 'API', href: '#api' },
     ]
 

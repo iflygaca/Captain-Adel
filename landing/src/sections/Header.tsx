@@ -75,7 +75,7 @@ export default function Header() {
             {isAr ? 'EN' : 'عربي'}
           </a>
           <a
-            href="#api"
+            href="/chat"
             className="!hidden md:!inline-flex btn-swap font-mono2 text-[11px] tracking-[0.16em] uppercase px-4 py-2 border border-[#2d8ea8] text-[#22d3ee] hover:bg-[#22d3ee] hover:text-[#050810] transition-colors duration-150"
           >
             <span className="bs-a">{isAr ? 'اسأل عادل' : 'Ask Adel'}</span>

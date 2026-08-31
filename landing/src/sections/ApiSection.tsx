@@ -100,12 +100,12 @@ export default function ApiSection() {
               ))}
             </div>
             <a
-              href="https://github.com/FlyGACA/Captain-Adel"
+              href="https://github.com/ay2m/Captain-Adel"
               target="_blank"
               rel="noreferrer"
               className="reveal reveal-d3 inline-flex items-center gap-2 mt-8 font-mono2 text-[12px] tracking-[0.14em] uppercase px-6 py-3.5 border border-[#2d8ea8] text-[#22d3ee] hover:bg-[#22d3ee] hover:text-[#050810] transition-colors duration-150"
             >
-              {isAr ? '⌥ FlyGACA/Captain-Adel على GitHub ←' : '⌥ FlyGACA/Captain-Adel on GitHub →'}
+              {isAr ? '⌥ مستودع Captain-Adel على GitHub ←' : '⌥ Captain-Adel on GitHub →'}
             </a>
           </div>
           <div className="space-y-6">

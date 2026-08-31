@@ -1,0 +1,28 @@
+{
+  "name": "Captain Adel — كابتن عادل",
+  "short_name": "Capt Adel",
+  "description": "AI Flight Instructor & GACAR Aviation Suite for Saudi Skies",
+  "start_url": "/chat",
+  "display": "standalone",
+  "background_color": "#050810",
+  "theme_color": "#050810",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/img/captain/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/img/captain/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/img/captain/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

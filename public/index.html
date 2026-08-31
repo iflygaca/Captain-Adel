@@ -1,232 +1,143 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>كابتن عادل — مرشد الطيران المدني السعودي بالذكاء الاصطناعي</title>
-  <meta name="description" content="كابتن عادل مرشد طيران مستقل بالذكاء الاصطناعي للطيران المدني السعودي. اسأل عن لوائح GACAR واحصل على إجابة مع الاستشهاد بالقسم الدقيق. أداة تعليمية — تحقّق دائماً من الهيئة. · Captain Adel is an independent AI flight instructor for Saudi civil aviation.">
-  <meta name="theme-color" content="#090C10">
-  <link rel="icon" type="image/png" sizes="512x512" href="assets/img/captain/logo.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/captain/favicon-32.png">
-  <link rel="apple-touch-icon" href="assets/img/captain/apple-touch-icon.png">
-
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Captain Adel · كابتن عادل">
-  <meta property="og:title" content="كابتن عادل — مرشد الطيران المدني السعودي">
-  <meta property="og:description" content="اسأل عن لوائح GACAR واحصل على إجابة مع الاستشهاد بالقسم الدقيق. مستقل وتعليمي.">
-  <meta property="og:url" content="https://captadel.com/">
-  <meta property="og:image" content="https://captadel.com/media/captain-adel.jpg">
-  <meta property="og:image:alt" content="Captain Adel — AI flight instructor portrait">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://captadel.com/media/captain-adel.jpg">
-  <link rel="canonical" href="https://captadel.com/">
-
-  <link rel="stylesheet" href="assets/css/adel.css">
-  <script src="assets/js/footer.js" defer></script>
-  <script src="assets/js/i18n.js" defer></script>
-</head>
-<body>
-  <a class="visually-hidden" href="#main" data-en="Skip to content">تخطَّ إلى المحتوى</a>
-  <div class="disclaimer-strip">
-    <div class="container">
-      <span data-i18n-html
-        data-en='<strong>Independent educational reference.</strong> Not affiliated with GACA — always verify against the official source, <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.'>
-        <strong>مرجع تعليمي مستقل.</strong> غير تابع للهيئة العامة للطيران المدني —
-        تحقّق دائماً من المصدر الرسمي،
-        <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.</span>
-    </div>
-  </div>
-
-  <header class="site-nav">
-    <div class="container nav-inner">
-      <a class="lockup" href="/" aria-label="كابتن عادل — الرئيسية">
-        <img src="assets/img/captain/logo.png" alt="" width="40" height="40">
-        <span>
-          <span class="wordmark" data-i18n-html
-            data-en='<span class="wm-capt">Captain</span> <span class="wm-adel">Adel</span>'><span class="wm-capt">كابتن</span> <span class="wm-adel">عادل</span></span>
-          <span class="lockup-sub" data-en="Saudi civil aviation">الطيران المدني السعودي</span>
-        </span>
-      </a>
-      <nav class="nav-links" id="site-menu" aria-label="رئيسية">
-        <a href="#what" data-en="What he does">ماذا يقدّم</a>
-        <a href="#how" data-en="How it works">كيف يعمل</a>
-        <a href="#pricing" data-en="Pricing">الأسعار</a>
-        <a href="exam.html" data-en="Mock exam">الاختبار التجريبي</a>
-        <a href="https://gaca.gov.sa" target="_blank" rel="noopener" data-en="GACA ↗">الهيئة ↗</a>
-      </nav>
-      <div class="nav-actions">
-        <button type="button" class="nav-burger" aria-expanded="false" aria-controls="site-menu" aria-label="القائمة">☰</button>
-        <button type="button" class="lang-toggle" lang="en">EN</button>
-        <a class="btn btn-ghost" href="account.html" data-en="Account">حسابي</a>
-        <a class="btn btn-primary" href="chat.html" data-en="Ask Captain Adel">اسأل كابتن عادل</a>
-      </div>
-    </div>
-  </header>
-
-  <main id="main">
-    <section class="hero">
-      <div class="container hero-grid">
-        <div>
-          <span class="hero-eyebrow" data-i18n-html
-            data-en='<span class="he-pip" aria-hidden="true"></span>Independent · GACAR reference · captadel.com'><span class="he-pip" aria-hidden="true"></span>مستقل · مرجع لوائح GACAR · captadel.com</span>
-          <h1 data-i18n-html
-            data-en='The whole of Saudi aviation regulation, <span class="g">one captain on the answer.</span>'>لوائح الطيران السعودي بأكملها،
-            <span class="g">وقائدٌ واحد على الإجابة.</span></h1>
-          <p class="lede" data-en="Captain Adel is an independent AI flight instructor for Saudi civil aviation. Ask about the GACARs, airspace, licensing or operations — he answers with the exact section cited, and refuses rather than guess.">كابتن عادل مرشد طيران مستقل بالذكاء الاصطناعي
-            للطيران المدني السعودي. اسأله عن لوائح GACAR أو المجال الجوي أو الرخص أو
-            العمليات — يجيبك مع الاستشهاد بالقسم الدقيق، ويرفض بدل أن يخمّن.</p>
-          <div class="hero-cta">
-            <a class="btn btn-primary" href="chat.html" data-en="Ask Captain Adel">اسأل كابتن عادل</a>
-            <a class="btn btn-ghost" href="#how" data-en="How it works">كيف يعمل</a>
-          </div>
-          <span class="cred"><span class="dot"></span> <span data-en="GACA ATPL · CFII · MEL · bilingual EN / العربية">رخصة GACA ATPL · CFII · MEL · ثنائي اللغة العربية / EN</span></span>
-        </div>
-        <div class="hero-art">
-          <!-- captadel signature: a CSS-drawn HUD / attitude-indicator framing the
-               captain. Decorative only (the flygaca embed never shows this). -->
-          <div class="hud" aria-hidden="true">
-            <span class="hud-ring"></span>
-            <span class="hud-bracket hud-tl"></span>
-            <span class="hud-bracket hud-tr"></span>
-            <span class="hud-bracket hud-bl"></span>
-            <span class="hud-bracket hud-br"></span>
-            <span class="hud-horizon"></span>
-          </div>
-          <img src="assets/img/captain/avatar.png" alt="كابتن عادل" width="512" height="512" decoding="async" fetchpriority="high">
-        </div>
-      </div>
-    </section>
-
-    <section class="showcase">
-      <div class="container">
-        <h2 data-en="How he answers">كيف يجاوب</h2>
-        <div class="demo-card">
-          <div class="demo-q">
-            <span class="demo-who" data-en="You">أنت</span>
-            <p data-en="What's the basic VFR day visibility minimum in uncontrolled airspace?">وش أقل رؤية مطلوبة للطيران البصري نهاراً في مجال غير مراقب؟</p>
-          </div>
-          <div class="demo-a">
-            <img class="demo-avatar" src="assets/img/captain/avatar.png" alt="" width="40" height="40">
-            <div class="demo-bubble">
-              <span class="demo-badge" data-en="Grounded">موثَّق بالمصدر</span>
-              <p data-i18n-html
-                data-en='The minimum is set in <span class="cite"><bdi dir="ltr">§91.155</bdi></span> — read it and don&#39;t go below it.'>الحدّ مذكور في
-                <span class="cite"><bdi dir="ltr">§91.155</bdi></span> — اقرأه ولا تنزل تحته.</p>
-              <p class="demo-brief" data-i18n-html
-                data-en='<strong>Captain&#39;s Briefing:</strong> don&#39;t trust your eyes alone — pull the METAR before you go and confirm the visibility is above the limit, especially in our dust season.'><strong>توجيه الكابتن:</strong>
-                لا تعتمد على عينك بس — قبل ما تطير افتح الـMETAR وتأكّد الرؤية فوق الحدّ،
-                خصوصاً وقت الغبار عندنا.</p>
-              <div class="demo-src" data-en="Source: GACAR Part 91, §91.155 · verify at gaca.gov.sa">المصدر: GACAR Part 91, §91.155 · تحقّق على gaca.gov.sa</div>
-            </div>
-          </div>
-          <span class="demo-note" data-en="Illustrative preview — Captain Adel always cites the live regulation and reminds you to verify.">مثال توضيحي — كابتن عادل يستشهد دائماً باللائحة الحيّة ويذكّرك بالتحقّق.</span>
-        </div>
-      </div>
-    </section>
-
-    <section id="what" class="features">
-      <div class="container">
-        <h2 data-en="What he does">ماذا يقدّم</h2>
-        <div class="cards">
-          <div class="card">
-            <h3 data-en="Cited answers">إجابات موثّقة بالمصدر</h3>
-            <p data-en="Every regulatory claim carries a &quot;GACAR Part X, §X.YYY&quot; citation, with links to the source passage. No citation, no claim.">كل معلومة تنظيمية تحمل استشهاداً بصيغة
-            «GACAR Part X, §X.YYY» مع رابط للنصّ المصدر. لا استشهاد، لا ادّعاء.</p>
-          </div>
-          <div class="card">
-            <h3 data-en="Refuses rather than guess">يرفض بدل أن يخمّن</h3>
-            <p data-en="For minima, distances, weights and currency periods, a wrong number is worse than no number. If he can't ground it, he says so and points you to the Part.">في الحدود الدنيا والمسافات والأوزان وفترات الحداثة،
-            الرقم الخاطئ أسوأ من لا رقم. إن لم يستطع توثيقه، يقولها ويدلّك على الجزء.</p>
-          </div>
-          <div class="card">
-            <h3 data-en="Bilingual">ثنائي اللغة</h3>
-            <p data-en="Answers in the language you ask — English or العربية — keeping technical terms in the language of the regulation.">يجيب بلغة سؤالك — العربية أو الإنجليزية — مع إبقاء
-            المصطلحات الفنية بلغة اللائحة.</p>
-          </div>
-          <div class="card" style="border-color:var(--gold);background:rgba(200,160,74,.04)">
-            <h3 data-en="Timed mock exam">اختبار تجريبي مؤقّت</h3>
-            <p data-en="25 GACAR questions · 30-minute timer · 75% pass mark — drawn from the regulation library, every answer cited back to the section.">25 سؤالاً من لوائح GACAR · مؤقّت 30 دقيقة · حد النجاح 75% —
-            مأخوذة من مكتبة اللوائح، وكل إجابة مستشهَدة بالقسم.</p>
-            <a class="btn btn-primary" href="exam.html" style="margin-top:14px;font-size:13px" data-en="Start exam">ابدأ الاختبار</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="how" class="features" style="padding-top:0;">
-      <div class="container">
-        <h2 data-en="How it works">كيف يعمل</h2>
-        <div class="cards">
-          <div class="card">
-            <h3 data-en="Grounded in the GACARs">مبنيّ على لوائح GACAR</h3>
-            <p data-en="A lexical and semantic search over the GACA Aviation Regulations and topical books retrieves the relevant passages before Captain Adel answers — never from memory.">بحثٌ لفظي ودلالي في لوائح الطيران (GACARs) والكتب
-            الموضوعية يسترجع النصوص ذات الصلة قبل أن يجيب كابتن عادل — لا من الذاكرة أبداً.</p>
-          </div>
-          <div class="card">
-            <h3 data-en="Saudi-first models">نماذج سعودية أولاً</h3>
-            <p data-en="English runs on a fast frontier model; Arabic runs on ALLaM, the Saudi (HUMAIN) Arabic model, self-hosted in-Kingdom.">الإنجليزية على نموذجٍ متقدّمٍ سريع؛ والعربية على
-            ALLaM، النموذج العربي السعودي (HUMAIN)، مُستضاف داخل المملكة.</p>
-          </div>
-          <div class="card">
-            <h3 data-en="Educational, not operational">تعليمي، لا تشغيلي</h3>
-            <p data-en="Captain Adel is a study and reference tool. GACA is always the authority; verify against the official publication before you rely on anything.">كابتن عادل أداة دراسة ومرجع. الهيئة هي المرجع
-            دائماً؛ تحقّق من النشرة الرسمية قبل أن تعتمد على أي شيء.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="pricing" class="pricing">
-      <div class="container">
-        <h2 data-en="Simple pricing">أسعار بسيطة</h2>
-        <p class="pricing-lede" data-en="Start free. Go Pro when you want the captain on every question. Cancel anytime.">ابدأ مجاناً. ارتقِ إلى برو عندما تريد الكابتن على كل سؤال. ألغِ في أي وقت.</p>
-
-        <div class="price-cards">
-          <div class="price-card">
-            <span class="price-tier" data-en="Free">مجاني</span>
-            <div class="price-amount"><span class="price-num" data-en="SAR 0">0 ريال</span></div>
-            <span class="price-note" data-en="forever">للأبد</span>
-            <ul class="price-feats">
-              <li data-en="5 cited questions a day">٥ أسئلة موثّقة يومياً</li>
-              <li data-en="Every answer cites the exact section">كل إجابة تستشهد بالقسم الدقيق</li>
-              <li data-en="Bilingual — العربية / English">ثنائي اللغة — العربية / الإنجليزية</li>
-              <li data-en="Timed mock exam included">الاختبار التجريبي المؤقّت مشمول</li>
-            </ul>
-            <a class="btn btn-ghost price-cta" href="chat.html" data-en="Start free">ابدأ مجاناً</a>
-          </div>
-
-          <div class="price-card price-card-pro">
-            <span class="price-flag" data-en="Founding rate">سعر التأسيس</span>
-            <span class="price-tier" data-en="Pro">برو</span>
-            <div class="price-amount">
-              <span class="price-num" data-en="SAR 299">299 ريال</span>
-              <span class="price-per" data-en="/ year">/ سنة</span>
-            </div>
-            <span class="price-note" data-en="≈ SAR 25/mo · or SAR 35 billed monthly">≈ 25 ريال/شهر · أو 35 ريال شهرياً</span>
-            <ul class="price-feats">
-              <li data-en="Unlimited cited questions">أسئلة موثّقة بلا حدود</li>
-              <li data-en="Priority during peak hours">أولوية في أوقات الذروة</li>
-              <li data-en="Oral-exam coach &amp; mock exam">مدرّب الاختبار الشفهي والتجريبي</li>
-              <li data-en="Everything in Free">كل مزايا المجاني</li>
-            </ul>
-            <button type="button" class="btn btn-primary price-cta" data-plan="annual" data-en="Go Pro">اشترك في برو</button>
-            <button type="button" class="price-alt" data-plan="monthly" data-en="Pay monthly instead">ادفع شهرياً بدلاً من ذلك</button>
-          </div>
-        </div>
-
-        <p class="price-disclaimer" data-i18n-html
-          data-en='<strong>Independent educational tool.</strong> A subscription supports the service and lifts the daily limit — it does not change the regulation. Captain Adel is not affiliated with GACA; always verify against the official source, <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.'>
-          <strong>أداة تعليمية مستقلة.</strong> الاشتراك يدعم الخدمة ويرفع الحدّ اليومي —
-          ولا يغيّر اللائحة. كابتن عادل غير تابع للهيئة؛ تحقّق دائماً من المصدر الرسمي،
-          <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.</p>
-      </div>
-    </section>
-  </main>
-
-  <div id="site-footer"></div>
-
-  <script src="assets/js/site.js" defer></script>
-  <script src="assets/js/landing.js" defer></script>
-  <script type="module" src="assets/js/boot-inline.js"></script>
-</body>
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Captain Adel (كابتن عادل) — AI Flight Instructor for Saudi GACAR</title>
+    <meta name="description" content="Captain Adel (كابتن عادل) is an independent AI flight instructor for Saudi civil aviation. Ask any GACAR question and get the exact Part and section cited — or an honest refusal, never a guess. English and العربية." />
+    <meta name="keywords" content="Captain Adel, كابتن عادل, GACAR, GACA, Saudi aviation, AI flight instructor, مدرّب طيران ذكي, الطيران السعودي, GACAR Part 91, GACAR Part 61, VFR weather minima, flight training Saudi Arabia" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <meta name="author" content="Fly GACA" />
+    <meta name="theme-color" content="#050810" />
+    <link rel="icon" type="image/png" href="./avatar.png" />
+    <link rel="canonical" href="https://captadel.com/" />
+    <link rel="alternate" hreflang="en" href="https://captadel.com/" />
+    <link rel="alternate" hreflang="ar" href="https://captadel.com/ar/" />
+    <link rel="alternate" hreflang="x-default" href="https://captadel.com/" />
+    <link rel="sitemap" type="application/xml" href="./sitemap.xml" />
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Captain Adel — كابتن عادل" />
+    <meta property="og:title" content="Captain Adel (كابتن عادل) — AI Flight Instructor for Saudi GACAR" />
+    <meta property="og:description" content="GACAR answers with the exact Part and section cited — or an honest refusal. The independent AI flight instructor for Saudi skies. بالعربية والإنجليزية." />
+    <meta property="og:url" content="https://captadel.com/" />
+    <meta property="og:image" content="https://captadel.com/media/captain-adel.jpg" />
+    <meta property="og:image:alt" content="Captain Adel — AI flight instructor portrait" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="ar_SA" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Captain Adel (كابتن عادل) — AI Flight Instructor for Saudi GACAR" />
+    <meta name="twitter:description" content="Ask any GACAR question — get the exact citation, or an honest refusal. بالعربية والإنجليزية." />
+    <meta name="twitter:image" content="https://captadel.com/media/captain-adel.jpg" />
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://captadel.com/#website",
+          "url": "https://captadel.com/",
+          "name": "Captain Adel",
+          "alternateName": ["كابتن عادل", "Capt. Adel", "CAPTADEL"],
+          "description": "Independent AI flight instructor for Saudi civil aviation — GACAR answers with exact citations, or an honest refusal.",
+          "inLanguage": ["en", "ar"],
+          "publisher": { "@id": "https://captadel.com/#org" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://captadel.com/#org",
+          "name": "Captain Adel — Fly GACA",
+          "alternateName": "كابتن عادل",
+          "url": "https://captadel.com/",
+          "logo": "https://captadel.com/avatar.png",
+          "sameAs": [
+            "https://github.com/FlyGACA",
+            "https://huggingface.co/flygaca",
+            "https://flygaca.com"
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://captadel.com/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Who is Captain Adel (كابتن عادل)?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Captain Adel (كابتن عادل) is an independent AI flight instructor for Saudi civil aviation. He answers questions about the GACAR regulations with the exact Part and section cited, and refuses rather than guesses when the corpus cannot support an answer. He is unofficial and not affiliated with GACA." }
+            },
+            {
+              "@type": "Question",
+              "name": "Does Captain Adel answer in Arabic?",
+              "acceptedAnswer": { "@type": "Answer", "text": "نعم — Captain Adel is fully bilingual. Ask in العربية or English and he answers in the same language, with the GACAR citation. Arabic questions are routed to in-Kingdom Arabic models under the same cite-or-refuse grounding." }
+            },
+            {
+              "@type": "Question",
+              "name": "Is Captain Adel an official GACA service?",
+              "acceptedAnswer": { "@type": "Answer", "text": "No. Captain Adel is an independent, unofficial, educational project. The authoritative source for any regulation is always the General Authority of Civil Aviation at gaca.gov.sa." }
+            },
+            {
+              "@type": "Question",
+              "name": "What happens when Captain Adel doesn't know an answer?",
+              "acceptedAnswer": { "@type": "Answer", "text": "He refuses. Retrieval runs in code over the GACAR corpus; if the passages cannot support the question, Adel says so and points to gaca.gov.sa instead of inventing an answer — cite or refuse, every time." }
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://captadel.com/#qa",
+          "name": "GACAR questions answered from the regulation itself",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is the minimum VFR visibility in Saudi airspace?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Under GACAR §91.155 the basic VFR weather minima are 5 km flight visibility clear of clouds — rising to 8 km at or above 3,050 m (10,000 ft) AMSL — with cloud clearance of 300 m vertically and 1,500 m horizontally." }
+            },
+            {
+              "@type": "Question",
+              "name": "How much fuel reserve does VFR flight require in Saudi Arabia?",
+              "acceptedAnswer": { "@type": "Answer", "text": "GACAR §91.151 requires fuel to reach the first point of intended landing and then fly 30 minutes by day or 45 minutes by night at normal cruising speed." }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the minimum safe altitude over cities in Saudi Arabia?",
+              "acceptedAnswer": { "@type": "Answer", "text": "GACAR §91.119: 1,000 ft above the highest obstacle within 600 m over congested areas; 500 ft from persons, vessels, vehicles, or structures elsewhere, except when necessary for takeoff or landing." }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the maximum speed below 10,000 feet?",
+              "acceptedAnswer": { "@type": "Answer", "text": "GACAR §91.117 limits indicated airspeed to 250 knots below 3,050 m (10,000 ft) AMSL unless the aircraft's minimum safe speed is higher or GACA authorizes otherwise." }
+            },
+            {
+              "@type": "Question",
+              "name": "How recent must flight experience be to carry passengers?",
+              "acceptedAnswer": { "@type": "Answer", "text": "GACAR §61.57: at least 3 takeoffs and 3 landings within the preceding 90 days in the same category and class; for night passenger carriage, night landings to a full stop." }
+            },
+            {
+              "@type": "Question",
+              "name": "What preflight action does GACAR require?",
+              "acceptedAnswer": { "@type": "Answer", "text": "GACAR §91.103: weather reports and forecasts, fuel requirements, alternatives, known traffic delays, runway lengths, and aircraft performance data before every flight." }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I fly with inoperative equipment on board?",
+              "acceptedAnswer": { "@type": "Answer", "text": "GACAR §91.213: an approved Minimum Equipment List (MEL) controls; without one, the equipment must not be required by the type certificate, operating rules, or airworthiness directives, and must be deactivated and placarded inoperative." }
+            },
+            {
+              "@type": "Question",
+              "name": "Who is responsible that the aircraft is airworthy?",
+              "acceptedAnswer": { "@type": "Answer", "text": "GACAR §91.7 makes the pilot in command directly responsible for determining the aircraft is in condition for safe flight; §91.405 keeps maintenance responsibility with the owner or operator." }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+    <script type="module" crossorigin src="./assets/main-B2tBXKSU.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/main-ebQggneG.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>

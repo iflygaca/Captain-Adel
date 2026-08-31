@@ -482,6 +482,14 @@
   const clearBtn = document.getElementById('chat-clear');
   if (clearBtn) clearBtn.addEventListener('click', clearChat);
 
+  const quicktools = document.getElementById('chat-quicktools');
+  if (quicktools) {
+    quicktools.addEventListener('click', (e) => {
+      const q = e.target.closest('button[data-q]');
+      if (q) send(chipQuestion(q));
+    });
+  }
+
   /* ---- exam mode: Adel runs a GACA oral exam ---- */
   const examBtn = document.getElementById('chat-exam');
   function examLabel() {

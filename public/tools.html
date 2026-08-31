@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حاسبة الطيران والأدوات — كابتن عادل</title>
+  <meta name="description" content="حاسبة طيران متقدمة للأجواء السعودية — حساب الرياح المتقاطعة، احتياطي الوقود، الارتفاع الكثافي، الوزن والاتزان، وحداثة رخصة الطيران وفق لوائح GACAR. · Aviation flight computer and calculation suite for Saudi civil aviation.">
+  <meta name="theme-color" content="#090C10">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/img/captain/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/captain/favicon-32.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/img/captain/apple-touch-icon.png">
+  <link rel="canonical" href="https://captadel.com/tools.html">
+  <meta property="og:image" content="https://captadel.com/media/captain-adel.jpg">
+  <meta property="og:image:alt" content="Captain Adel — Flight Computer">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://captadel.com/media/captain-adel.jpg">
+  <link rel="stylesheet" href="assets/css/adel.css">
+  <script src="assets/js/footer.js" defer></script>
+  <script src="assets/js/i18n.js" defer></script>
+</head>
+<body>
+  <a class="visually-hidden" href="#main" data-en="Skip to content">تخطَّ إلى المحتوى</a>
+
+  <div class="disclaimer-strip">
+    <div class="container">
+      <span data-i18n-html
+        data-en='<strong>Independent educational reference.</strong> Not affiliated with GACA — always verify against the official source, <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.'>
+        <strong>مرجع تعليمي مستقل.</strong> غير تابع للهيئة العامة للطيران المدني —
+        تحقّق دائماً من المصدر الرسمي،
+        <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.</span>
+    </div>
+  </div>
+
+  <header class="site-nav">
+    <div class="container nav-inner">
+      <a class="lockup" href="/" aria-label="كابتن عادل — الرئيسية">
+        <img src="assets/img/captain/logo.png" alt="" width="40" height="40">
+        <span>
+          <span class="wordmark" data-i18n-html
+            data-en='<span class="wm-capt">Captain</span> <span class="wm-adel">Adel</span>'><span class="wm-capt">كابتن</span> <span class="wm-adel">عادل</span></span>
+          <span class="lockup-sub" data-en="Saudi civil aviation">الطيران المدني السعودي</span>
+        </span>
+      </a>
+      <nav class="nav-links" id="site-menu" aria-label="رئيسية">
+        <a href="/" data-en="Home">الرئيسية</a>
+        <a href="chat.html" data-en="Ask">اسأل</a>
+        <a href="exam.html" data-en="Exam">الاختبار</a>
+        <a href="tools.html" aria-current="page" data-en="Flight Computer">حاسبة الطيران</a>
+        <a href="https://gaca.gov.sa" target="_blank" rel="noopener" data-en="GACA ↗">الهيئة ↗</a>
+      </nav>
+      <div class="nav-actions">
+        <button type="button" class="nav-burger" aria-expanded="false" aria-controls="site-menu" aria-label="القائمة">☰</button>
+        <button type="button" class="lang-toggle" lang="en">EN</button>
+        <a class="btn btn-ghost" href="account.html" data-en="Account">حسابي</a>
+        <a class="btn btn-primary" href="chat.html" data-en="Ask Adel">اسأل عادل</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="tools-main">
+    <div class="container">
+      <div class="tools-hero">
+        <div class="tools-hero-badge font-mono" data-en="FLIGHT COMPUTER & INSTRUMENTS">حاسبة الطيران والأدوات الملاحية</div>
+        <h1 data-en="Pilot Calculation Suite">مجموعة الحسابات الجوية</h1>
+        <p data-en="Interactive pre-flight tools built for GACAR operational standards: wind triangle, fuel reserves, density altitude, weight and balance, and pilot currency.">أدوات تخطيط وتحضير الطيران التفاعلية وفق معايير أنظمة GACAR: مثلث الرياح، احتياطي الوقود، الارتفاع الكثافي، الوزن وتمركز الثقل، وحداثة الخبرة.</p>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="tools-tabs" role="tablist">
+        <button type="button" class="tool-tab active" data-tab="wind" role="tab" aria-selected="true" data-en="💨 Wind & Crosswind">💨 الرياح والمدرج</button>
+        <button type="button" class="tool-tab" data-tab="fuel" role="tab" aria-selected="false" data-en="⛽ Fuel & Reserves">⛽ الوقود والاحتياطي</button>
+        <button type="button" class="tool-tab" data-tab="density" role="tab" aria-selected="false" data-en="⛰️ Density Altitude">⛰️ الارتفاع الكثافي</button>
+        <button type="button" class="tool-tab" data-tab="wb" role="tab" aria-selected="false" data-en="⚖️ Weight & Balance">⚖️ الوزن والاتزان</button>
+        <button type="button" class="tool-tab" data-tab="recency" role="tab" aria-selected="false" data-en="🛫 Pilot Currency">🛫 حداثة الخبرة §61.57</button>
+      </div>
+
+      <!-- Tool 1: Wind & Crosswind -->
+      <div class="tool-card active" id="pane-wind">
+        <div class="tool-grid">
+          <div class="tool-inputs">
+            <h2 data-en="Runway & Wind Components">حساب الرياح والمدرج</h2>
+            <p class="tool-desc" data-en="Calculate crosswind and headwind/tailwind components, wind correction angle (WCA), and ground speed.">احسب مركبة الرياح المتقاطعة والرياح المقابلة/الخلفية وزاوية تصحيح الانجراف WCA والسرعة الأرضية.</p>
+
+            <div class="input-group">
+              <label for="w-rwy"><span data-en="Runway Heading (°)">اتجاه المدرج (درجات)</span> <span class="val-badge" id="val-rwy">240° (RWY 24)</span></label>
+              <input type="range" id="w-rwy" min="10" max="360" step="10" value="240">
+            </div>
+
+            <div class="input-group">
+              <label for="w-dir"><span data-en="Wind Direction (°)">اتجاه الرياح (درجات)</span> <span class="val-badge" id="val-wdir">270°</span></label>
+              <input type="range" id="w-dir" min="0" max="360" step="5" value="270">
+            </div>
+
+            <div class="input-row">
+              <div class="input-group">
+                <label for="w-spd" data-en="Wind Speed (kt)">سرعة الرياح (عقدة)</label>
+                <input type="number" id="w-spd" min="0" max="80" value="20">
+              </div>
+              <div class="input-group">
+                <label for="w-tas" data-en="True Airspeed TAS (kt)">السرعة الجوية الحقيقية TAS (عقدة)</label>
+                <input type="number" id="w-tas" min="40" max="350" value="110">
+              </div>
+            </div>
+
+            <div class="tool-ask-bar">
+              <a href="chat.html?q=Calculate+crosswind+for+Runway+24+with+wind+270+at+20+kt" id="ask-wind" class="btn btn-ghost" data-en="Ask Captain Adel about this wind ↗">اسأل كابتن عادل عن هذه الرياح ↗</a>
+            </div>
+          </div>
+
+          <div class="tool-display">
+            <div class="radar-visual">
+              <div class="compass-dial" id="wind-compass">
+                <div class="runway-mark" id="runway-needle"></div>
+                <div class="wind-arrow" id="wind-needle"></div>
+                <div class="compass-center"></div>
+              </div>
+            </div>
+            <div class="telemetry-grid">
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Crosswind">الرياح المتقاطعة</span>
+                <span class="tele-val highlight-cyan" id="res-xw">10.0 kt</span>
+                <span class="tele-sub" id="res-xw-dir" data-en="Right crosswind">رياح من اليمين</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Headwind / Tailwind">الرياح المقابلة</span>
+                <span class="tele-val highlight-mint" id="res-hw">17.3 kt</span>
+                <span class="tele-sub" id="res-hw-sub" data-en="Headwind component">مركبة رياح مقابلة</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Wind Correction (WCA)">زاوية التصحيح WCA</span>
+                <span class="tele-val" id="res-wca">+5.2°</span>
+                <span class="tele-sub" id="res-hdg" data-en="Heading: 245°">الاتجاه: 245°</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Ground Speed">السرعة الأرضية GS</span>
+                <span class="tele-val" id="res-gs">92.5 kt</span>
+                <span class="tele-sub" data-en="Estimated on runway axis">على مسار المدرج</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tool 2: Fuel Planning & Reserves -->
+      <div class="tool-card" id="pane-fuel">
+        <div class="tool-grid">
+          <div class="tool-inputs">
+            <h2 data-en="Fuel & GACAR Reserve Planning">حساب الوقود واحتياطي GACAR</h2>
+            <p class="tool-desc" data-en="Verify legal reserves under GACAR §91.151 (30m Day / 45m Night) or Part 121 commercial rules.">تحقق من كفاية الوقود والاحتياطي القانوني وفق GACAR §91.151 (30 د نهاراً / 45 د ليلاً) أو لوائح الجزء 121.</p>
+
+            <div class="input-row">
+              <div class="input-group">
+                <label for="f-burn" data-en="Burn Rate (L/h or GPH)">معدل الاستهلاك (لتر/ساعة أو جالون)</label>
+                <input type="number" id="f-burn" min="1" max="500" value="35">
+              </div>
+              <div class="input-group">
+                <label for="f-onboard" data-en="Fuel on Board">الوقود على متن الطائرة</label>
+                <input type="number" id="f-onboard" min="1" max="2000" value="140">
+              </div>
+            </div>
+
+            <div class="input-row">
+              <div class="input-group">
+                <label for="f-time" data-en="Estimated Enroute Time (minutes)">زمن الرحلة المقدّر (دقائق)</label>
+                <input type="number" id="f-time" min="5" max="600" value="90">
+              </div>
+              <div class="input-group">
+                <label for="f-rule" data-en="Operating Rule (GACAR)">القاعدة التشغيلية (GACAR)</label>
+                <select id="f-rule">
+                  <option value="30">VFR Day (30 min reserve §91.151)</option>
+                  <option value="45" selected>VFR Night / IFR (45 min reserve §91.151)</option>
+                  <option value="60">Commercial Part 121 / 135 (45m + alternate)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="tool-ask-bar">
+              <a href="chat.html?q=Explain+GACAR+Part+91.151+fuel+reserves" id="ask-fuel" class="btn btn-ghost" data-en="Ask Captain Adel about §91.151 ↗">اسأل كابتن عادل عن المادة §91.151 ↗</a>
+            </div>
+          </div>
+
+          <div class="tool-display">
+            <div class="tank-visual">
+              <div class="tank-bar-bg">
+                <div class="tank-fill-trip" id="bar-trip" style="width: 37.5%;"></div>
+                <div class="tank-fill-reserve" id="bar-reserve" style="width: 18.75%;"></div>
+                <div class="tank-fill-margin" id="bar-margin" style="width: 43.75%;"></div>
+              </div>
+              <div class="tank-legend">
+                <span><span class="dot-trip"></span> <span data-en="Trip Fuel">وقود الرحلة</span></span>
+                <span><span class="dot-reserve"></span> <span data-en="GACAR Reserve">الاحتياطي الإلزامي</span></span>
+                <span><span class="dot-margin"></span> <span data-en="Extra Margin">الهامش الإضافي</span></span>
+              </div>
+            </div>
+
+            <div class="telemetry-grid">
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Trip Fuel">وقود الرحلة</span>
+                <span class="tele-val" id="res-f-trip">52.5 L</span>
+                <span class="tele-sub" id="res-f-triptime" data-en="1h 30m enroute">زمن: 1 س 30 د</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Required Reserve">الاحتياطي الإلزامي</span>
+                <span class="tele-val highlight-gold" id="res-f-res">26.3 L</span>
+                <span class="tele-sub" id="res-f-reslabel" data-en="45 min VFR Night">45 دقيقة VFR ليلي</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Total Minimum Required">الحد الأدنى الإجمالي</span>
+                <span class="tele-val" id="res-f-min">78.8 L</span>
+                <span class="tele-sub" data-en="GACAR legal minimum">الحد النظامي للإقلاع</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Status / Total Endurance">الحالة / مدة الطيران</span>
+                <span class="tele-val highlight-mint" id="res-f-status">LEGAL ✓</span>
+                <span class="tele-sub" id="res-f-endurance" data-en="4h 00m total endurance">مدة كلية: 4 س 00 د</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tool 3: Density Altitude -->
+      <div class="tool-card" id="pane-density">
+        <div class="tool-grid">
+          <div class="tool-inputs">
+            <h2 data-en="Density Altitude & Atmospheric Performance">الارتفاع الكثافي وأداء الطائرة</h2>
+            <p class="tool-desc" data-en="High density altitude severely degrades engine power, propeller efficiency, and wing lift. Computes standard ISA deviation.">ارتفاع درجة الحرارة وانخفاض الضغط يقللان قوة المحرك وكفاءة المروحة والرفع. يحسب انحراف ISA بدقة.</p>
+
+            <div class="input-group">
+              <label for="d-elev"><span data-en="Field Elevation (ft)">ارتفاع المطار (قدم)</span> <span class="val-badge" id="val-delev">2,000 ft</span></label>
+              <input type="range" id="d-elev" min="0" max="9000" step="100" value="2000">
+            </div>
+
+            <div class="input-group">
+              <label for="d-oat"><span data-en="Outside Air Temp OAT (°C)">درجة الحرارة الخارجية OAT (مئوية)</span> <span class="val-badge" id="val-doat">38°C</span></label>
+              <input type="range" id="d-oat" min="-10" max="55" step="1" value="38">
+            </div>
+
+            <div class="input-group">
+              <label for="d-qnh"><span data-en="Altimeter Setting QNH (hPa)">مقياس الضغط الجوي QNH (هيكتوباسكال)</span> <span class="val-badge" id="val-dqnh">1008 hPa</span></label>
+              <input type="range" id="d-qnh" min="980" max="1040" step="1" value="1008">
+            </div>
+
+            <div class="tool-ask-bar">
+              <a href="chat.html?q=How+does+density+altitude+affect+takeoff+distance?" id="ask-density" class="btn btn-ghost" data-en="Ask Captain Adel about performance impact ↗">اسأل كابتن عادل عن أثر الارتفاع الكثافي ↗</a>
+            </div>
+          </div>
+
+          <div class="tool-display">
+            <div class="density-gauge-box">
+              <div class="da-badge-wrapper">
+                <span class="da-big-title" data-en="DENSITY ALTITUDE">الارتفاع الكثافي</span>
+                <span class="da-big-num" id="res-da">4,812 ft</span>
+                <span class="da-impact-warning" id="res-da-warn" data-en="⚠️ Takeoff distance increased by ≈ 35%">⚠️ مسافة الإقلاع تزداد بنسبة تقارب 35%</span>
+              </div>
+            </div>
+
+            <div class="telemetry-grid">
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Pressure Altitude (PA)">الارتفاع الضغطي PA</span>
+                <span class="tele-val" id="res-pa">2,158 ft</span>
+                <span class="tele-sub" data-en="Standard 1013.25 datum">مبني على 1013.25 hPa</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Standard ISA Temp">حرارة ISA القياسية</span>
+                <span class="tele-val" id="res-isa">10.7°C</span>
+                <span class="tele-sub" data-en="At current pressure altitude">على الارتفاع الحالي</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="ISA Deviation (ΔISA)">انحراف الحرارة ΔISA</span>
+                <span class="tele-val highlight-gold" id="res-disa">+27.3°C</span>
+                <span class="tele-sub" data-en="Hot day condition">أجواء حارة فوق القياسي</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Density Spread">فارق الكثافة</span>
+                <span class="tele-val highlight-cyan" id="res-spread">+2,812 ft</span>
+                <span class="tele-sub" data-en="Aircraft feels like this altitude">الطائرة تشعر بهذا الارتفاع</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tool 4: Weight & Balance -->
+      <div class="tool-card" id="pane-wb">
+        <div class="tool-grid">
+          <div class="tool-inputs">
+            <h2 data-en="Weight, Moments & Center of Gravity">حساب الوزن والاتزان وتمركز الثقل</h2>
+            <p class="tool-desc" data-en="Check total takeoff weight and Center of Gravity (CG) against aircraft forward and aft limits.">تحقق من الوزن الإجمالي عند الإقلاع وتمركز الثقل (CG) ضمن الحدود المعتمدة للطائرة.</p>
+
+            <div class="input-row">
+              <div class="input-group">
+                <label for="wb-empty-wt" data-en="Empty Weight (kg)">وزن الطائرة فارغة (كجم)</label>
+                <input type="number" id="wb-empty-wt" min="300" max="2500" value="650">
+              </div>
+              <div class="input-group">
+                <label for="wb-empty-arm" data-en="Empty Arm (in / cm)">ذراع الطائرة فارغة (سم)</label>
+                <input type="number" id="wb-empty-arm" min="50" max="300" value="85">
+              </div>
+            </div>
+
+            <div class="input-row">
+              <div class="input-group">
+                <label for="wb-pax-wt" data-en="Front Seats Weight (kg)">وزن الطيار والراكب الأمامي</label>
+                <input type="number" id="wb-pax-wt" min="0" max="300" value="160">
+              </div>
+              <div class="input-group">
+                <label for="wb-pax-arm" data-en="Front Seats Arm (cm)">ذراع المقاعد الأمامية</label>
+                <input type="number" id="wb-pax-arm" min="50" max="300" value="80">
+              </div>
+            </div>
+
+            <div class="input-row">
+              <div class="input-group">
+                <label for="wb-fuel-wt" data-en="Fuel Weight (kg)">وزن الوقود (كجم)</label>
+                <input type="number" id="wb-fuel-wt" min="0" max="500" value="100">
+              </div>
+              <div class="input-group">
+                <label for="wb-fuel-arm" data-en="Fuel Arm (cm)">ذراع خزان الوقود</label>
+                <input type="number" id="wb-fuel-arm" min="50" max="300" value="95">
+              </div>
+            </div>
+
+            <div class="input-row">
+              <div class="input-group">
+                <label for="wb-bag-wt" data-en="Baggage Weight (kg)">الأمتعة والحمولة (كجم)</label>
+                <input type="number" id="wb-bag-wt" min="0" max="200" value="30">
+              </div>
+              <div class="input-group">
+                <label for="wb-bag-arm" data-en="Baggage Arm (cm)">ذراع الأمتعة</label>
+                <input type="number" id="wb-bag-arm" min="50" max="300" value="140">
+              </div>
+            </div>
+
+            <div class="tool-ask-bar">
+              <a href="chat.html?q=Explain+GACAR+weight+and+balance+limits" id="ask-wb" class="btn btn-ghost" data-en="Ask Captain Adel about W&B limits ↗">اسأل كابتن عادل عن حدود الوزن والاتزان ↗</a>
+            </div>
+          </div>
+
+          <div class="tool-display">
+            <div class="cg-envelope-box">
+              <div class="cg-chart" id="cg-chart">
+                <div class="cg-limit-box">
+                  <span class="cg-env-label" data-en="APPROVED CG ENVELOPE">النطاق المعتمد للاتزان</span>
+                </div>
+                <div class="cg-dot" id="cg-marker"></div>
+              </div>
+            </div>
+
+            <div class="telemetry-grid">
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Total Weight">الوزن الكلي</span>
+                <span class="tele-val highlight-cyan" id="res-wb-total">940 kg</span>
+                <span class="tele-sub" data-en="Max Gross: 1,050 kg">الحد الأقصى: 1,050 كجم</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Center of Gravity (CG)">مركز الثقل CG</span>
+                <span class="tele-val highlight-mint" id="res-wb-cg">86.7 cm</span>
+                <span class="tele-sub" data-en="Limits: 82.0 – 95.0 cm">الحدود: 82.0 – 95.0 سم</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Total Moment">إجمالي العزم</span>
+                <span class="tele-val" id="res-wb-moment">81,500</span>
+                <span class="tele-sub" data-en="kg·cm">كجم · سم</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Envelope Status">حالة مركز الثقل</span>
+                <span class="tele-val highlight-mint" id="res-wb-status">IN LIMITS ✓</span>
+                <span class="tele-sub" data-en="Safe for flight">آمن للإقلاع</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tool 5: Pilot Recency §61.57 -->
+      <div class="tool-card" id="pane-recency">
+        <div class="tool-grid">
+          <div class="tool-inputs">
+            <h2 data-en="GACAR §61.57 Recent Flight Experience">حداثة خبرة الطيران GACAR §61.57</h2>
+            <p class="tool-desc" data-en="To carry passengers, GACAR §61.57 requires at least 3 takeoffs and 3 landings within the preceding 90 days in the same aircraft category and class.">لحمل الركاب، توجب المادة §61.57 تنفيذ 3 إقلاعات و3 هبوطات على الأقل خلال التسعين يوماً السابقة في نفس فئة وصنف الطائرة.</p>
+
+            <div class="input-row">
+              <div class="input-group">
+                <label for="rec-day-landings" data-en="Day Landings (last 90d)">الهبوطات النهارية (آخر 90 يوماً)</label>
+                <input type="number" id="rec-day-landings" min="0" max="100" value="4">
+              </div>
+              <div class="input-group">
+                <label for="rec-night-landings" data-en="Night Full-Stop Landings">هبوطات ليلية كاملة التوقف</label>
+                <input type="number" id="rec-night-landings" min="0" max="100" value="3">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label for="rec-last-date" data-en="Date of Latest Landing">تاريخ آخر هبوط تم تنفيذه</label>
+              <input type="date" id="rec-last-date">
+            </div>
+
+            <div class="tool-ask-bar">
+              <a href="chat.html?q=What+are+GACAR+Part+61.57+recent+flight+experience+rules%3F" class="btn btn-ghost" data-en="Ask Captain Adel about §61.57 rules ↗">اسأل كابتن عادل عن لوائح المادة §61.57 ↗</a>
+            </div>
+          </div>
+
+          <div class="tool-display">
+            <div class="recency-badge-box">
+              <div class="currency-card current" id="card-day-status">
+                <span class="cur-icon">☀️</span>
+                <div>
+                  <span class="cur-title" data-en="DAY PASSENGER CURRENCY">حداثة نقل الركاب نهاراً</span>
+                  <span class="cur-status" id="res-day-cur" data-en="CURRENT (3+ Landings)">سارية المفعول (٣+ هبوطات)</span>
+                </div>
+              </div>
+
+              <div class="currency-card current" id="card-night-status">
+                <span class="cur-icon">🌙</span>
+                <div>
+                  <span class="cur-title" data-en="NIGHT PASSENGER CURRENCY">حداثة نقل الركاب ليلاً</span>
+                  <span class="cur-status" id="res-night-cur" data-en="CURRENT (Full Stop)">سارية المفعول (توقف كامل)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="telemetry-grid">
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="90-Day Window Expiry">تاريخ انتهاء فترة الـ 90 يوماً</span>
+                <span class="tele-val highlight-gold" id="res-exp-date">--</span>
+                <span class="tele-sub" data-en="Must renew before this date">يجب التجديد قبل هذا التاريخ</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Days Remaining">الأيام المتبقية</span>
+                <span class="tele-val highlight-cyan" id="res-days-left">--</span>
+                <span class="tele-sub" data-en="Countdown">العد التنازلي للحداثة</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="Required Minimum">الحد الأدنى المطلوب</span>
+                <span class="tele-val">3 / 3</span>
+                <span class="tele-sub" data-en="Takeoffs and landings">إقلاعات وهبوطات</span>
+              </div>
+              <div class="tele-box">
+                <span class="tele-lbl" data-en="GACAR Rule">المرجع النظامي</span>
+                <span class="tele-val">§61.57</span>
+                <span class="tele-sub" data-en="General Operating Rules">لوائح الطيران المدني</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/site.js" defer></script>
+  <script src="assets/js/tools.js" defer></script>
+</body>
+</html>

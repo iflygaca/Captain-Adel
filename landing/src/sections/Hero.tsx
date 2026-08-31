@@ -140,11 +140,18 @@ export default function Hero() {
             </p>
             <div className="reveal reveal-d3 mt-9 flex flex-wrap items-center gap-4">
               <a
-                href="#api"
+                href="/chat"
                 className="btn-swap magnetic font-mono2 text-[12px] tracking-[0.14em] uppercase px-6 py-3.5 bg-[#22d3ee] text-[#050810] font-semibold hover:bg-[#34d399] transition-colors duration-150"
               >
                 <span className="bs-a">{isAr ? 'ابدأ السؤال ←' : 'Start asking →'}</span>
                 <span className="bs-b">{isAr ? 'إذن إقلاع' : 'Cleared for takeoff'}</span>
+              </a>
+              <a
+                href="/exam"
+                className="btn-swap magnetic font-mono2 text-[12px] tracking-[0.14em] uppercase px-5 py-3.5 border border-[#2d8ea8] text-[#22d3ee] hover:bg-[#22d3ee] hover:text-[#050810] transition-colors duration-150"
+              >
+                <span className="bs-a">{isAr ? 'الاختبار التجريبي 🎓' : 'Mock Exam 🎓'}</span>
+                <span className="bs-b">{isAr ? '٢٥ سؤالاً · ٣٠ د' : '25 Qs · 30 min'}</span>
               </a>
               <a
                 href="#doctrine"

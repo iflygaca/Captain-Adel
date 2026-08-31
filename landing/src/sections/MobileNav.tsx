@@ -88,7 +88,7 @@ export default function MobileNav({ open, onClose }: { open: boolean; onClose: (
           >
             {isAr ? 'EN' : 'عربي'}
           </a>
-          <a href="#api" onClick={onClose} className="mnav-cta font-mono2">
+          <a href="/chat" onClick={onClose} className="mnav-cta font-mono2">
             {isAr ? 'اسأل عادل' : 'Ask Adel'}
           </a>
         </div>

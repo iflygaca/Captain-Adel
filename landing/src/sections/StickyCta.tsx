@@ -36,7 +36,7 @@ export default function StickyCta() {
 
   return (
     <div className={`sticky-cta md:hidden ${shown ? 'is-shown' : ''}`} aria-hidden={!shown}>
-      <a href="#api" className="sticky-cta-btn font-mono2">
+      <a href="/chat" className="sticky-cta-btn font-mono2">
         {isAr ? 'اسأل كابتن عادل' : 'Ask Captain Adel'}
         <span aria-hidden>{isAr ? '←' : '→'}</span>
       </a>

@@ -1,16 +1,7 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/v1/:path*",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/health",
-      "destination": "/api/index.js"
-    }
-  ],
+
   "headers": [
     {
       "source": "/(.*)",
