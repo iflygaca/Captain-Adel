@@ -100,6 +100,22 @@ edited first.**
 The colour semantics above are load-bearing: teal is links/focus only and must never stand for a
 grounded or verified answer in a diagram, mirroring the rule in `public/assets/css/adel.css`.
 
+## Context7 (Upstash) — *Added 2026-08-31*
+
+- **Project:** Context7 — live documentation and API lookup for 1000+ libraries
+- **Author:** Upstash
+- **Source:** https://github.com/upstash/context7
+- **License:** MIT
+- **Skill vendored:** `find-docs` — retrieve current documentation, API references, and code examples for any developer technology (flight data libraries, inference APIs, LLM docs, etc.)
+
+## Superpowers (Jesse Vincent) — *Added 2026-08-31*
+
+- **Project:** Superpowers — AI-native workflow orchestration for Claude Code
+- **Author:** Jesse Vincent (@obra)
+- **Source:** https://github.com/obra/superpowers
+- **License:** MIT
+- **Skill vendored:** `executing-plans` — break down and execute complex multi-step plans (curriculum design, model evaluation flows, deployment sequencing, etc.)
+
 ## Anthropic-Cybersecurity-Skills
 
 - **Project:** Anthropic-Cybersecurity-Skills (a community project — **not affiliated with
