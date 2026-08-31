@@ -52,10 +52,6 @@ module.exports = {
   // billing paperwork completes. The abuse rate limiter still runs.
   launchMode: String(process.env.ADEL_LAUNCH_MODE || '').toLowerCase() === 'free' ? 'free' : '',
 
-  // Firebase project for the Admin SDK. Automatic on Cloud Run via
-  // GOOGLE_CLOUD_PROJECT; override with FIREBASE_PROJECT_ID for local dev.
-  firebaseProjectId: process.env.FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT || '',
-
   // Moyasar — empty = billing endpoints return 503 (the SaaS layer is dark).
   // Prices are SAR strings (e.g. "35", "299"), converted to halalas in
   // billing/moyasar-core.js; the browser never chooses an amount.

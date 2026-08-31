@@ -22,7 +22,6 @@ const corsMiddleware = require('./middleware/cors');
 const apiKeyMiddleware = require('./middleware/apikey');
 const authMiddleware = require('./middleware/auth');
 const billing = require('./billing/routes');
-const firebase = require('./firebase');
 const quota = require('./quota/quota');
 const { resolveTier } = require('./billing/tier-core');
 
@@ -47,33 +46,20 @@ app.post('/v1/billing/webhook', express.raw({ type: 'application/json' }), billi
 
 app.use(express.json({ limit: config.maxBodyBytes }));
 
-/* Security headers on every response. The Firebase-hosted Fly GACA site sets
- * these in firebase.json; this standalone service serves the same UI (public/)
- * and must match — without them captadel.com had no CSP, no frame protection,
- * and no nosniff. frame-ancestors 'none' + X-Frame-Options:DENY block
- * clickjacking; the captadel pages only load same-origin assets, so the
- * policy below is tight. */
+/* Security headers on every response. Served on Vercel / standalone Express. */
 app.use((req, res, next) => {
   res.set('X-Content-Type-Options', 'nosniff');
   res.set('X-Frame-Options', 'DENY');
   res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  // Firebase Auth (the only client-side Google SDK we load) needs gstatic for
-  // the SDK, the identitytoolkit/securetoken endpoints for sign-in, and a frame
-  // for the popup helper. The client never opens Firestore — plan/quota come
-  // from /v1/me — so no firestore.googleapis.com here.
-  // Moyasar's hosted payment widget is the one deliberate payments exception:
-  // cdn.moyasar.com serves the widget assets, api.moyasar.com receives the
-  // card data directly from the browser (PCI SAQ-A) and hosts 3-D Secure
-  // frames/redirects.
   res.set('Content-Security-Policy',
     "default-src 'self'; "
-    + "script-src 'self' https://www.gstatic.com https://apis.google.com https://cdn.moyasar.com; "
+    + "script-src 'self' https://cdn.moyasar.com; "
     + "style-src 'self' 'unsafe-inline' https://cdn.moyasar.com; "
-    + "img-src 'self' data: blob: https://*.googleusercontent.com https://cdn.moyasar.com; "
+    + "img-src 'self' data: blob: https://cdn.moyasar.com; "
     + "font-src 'self'; "
-    + "connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.moyasar.com; "
-    + "frame-src https://apis.google.com https://*.firebaseapp.com https://api.moyasar.com; "
+    + "connect-src 'self' https://api.moyasar.com; "
+    + "frame-src 'self' https://api.moyasar.com; "
     + "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; "
     + "form-action 'self' https://api.moyasar.com");
   next();

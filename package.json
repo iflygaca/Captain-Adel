@@ -11,6 +11,7 @@
   },
   "scripts": {
     "start": "node src/server.js",
+    "test": "node --test test/*.test.js",
     "test:unit": "node --test test/*.test.js",
     "test:coverage": "node --test --experimental-test-coverage test/*.test.js",
     "eval": "node evals/run.js",
@@ -39,7 +40,6 @@
   },
   "dependencies": {
     "@google/genai": "^2.17.1",
-    "express": "^5.2.1",
-    "firebase-admin": "^14.2.0"
+    "express": "^5.2.1"
   }
 }
