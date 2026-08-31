@@ -13,7 +13,6 @@ const { createHmac } = require('node:crypto');
 
 const routes = require('../src/billing/routes');
 const config = require('../src/config');
-const firebase = require('../src/firebase');
 const ent = require('../src/billing/entitlements');
 const authMiddleware = require('../src/middleware/auth');
 const qc = require('../src/quota/quota-core');
@@ -83,25 +82,21 @@ async function withOverrides(over, fn) {
     config[k] = over.config[k];
   }
   const saved = {
-    available: firebase.available, db: firebase.db, serverTimestamp: firebase.serverTimestamp,
-    deleteUser: firebase.deleteUser,
     applyEntitlement: ent.applyEntitlement, readEntitlement: ent.readEntitlement,
     invalidate: authMiddleware.invalidate, fetch: global.fetch,
   };
-  if (over.available !== undefined) firebase.available = () => over.available;
-  if (over.db) firebase.db = over.db;
-  firebase.serverTimestamp = () => 'ts';
-  firebase.deleteUser = over.deleteUser || (async () => {});   // never the real Admin SDK
+  const defaultDb = (over.available === false || over.db === null) ? null : (over.db || memDb());
+  routes.setDb(defaultDb, () => 'ts', over.deleteUser || (async () => {}));
+  routes.setAuthAvailable(over.available !== undefined ? over.available : Boolean(defaultDb));
+
   if (over.applyEntitlement) ent.applyEntitlement = over.applyEntitlement;
   if (over.readEntitlement) ent.readEntitlement = over.readEntitlement;
   authMiddleware.invalidate = over.invalidate || (() => {});
   if (over.fetch) global.fetch = over.fetch;
   try { return await fn(); } finally {
     for (const k of Object.keys(savedConfig)) config[k] = savedConfig[k];
-    Object.assign(firebase, {
-      available: saved.available, db: saved.db, serverTimestamp: saved.serverTimestamp,
-      deleteUser: saved.deleteUser,
-    });
+    routes.setDb(null, null, null);
+    routes.setAuthAvailable(false);
     Object.assign(ent, {
       applyEntitlement: saved.applyEntitlement, readEntitlement: saved.readEntitlement,
     });

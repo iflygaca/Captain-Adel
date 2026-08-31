@@ -18,7 +18,6 @@
 'use strict';
 
 const config = require('../config');
-const firebase = require('../firebase');
 const ent = require('../billing/entitlements');
 
 const ENTITLEMENT_TTL_MS = 60 * 1000;
@@ -31,8 +30,7 @@ function cachedIsPro(uid) {
 }
 function setCache(uid, isPro) { cache.set(uid, { isPro, at: Date.now() }); }
 
-/* Invalidate a uid (call after a webhook writes a new entitlement on this
- * instance, so the buyer sees Pro immediately rather than after the TTL). */
+/* Invalidate a uid */
 function invalidate(uid) { if (uid) cache.delete(uid); }
 
 async function resolveIsPro(uid) {
@@ -42,20 +40,23 @@ async function resolveIsPro(uid) {
   try {
     isPro = ent.isActive(await ent.readEntitlement(uid));
   } catch (_) {
-    // Firestore outage — treat as free for this turn but don't cache the miss,
-    // so a transient blip doesn't pin a paid pilot to free for 60s.
     return false;
   }
   setCache(uid, isPro);
   return isPro;
 }
 
+let _verifier = {
+  available: () => false,
+  verifyIdToken: async () => { throw new Error('auth_disabled'); },
+};
+
 async function authMiddleware(req, _res, next) {
   req.user = { uid: '', isPro: false, email: '' };
   const m = String(req.headers.authorization || '').match(/^Bearer (.+)$/);
-  if (!m || !firebase.available()) return next();   // anonymous / layer dark
+  if (!m || !_verifier.available()) return next();   // anonymous / layer dark
   try {
-    const decoded = await firebase.verifyIdToken(m[1]);
+    const decoded = await _verifier.verifyIdToken(m[1]);
     req.user = {
       uid: decoded.uid,
       email: decoded.email || '',
@@ -70,3 +71,5 @@ async function authMiddleware(req, _res, next) {
 module.exports = authMiddleware;
 module.exports.invalidate = invalidate;
 module.exports._cache = cache;
+module.exports.__setVerifier = (v) => { _verifier = v; };
+module.exports.__getVerifier = () => _verifier;

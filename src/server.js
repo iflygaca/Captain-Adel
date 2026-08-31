@@ -135,8 +135,8 @@ app.post('/v1/chat', corsMiddleware, apiKeyMiddleware, authMiddleware, async (re
       freeDaily: config.freeDaily,
       anonDaily: config.anonDaily,
     });
-    if (tier.metered && firebase.available()) {
-      const q = await quota.check(firebase.db(), {
+    if (tier.metered && billing.getDb()) {
+      const q = await quota.check(billing.getDb(), {
         key: tier.quotaKey, limit: tier.limit, period: config.freePeriod,
       });
       if (!q.ok) {

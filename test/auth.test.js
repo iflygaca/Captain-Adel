@@ -9,7 +9,6 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const firebase = require('../src/firebase');
 const ent = require('../src/billing/entitlements');
 const config = require('../src/config');
 const authMiddleware = require('../src/middleware/auth');
@@ -18,14 +17,16 @@ const authMiddleware = require('../src/middleware/auth');
  * may set: available (bool), verify (uid|throws), readEntitlement (fn),
  * isActive (fn), launchMode (string). */
 async function run(req, overrides = {}) {
+  const savedVerifier = authMiddleware.__getVerifier();
   const saved = {
-    available: firebase.available, verifyIdToken: firebase.verifyIdToken,
     readEntitlement: ent.readEntitlement, isActive: ent.isActive,
     launchMode: config.launchMode,
   };
-  firebase.available = () => overrides.available !== false;
-  firebase.verifyIdToken = overrides.verify
-    || (async (t) => ({ uid: `uid-${t}`, email: `${t}@x.com` }));
+  authMiddleware.__setVerifier({
+    available: () => overrides.available !== false,
+    verifyIdToken: overrides.verify
+      || (async (t) => ({ uid: `uid-${t}`, email: `${t}@x.com` })),
+  });
   if (overrides.readEntitlement) ent.readEntitlement = overrides.readEntitlement;
   if (overrides.isActive) ent.isActive = overrides.isActive;
   config.launchMode = overrides.launchMode || '';
@@ -34,7 +35,7 @@ async function run(req, overrides = {}) {
     await authMiddleware(req, {}, () => { nexted = true; });
     return { user: req.user, nexted };
   } finally {
-    Object.assign(firebase, { available: saved.available, verifyIdToken: saved.verifyIdToken });
+    authMiddleware.__setVerifier(savedVerifier);
     Object.assign(ent, { readEntitlement: saved.readEntitlement, isActive: saved.isActive });
     config.launchMode = saved.launchMode;
   }

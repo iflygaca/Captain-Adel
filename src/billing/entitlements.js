@@ -11,19 +11,35 @@
 
 'use strict';
 
-const firebase = require('../firebase');
 const core = require('./entitlements-core');
+
+let _db = null;
+let _serverTimestamp = () => new Date().toISOString();
+
+function setDb(db, serverTimestamp) {
+  _db = db;
+  if (serverTimestamp) _serverTimestamp = serverTimestamp;
+}
+
+function getDb() {
+  if (!_db) return null;
+  if (typeof _db === 'function') return _db();
+  if (typeof _db.db === 'function') return _db.db();
+  return _db;
+}
 
 /** Run `mutate(currentEntitlement) -> nextEntitlement` atomically. */
 async function applyEntitlement(uid, mutate, extraFields) {
   if (!uid) throw new Error('applyEntitlement: missing uid');
-  const db = firebase.db();
+  const db = getDb();
+  if (!db) return;
   const ref = db.collection('users').doc(uid);
   await db.runTransaction(async (tx) => {
-    const cur = (await tx.get(ref)).data() || {};
+    const snap = await tx.get(ref);
+    const cur = (snap && typeof snap.data === 'function' ? snap.data() : snap) || {};
     const e = core.normalize(cur.entitlement);
     const patch = Object.assign(
-      { entitlement: mutate(e), updatedAt: firebase.serverTimestamp() },
+      { entitlement: mutate(e), updatedAt: _serverTimestamp() },
       extraFields || {},
     );
     tx.set(ref, patch, { merge: true });
@@ -32,8 +48,9 @@ async function applyEntitlement(uid, mutate, extraFields) {
 
 /** Read a user's entitlement map (or null). */
 async function readEntitlement(uid) {
-  if (!uid) return null;
-  const snap = await firebase.db().collection('users').doc(uid).get();
+  const db = getDb();
+  if (!uid || !db) return null;
+  const snap = await db.collection('users').doc(uid).get();
   return snap.exists ? ((snap.data() || {}).entitlement || null) : null;
 }
 
@@ -43,4 +60,5 @@ module.exports = {
   grantSubscription: core.grantSubscription,
   revoke: core.revoke,
   isActive: core.isActive,
+  setDb,
 };

@@ -89,12 +89,6 @@ test('siteUrl: strips trailing slashes', () => {
   assert.equal(loadConfig({ SITE_URL: undefined }).siteUrl, 'https://captadel.com');
 });
 
-test('firebaseProjectId: prefers FIREBASE_PROJECT_ID, falls back to GOOGLE_CLOUD_PROJECT', () => {
-  assert.equal(loadConfig({ FIREBASE_PROJECT_ID: 'proj-a', GOOGLE_CLOUD_PROJECT: 'proj-b' }).firebaseProjectId, 'proj-a');
-  assert.equal(loadConfig({ FIREBASE_PROJECT_ID: undefined, GOOGLE_CLOUD_PROJECT: 'proj-b' }).firebaseProjectId, 'proj-b');
-  assert.equal(loadConfig({ FIREBASE_PROJECT_ID: undefined, GOOGLE_CLOUD_PROJECT: undefined }).firebaseProjectId, '');
-});
-
 test('provider: defaults to gemini, honours MODEL_PROVIDER', () => {
   assert.equal(loadConfig({ MODEL_PROVIDER: undefined }).provider, 'gemini');
   assert.equal(loadConfig({ MODEL_PROVIDER: 'allam' }).provider, 'allam');

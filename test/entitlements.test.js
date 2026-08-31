@@ -4,15 +4,12 @@
  * stores a pure mutator's result; readEntitlement reads the map back. The
  * Firestore Admin SDK is faked by overriding firebase.db()/serverTimestamp()
  * (assign-and-restore) — no emulator, no network. */
-'use strict';
-
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const firebase = require('../src/firebase');
 const ent = require('../src/billing/entitlements');
 
 /* In-memory users collection with a transactional set, matching the slice of
- * the Admin SDK that entitlements.js uses. */
+ * the database interface that entitlements.js uses. */
 function fakeDb(initial = {}) {
   const store = new Map(Object.entries(initial));
   const ref = (id) => ({ id });
@@ -43,13 +40,9 @@ function fakeDb(initial = {}) {
 }
 
 async function withDb(db, fn) {
-  const realDb = firebase.db;
-  const realTs = firebase.serverTimestamp;
-  firebase.db = () => db;
-  firebase.serverTimestamp = () => 'TS';
+  ent.setDb(db, () => 'TS');
   try { return await fn(); } finally {
-    firebase.db = realDb;
-    firebase.serverTimestamp = realTs;
+    ent.setDb(null);
   }
 }
 

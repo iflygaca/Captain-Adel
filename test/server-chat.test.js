@@ -16,12 +16,10 @@ const http = require('node:http');
 // layer otherwise dark. Set BEFORE requiring the server (config reads env once).
 process.env.ADEL_DAILY_ANON = '5';
 delete process.env.ADEL_API_KEY;
-delete process.env.FIREBASE_PROJECT_ID;
-delete process.env.GOOGLE_CLOUD_PROJECT;
 
 const server = require('../src/server');
 const realBrain = require('../src/brain');
-const firebase = require('../src/firebase');
+const billing = require('../src/billing/routes');
 const quota = require('../src/quota/quota');
 
 // Fake brain = real brain (real guards + rate limiter) with a capturing answer.
@@ -53,7 +51,7 @@ beforeEach(() => {
   };
   fakeBrain.answerStream = realBrain.answerStream;
   realBrain.ratelimit._reset && realBrain.ratelimit._reset();
-  firebase.available = () => false;   // SaaS layer dark unless a test opts in
+  billing.setDb(null);   // SaaS layer dark unless a test opts in
 });
 
 async function req(path, { body, headers } = {}) {
@@ -118,8 +116,7 @@ test('POST /v1/chat: a brain failure surfaces as 502 engine_error', async () => 
 });
 
 test('POST /v1/chat: an exhausted quota returns 402 with the upgrade hint', async () => {
-  firebase.available = () => true;
-  firebase.db = () => ({});                  // value is unused by the fake quota
+  billing.setDb({});
   const realCheck = quota.check;
   quota.check = async () => ({ ok: false, retryAfter: 3600, limit: 5 });
   try {

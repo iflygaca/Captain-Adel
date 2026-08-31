@@ -37,7 +37,6 @@
 const { randomUUID } = require('node:crypto');
 const express = require('express');
 const config = require('../config');
-const firebase = require('../firebase');
 const ent = require('./entitlements');
 const mc = require('./moyasar-core');
 const quota = require('../quota/quota');
@@ -46,6 +45,30 @@ const tierCore = require('./tier-core');
 const authMiddleware = require('../middleware/auth');
 
 const MOYASAR_API = 'https://api.moyasar.com/v1';
+
+let _db = null;
+let _serverTimestamp = () => new Date().toISOString();
+let _deleteUser = async () => {};
+let _authAvailable = () => false;
+
+function setDb(db, serverTimestamp, deleteUser) {
+  _db = db;
+  if (serverTimestamp) _serverTimestamp = serverTimestamp;
+  if (deleteUser) _deleteUser = deleteUser;
+  ent.setDb(_db, _serverTimestamp);
+}
+
+function setAuthAvailable(fn) {
+  _authAvailable = typeof fn === 'function' ? fn : () => !!fn;
+}
+
+function getDb() {
+  if (!_db) return null;
+  if (typeof _db === 'function') return _db();
+  if (typeof _db.db === 'function') return _db.db();
+  return _db;
+}
+function getServerTimestamp() { return _serverTimestamp(); }
 
 /* Resolved at call time so tests can stub the global fetch (the same
  * lazy-resolution test seam the old provider require() provided). */
@@ -64,7 +87,7 @@ async function moyasarRequest(path, init) {
 }
 
 function billingEnabled() {
-  return !!(config.moyasarSecretKey && firebase.available());
+  return !!(config.moyasarSecretKey && getDb());
 }
 
 function priceEnv() {
@@ -88,14 +111,15 @@ async function checkoutHandler(req, res) {
 
   try {
     const checkoutId = randomUUID();
-    await firebase.db().collection('checkoutIntents').doc(checkoutId).set({
+    const db = getDb();
+    await db.collection('checkoutIntents').doc(checkoutId).set({
       uid,
       plan,
       cadence,
       amountHalalas: amount,
       currency: 'SAR',
       status: 'pending',
-      createdAt: firebase.serverTimestamp(),
+      createdAt: _serverTimestamp(),
     });
     res.json({
       checkoutId,
@@ -126,7 +150,10 @@ async function settlePayment(paymentId, { requireUid } = {}) {
   const checkoutId = payment && payment.metadata && payment.metadata.checkoutId;
   if (!checkoutId) return { ok: false, code: 'intent_missing' };
 
-  const intentRef = firebase.db().collection('checkoutIntents').doc(String(checkoutId));
+  const db = getDb();
+  if (!db) return { ok: false, code: 'db_unavailable' };
+
+  const intentRef = db.collection('checkoutIntents').doc(String(checkoutId));
   const intentSnap = await intentRef.get();
   if (!intentSnap.exists) return { ok: false, code: 'intent_missing' };
   const intent = intentSnap.data() || {};
@@ -141,8 +168,8 @@ async function settlePayment(paymentId, { requireUid } = {}) {
 
   // Idempotency claim — create() fails if the doc exists (already settled).
   try {
-    await firebase.db().collection('moyasarPayments').doc(String(paymentId))
-      .create({ uid: intent.uid, checkoutId, settledAt: firebase.serverTimestamp() });
+    await db.collection('moyasarPayments').doc(String(paymentId))
+      .create({ uid: intent.uid, checkoutId, settledAt: _serverTimestamp() });
   } catch (_) {
     return { ok: true, alreadySettled: true };
   }
@@ -160,22 +187,22 @@ async function settlePayment(paymentId, { requireUid } = {}) {
   const token = mc.tokenOf(payment);
   if (token) {
     const src = payment.source || {};
-    await firebase.db().collection('moyasarCustomers').doc(intent.uid).set({
+    await db.collection('moyasarCustomers').doc(intent.uid).set({
       token,
       brand: src.company || null,
       last4: src.last_four || null,
-      updatedAt: firebase.serverTimestamp(),
+      updatedAt: _serverTimestamp(),
     }, { merge: true });
   }
 
-  await firebase.db().collection('subscriptions').doc(intent.uid).set({
+  await db.collection('subscriptions').doc(intent.uid).set({
     cadence: intent.cadence,
     amountHalalas: intent.amountHalalas,   // renewals charge THIS, never env price
     autoRenew: true,
     status: 'active',
     failedAttempts: 0,
     nextChargeAt: new Date(mc.nextChargeAt(grant.expiresAtMs)).toISOString(),
-    updatedAt: firebase.serverTimestamp(),
+    updatedAt: _serverTimestamp(),
   }, { merge: true });
 
   await intentRef.set({ status: 'fulfilled' }, { merge: true });
@@ -242,9 +269,10 @@ async function cancelAutoRenewHandler(req, res) {
   const uid = req.user && req.user.uid;
   if (!uid) { res.status(401).json({ error: 'sign_in_required' }); return; }
   try {
-    await firebase.db().collection('subscriptions').doc(uid).set({
+    const db = getDb();
+    await db.collection('subscriptions').doc(uid).set({
       autoRenew: false,
-      updatedAt: firebase.serverTimestamp(),
+      updatedAt: _serverTimestamp(),
     }, { merge: true });
     res.json({ ok: true });
   } catch (err) {
@@ -254,7 +282,7 @@ async function cancelAutoRenewHandler(req, res) {
   }
 }
 
-/* ---- POST /v1/billing/renewals/run (Cloud Scheduler) ---------------------- */
+/* ---- POST /v1/billing/renewals/run (Cloud Scheduler / Cron) -------------- */
 /* Charges due saved-card tokens. Guarded by CRON_SECRET, not user auth. */
 async function renewalsHandler(req, res) {
   if (!config.cronSecret || req.headers['x-cron-key'] !== config.cronSecret) {
@@ -265,7 +293,8 @@ async function renewalsHandler(req, res) {
   const nowIso = new Date().toISOString();
   const out = { charged: 0, pastDue: 0, canceled: 0 };
   try {
-    const due = await firebase.db().collection('subscriptions')
+    const db = getDb();
+    const due = await db.collection('subscriptions')
       .where('autoRenew', '==', true)
       .where('status', 'in', ['active', 'past_due'])
       .where('nextChargeAt', '<=', nowIso)
@@ -287,22 +316,23 @@ async function renewalsHandler(req, res) {
 
 async function renewOne(uid, sub, out) {
   const failedAttempts = sub.failedAttempts || 0;
-  const subRef = firebase.db().collection('subscriptions').doc(uid);
+  const db = getDb();
+  const subRef = db.collection('subscriptions').doc(uid);
 
   async function recordFailure() {
     const attempts = failedAttempts + 1;
     if (attempts >= mc.MAX_RENEWAL_ATTEMPTS) {
       out.canceled += 1;
       await subRef.set({ status: 'canceled', autoRenew: false, failedAttempts: attempts,
-        updatedAt: firebase.serverTimestamp() }, { merge: true });
+        updatedAt: _serverTimestamp() }, { merge: true });
     } else {
       out.pastDue += 1;
       await subRef.set({ status: 'past_due', failedAttempts: attempts,
-        updatedAt: firebase.serverTimestamp() }, { merge: true });
+        updatedAt: _serverTimestamp() }, { merge: true });
     }
   }
 
-  const custSnap = await firebase.db().collection('moyasarCustomers').doc(uid).get();
+  const custSnap = await db.collection('moyasarCustomers').doc(uid).get();
   const token = custSnap.exists ? (custSnap.data() || {}).token : null;
   if (!token) { await recordFailure(); return; }
 
@@ -340,66 +370,53 @@ async function renewOne(uid, sub, out) {
     status: 'active',
     failedAttempts: 0,
     nextChargeAt: new Date(mc.nextChargeAt(newExpiryMs)).toISOString(),
-    updatedAt: firebase.serverTimestamp(),
+    updatedAt: _serverTimestamp(),
   }, { merge: true });
 }
 
 /* ---- POST /v1/account/delete ---------------------------------------------- */
-/* Apple 5.1.1(v) / PDPL erasure. Order is load-bearing: Firestore purge FIRST,
- * the Auth user LAST — if Auth died first the caller's token would be dead and
- * the data purge unretryable. Idempotent throughout: doc deletes of missing
- * docs are no-ops, queries come back empty on retry, and a user-not-found from
- * Auth (a retry inside the old ID token's ≤1h validity) counts as success.
- * moyasarPayments docs are NOT deleted — each is the settle-once idempotency
- * marker (see settlePayment): a deleted marker would let a replayed webhook
- * re-grant an entitlement to the dead uid. They are tombstoned instead: the
- * doc is overwritten (uid/checkoutId erased) but kept, so create() still
- * fails. Quota counters are swept best-effort; stragglers TTL out (expireAt). */
+/* Apple 5.1.1(v) / PDPL erasure. */
 async function deleteAccountHandler(req, res) {
-  if (!firebase.available()) { res.status(503).json({ error: 'account_unavailable' }); return; }
+  const db = getDb();
+  if (!(_authAvailable() || db)) { res.status(503).json({ error: 'account_unavailable' }); return; }
   const uid = req.user && req.user.uid;
   if (!uid) { res.status(401).json({ error: 'sign_in_required' }); return; }
 
   try {
-    const db = firebase.db();
+    if (db) {
+      // 1. Saved card token first
+      await db.collection('moyasarCustomers').doc(uid).delete();
+      // 2. Subscription
+      await db.collection('subscriptions').doc(uid).delete();
+      // 3. Profile + entitlement
+      await db.collection('users').doc(uid).delete();
 
-    // 1. Saved card token first — the most sensitive doc, and removing it
-    //    guarantees no future renewal can charge even if a later step fails.
-    await db.collection('moyasarCustomers').doc(uid).delete();
-    // 2. Subscription — drops the uid out of the renewals cron query.
-    await db.collection('subscriptions').doc(uid).delete();
-    // 3. Profile + entitlement.
-    await db.collection('users').doc(uid).delete();
+      // 4. Checkout intents
+      const intents = await db.collection('checkoutIntents').where('uid', '==', uid).get();
+      for (const d of intents.docs) {
+        // eslint-disable-next-line no-await-in-loop
+        await db.collection('checkoutIntents').doc(d.id).delete();
+      }
 
-    // 4. Checkout intents are keyed by uuid but carry the uid — query-delete.
-    const intents = await db.collection('checkoutIntents').where('uid', '==', uid).get();
-    for (const d of intents.docs) {
-      // eslint-disable-next-line no-await-in-loop
-      await db.collection('checkoutIntents').doc(d.id).delete();
+      // 5. Settle markers
+      const markers = await db.collection('moyasarPayments').where('uid', '==', uid).get();
+      for (const d of markers.docs) {
+        // eslint-disable-next-line no-await-in-loop
+        await db.collection('moyasarPayments').doc(d.id)
+          .set({ tombstone: true, deletedAt: _serverTimestamp() });
+      }
+
+      // 6. Quota counters
+      try {
+        const now = Date.now();
+        await db.collection('adelQuota').doc(qc.dayStamp(now) + '__uid:' + uid).delete();
+        await db.collection('adelQuota').doc(qc.monthStamp(now) + '__uid:' + uid).delete();
+      } catch (_) { /* fail open */ }
     }
 
-    // 5. Settle markers: overwrite (non-merge set), never delete — the doc's
-    //    existence is the replay guard; its uid is the personal data.
-    const markers = await db.collection('moyasarPayments').where('uid', '==', uid).get();
-    for (const d of markers.docs) {
-      // eslint-disable-next-line no-await-in-loop
-      await db.collection('moyasarPayments').doc(d.id)
-        .set({ tombstone: true, deletedAt: firebase.serverTimestamp() });
-    }
-
-    // 6. Quota counters (uid lives only in the doc id; stamps are
-    //    deterministic). Sweep BOTH period stamps so an ADEL_FREE_PERIOD flip
-    //    can't strand a live counter. Best effort — they hold only a count.
+    // 7. The Auth user, LAST.
     try {
-      const now = Date.now();
-      await db.collection('adelQuota').doc(qc.dayStamp(now) + '__uid:' + uid).delete();
-      await db.collection('adelQuota').doc(qc.monthStamp(now) + '__uid:' + uid).delete();
-    } catch (_) { /* fail open — the TTL policy on expireAt cleans up */ }
-
-    // 7. The Auth user, LAST. user-not-found = a retry after success (the old
-    //    ID token verifies for up to ~1h; verifyIdToken doesn't checkRevoked).
-    try {
-      await firebase.deleteUser(uid);
+      await _deleteUser(uid);
     } catch (err) {
       if (!err || err.code !== 'auth/user-not-found') throw err;
     }
@@ -409,7 +426,7 @@ async function deleteAccountHandler(req, res) {
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('account delete failed', String((err && err.message) || err));
-    res.status(502).json({ error: 'delete_failed' });   // token still valid — retry
+    res.status(502).json({ error: 'delete_failed' });
   }
 }
 
@@ -420,10 +437,11 @@ async function meHandler(req, res) {
 
   const launch = config.launchMode === 'free';
   const isPro = !!(req.user && req.user.isPro);
+  const db = getDb();
   let quotaInfo = null;
-  if (!launch && !isPro && config.freeDaily > 0 && firebase.available()) {
+  if (!launch && !isPro && config.freeDaily > 0 && db) {
     try {
-      quotaInfo = await quota.peek(firebase.db(), {
+      quotaInfo = await quota.peek(db, {
         key: 'uid:' + uid, limit: config.freeDaily, period: config.freePeriod,
       });
     } catch (_) { /* fail open — no quota panel rather than an error */ }
@@ -444,7 +462,7 @@ function configHandler(_req, res) {
   res.json({
     launchMode: config.launchMode === 'free',
     billingEnabled: billingEnabled(),
-    authEnabled: firebase.available(),
+    authEnabled: _authAvailable(),
     moyasarPublishableKey: config.moyasarPublishableKey || null,
     freeDaily: config.freeDaily,
     anonDaily: config.anonDaily,
@@ -469,5 +487,6 @@ module.exports = {
   // exported for tests
   checkoutHandler, confirmHandler, cancelAutoRenewHandler, renewalsHandler,
   deleteAccountHandler, meHandler, configHandler, billingEnabled, settlePayment,
+  setDb, setAuthAvailable, getDb, getServerTimestamp,
   _tierCore: tierCore,
 };
