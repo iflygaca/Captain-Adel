@@ -418,10 +418,109 @@
     });
   }
 
+  /* ---- Kneeboard Export & Print Functionality ------------------------------ */
+  const btnExportKneeboard = document.getElementById('btn-export-kneeboard');
+  const kbSheet = document.getElementById('kneeboard-sheet');
+
+  function updateKneeboard() {
+    if (!kbSheet) return;
+    const now = new Date();
+    const utcStr = now.toISOString().replace('T', ' ').substring(0, 16) + ' UTC';
+
+    const kbDt = document.getElementById('kb-dt');
+    if (kbDt) kbDt.textContent = utcStr;
+
+    // Wind
+    const rwyVal = valRwy ? valRwy.textContent : 'RWY 24';
+    const wdirVal = valWdir ? valWdir.textContent : '270°';
+    const wspdVal = wspdInput ? wspdInput.value + ' kt' : '20 kt';
+    const tasVal = wtasInput ? wtasInput.value + ' kt' : '110 kt';
+    const xwVal = resXw ? resXw.textContent : '';
+    const xwDirVal = resXwDir ? resXwDir.textContent : '';
+    const hwVal = resHw ? resHw.textContent : '';
+    const hwSubVal = resHwSub ? resHwSub.textContent : '';
+    const wcaVal = resWca ? resWca.textContent : '';
+    const hdgVal = resHdg ? resHdg.textContent : '';
+    const gsVal = resGs ? resGs.textContent : '';
+
+    const kbRwy = document.getElementById('kb-rwy');
+    const kbWind = document.getElementById('kb-wind');
+    const kbXw = document.getElementById('kb-xw');
+    const kbHw = document.getElementById('kb-hw');
+    const kbWca = document.getElementById('kb-wca');
+    const kbGs = document.getElementById('kb-gs');
+
+    if (kbRwy) kbRwy.textContent = `${rwyVal}`;
+    if (kbWind) kbWind.textContent = `${wdirVal} @ ${wspdVal} (TAS: ${tasVal})`;
+    if (kbXw) kbXw.textContent = `${xwVal} (${xwDirVal})`;
+    if (kbHw) kbHw.textContent = `${hwVal} (${hwSubVal})`;
+    if (kbWca) kbWca.textContent = `${wcaVal} (${hdgVal})`;
+    if (kbGs) kbGs.textContent = `${gsVal}`;
+
+    // Fuel
+    const kbFOnboard = document.getElementById('kb-f-onboard');
+    const kbFBurn = document.getElementById('kb-f-burn');
+    const kbFTrip = document.getElementById('kb-f-trip');
+    const kbFRes = document.getElementById('kb-f-res');
+    const kbFMin = document.getElementById('kb-f-min');
+    const kbFEnd = document.getElementById('kb-f-end');
+
+    if (kbFOnboard) kbFOnboard.textContent = `${fOnboard ? fOnboard.value : '140'} L`;
+    if (kbFBurn) kbFBurn.textContent = `${fBurn ? fBurn.value : '35'} L/h`;
+    if (kbFTrip) kbFTrip.textContent = `${resFTrip ? resFTrip.textContent : ''} (${resFTripTime ? resFTripTime.textContent : ''})`;
+    if (kbFRes) kbFRes.textContent = `${resFRes ? resFRes.textContent : ''} (${resFResLabel ? resFResLabel.textContent : ''})`;
+    if (kbFMin) kbFMin.textContent = `${resFMin ? resFMin.textContent : ''}`;
+    if (kbFEnd) kbFEnd.textContent = `${resFEndurance ? resFEndurance.textContent : ''} (${resFStatus ? resFStatus.textContent : ''})`;
+
+    // Density
+    const kbElev = document.getElementById('kb-elev');
+    const kbQnh = document.getElementById('kb-qnh');
+    const kbOat = document.getElementById('kb-oat');
+    const kbPa = document.getElementById('kb-pa');
+    const kbDa = document.getElementById('kb-da');
+    const kbDisa = document.getElementById('kb-disa');
+
+    if (kbElev) kbElev.textContent = `${valDelev ? valDelev.textContent : ''}`;
+    if (kbQnh) kbQnh.textContent = `${valDqnh ? valDqnh.textContent : ''}`;
+    if (kbOat) kbOat.textContent = `${valDoat ? valDoat.textContent : ''}`;
+    if (kbPa) kbPa.textContent = `${resPa ? resPa.textContent : ''}`;
+    if (kbDa) kbDa.textContent = `${resDa ? resDa.textContent : ''} (${resSpread ? resSpread.textContent : ''})`;
+    if (kbDisa) kbDisa.textContent = `${resDisa ? resDisa.textContent : ''}`;
+
+    // W&B
+    const kbWbWt = document.getElementById('kb-wb-wt');
+    const kbWbCg = document.getElementById('kb-wb-cg');
+    const kbWbMom = document.getElementById('kb-wb-mom');
+    const kbWbStatus = document.getElementById('kb-wb-status');
+
+    if (kbWbWt) kbWbWt.textContent = `${resWbTotal ? resWbTotal.textContent : ''}`;
+    if (kbWbCg) kbWbCg.textContent = `${resWbCg ? resWbCg.textContent : ''}`;
+    if (kbWbMom) kbWbMom.textContent = `${resWbMoment ? resWbMoment.textContent : ''} kg·cm`;
+    if (kbWbStatus) kbWbStatus.textContent = `${resWbStatus ? resWbStatus.textContent : ''}`;
+
+    // Recency
+    const kbRecDay = document.getElementById('kb-rec-day');
+    const kbRecNight = document.getElementById('kb-rec-night');
+    const kbRecExp = document.getElementById('kb-rec-exp');
+
+    if (kbRecDay) kbRecDay.textContent = `${resDayCur ? resDayCur.textContent : ''}`;
+    if (kbRecNight) kbRecNight.textContent = `${resNightCur ? resNightCur.textContent : ''}`;
+    if (kbRecExp) kbRecExp.textContent = `${resExpDate ? resExpDate.textContent : ''} (${resDaysLeft ? resDaysLeft.textContent : ''})`;
+  }
+
+  if (btnExportKneeboard) {
+    btnExportKneeboard.addEventListener('click', () => {
+      updateKneeboard();
+      if (kbSheet) kbSheet.hidden = false;
+      window.print();
+    });
+  }
+
   // Initial runs
   calcWind();
   calcFuel();
   calcDensity();
   calcWb();
   calcRecency();
+  updateKneeboard();
 })();

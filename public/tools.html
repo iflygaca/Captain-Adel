@@ -64,6 +64,9 @@
         <div class="tools-hero-badge font-mono" data-en="FLIGHT COMPUTER & INSTRUMENTS">حاسبة الطيران والأدوات الملاحية</div>
         <h1 data-en="Pilot Calculation Suite">مجموعة الحسابات الجوية</h1>
         <p data-en="Interactive pre-flight tools built for GACAR operational standards: wind triangle, fuel reserves, density altitude, weight and balance, and pilot currency.">أدوات تخطيط وتحضير الطيران التفاعلية وفق معايير أنظمة GACAR: مثلث الرياح، احتياطي الوقود، الارتفاع الكثافي، الوزن وتمركز الثقل، وحداثة الخبرة.</p>
+        <div style="margin-top: 18px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <button type="button" id="btn-export-kneeboard" class="btn btn-primary" data-en="📋 Print / Export Flight Briefing (PDF)">📋 طباعة ملخص الرحلة واللوحة الملاحية (PDF)</button>
+        </div>
       </div>
 
       <!-- Navigation Tabs -->
@@ -442,6 +445,90 @@
                 <span class="tele-val">§61.57</span>
                 <span class="tele-sub" data-en="General Operating Rules">لوائح الطيران المدني</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Printable Kneeboard Summary Sheet (renders on print or export) -->
+      <div id="kneeboard-sheet" class="kneeboard-sheet" hidden>
+        <div class="kb-header">
+          <div class="kb-brand">
+            <img src="assets/img/captain/logo.png" alt="" width="40" height="40">
+            <div>
+              <div class="kb-title">CAPTAIN ADEL — PRE-FLIGHT BRIEFING & KNEEBOARD</div>
+              <div class="kb-sub">ملخص التخطيط والحسابات الملاحية وفق لوائح GACAR للأجواء السعودية</div>
+            </div>
+          </div>
+          <div class="kb-meta font-mono">
+            <div><strong>GENERATED (UTC):</strong> <span id="kb-dt">--</span></div>
+            <div><strong>REGULATION:</strong> GACAR §91 & §61 Operations</div>
+          </div>
+        </div>
+
+        <div class="kb-grid">
+          <!-- 1. Wind & Runway -->
+          <div class="kb-section">
+            <div class="kb-sec-title">1. RUNWAY & WIND VECTORS (مركبات الرياح)</div>
+            <div class="kb-rows font-mono">
+              <div class="kb-row"><span>Active Runway / Axis:</span><strong id="kb-rwy">--</strong></div>
+              <div class="kb-row"><span>Wind Direction / Speed:</span><strong id="kb-wind">--</strong></div>
+              <div class="kb-row"><span>Crosswind Component:</span><strong id="kb-xw">--</strong></div>
+              <div class="kb-row"><span>Headwind Component:</span><strong id="kb-hw">--</strong></div>
+              <div class="kb-row"><span>Wind Correction (WCA):</span><strong id="kb-wca">--</strong></div>
+              <div class="kb-row"><span>Estimated Groundspeed:</span><strong id="kb-gs">--</strong></div>
+            </div>
+          </div>
+
+          <!-- 2. Fuel & Reserves -->
+          <div class="kb-section">
+            <div class="kb-sec-title">2. FUEL PLANNING & GACAR §91.151 (الوقود والاحتياطي)</div>
+            <div class="kb-rows font-mono">
+              <div class="kb-row"><span>Fuel on Board:</span><strong id="kb-f-onboard">--</strong></div>
+              <div class="kb-row"><span>Fuel Burn Rate:</span><strong id="kb-f-burn">--</strong></div>
+              <div class="kb-row"><span>Trip Fuel Required:</span><strong id="kb-f-trip">--</strong></div>
+              <div class="kb-row"><span>GACAR Legal Reserve:</span><strong id="kb-f-res">--</strong></div>
+              <div class="kb-row"><span>Total Minimum Required:</span><strong id="kb-f-min">--</strong></div>
+              <div class="kb-row"><span>Total Flight Endurance:</span><strong id="kb-f-end">--</strong></div>
+            </div>
+          </div>
+
+          <!-- 3. Atmospheric Performance -->
+          <div class="kb-section">
+            <div class="kb-sec-title">3. ATMOSPHERIC PERFORMANCE & DENSITY ALT (الارتفاع الكثافي)</div>
+            <div class="kb-rows font-mono">
+              <div class="kb-row"><span>Field Elevation:</span><strong id="kb-elev">--</strong></div>
+              <div class="kb-row"><span>Altimeter Setting (QNH):</span><strong id="kb-qnh">--</strong></div>
+              <div class="kb-row"><span>Outside Air Temp (OAT):</span><strong id="kb-oat">--</strong></div>
+              <div class="kb-row"><span>Pressure Altitude (PA):</span><strong id="kb-pa">--</strong></div>
+              <div class="kb-row"><span>Density Altitude (DA):</span><strong id="kb-da">--</strong></div>
+              <div class="kb-row"><span>Temperature Deviation:</span><strong id="kb-disa">--</strong></div>
+            </div>
+          </div>
+
+          <!-- 4. Weight & Balance -->
+          <div class="kb-section">
+            <div class="kb-sec-title">4. WEIGHT & BALANCE ENVELOPE (الوزن والاتزان)</div>
+            <div class="kb-rows font-mono">
+              <div class="kb-row"><span>Total Takeoff Weight:</span><strong id="kb-wb-wt">--</strong></div>
+              <div class="kb-row"><span>Center of Gravity (CG):</span><strong id="kb-wb-cg">--</strong></div>
+              <div class="kb-row"><span>Total Loaded Moment:</span><strong id="kb-wb-mom">--</strong></div>
+              <div class="kb-row"><span>Envelope Compliance:</span><strong id="kb-wb-status">--</strong></div>
+            </div>
+          </div>
+
+          <!-- 5. Pilot Currency & Signoff -->
+          <div class="kb-section kb-full">
+            <div class="kb-sec-title">5. PILOT IN COMMAND SIGN-OFF & GACAR §61.57 CURRENCY</div>
+            <div class="kb-rows font-mono kb-inline">
+              <div class="kb-row"><span>Day Passenger Currency:</span><strong id="kb-rec-day">--</strong></div>
+              <div class="kb-row"><span>Night Passenger Currency:</span><strong id="kb-rec-night">--</strong></div>
+              <div class="kb-row"><span>90-Day Currency Expiry:</span><strong id="kb-rec-exp">--</strong></div>
+            </div>
+            <div class="kb-signoff">
+              <div class="kb-sign-box"><strong>PILOT IN COMMAND:</strong> ________________________</div>
+              <div class="kb-sign-box"><strong>SIGNATURE:</strong> ____________________________</div>
+              <div class="kb-sign-box"><strong>EMERGENCY FREQ:</strong> 121.500 MHz</div>
             </div>
           </div>
         </div>
