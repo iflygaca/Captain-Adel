@@ -16,8 +16,10 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://captadel.com/media/captain-adel.jpg">
 
+  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="assets/css/adel.css">
   <script src="assets/js/footer.js" defer></script>
+  <script src="assets/js/site.js" defer></script>
   <script src="assets/js/i18n.js" defer></script>
 </head>
 <body>
@@ -34,16 +36,42 @@
   <header class="site-nav">
     <div class="container nav-inner">
       <a class="lockup" href="/" aria-label="كابتن عادل — الرئيسية">
-        <img src="assets/img/captain/logo.png" alt="" width="40" height="40">
-        <span>
-          <span class="wordmark" data-i18n-html
-            data-en='<span class="wm-capt">Captain</span> <span class="wm-adel">Adel</span>'><span class="wm-capt">كابتن</span> <span class="wm-adel">عادل</span></span>
-          <span class="lockup-sub" data-en="Saudi civil aviation">الطيران المدني السعودي</span>
-        </span>
+        <svg class="radar-mark" width="34" height="34" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <circle cx="24" cy="24" r="21" stroke="#2d8ea8" stroke-width="1.5" opacity=".8" />
+          <circle cx="24" cy="24" r="13" stroke="#1a2540" stroke-width="1" />
+          <circle cx="24" cy="24" r="5" stroke="#1a2540" stroke-width="1" />
+          <line x1="24" y1="3" x2="24" y2="45" stroke="#1a2540" stroke-width="1" />
+          <line x1="3" y1="24" x2="45" y2="24" stroke="#1a2540" stroke-width="1" />
+          <g class="anim-sweep">
+            <path d="M24 24 L24 3 A21 21 0 0 1 38.8 9.2 Z" fill="url(#sweepGradH)" opacity=".7" />
+            <line x1="24" y1="24" x2="24" y2="3" stroke="#22d3ee" stroke-width="1.6" />
+          </g>
+          <circle cx="33" cy="15" r="2" fill="#34d399" class="anim-pulse-dot" />
+          <circle cx="24" cy="24" r="2" fill="#22d3ee" />
+          <defs>
+            <linearGradient id="sweepGradH" x1="24" y1="24" x2="24" y2="3" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#22d3ee" stop-opacity=".5" />
+              <stop offset="1" stop-color="#22d3ee" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div>
+          <span class="wordmark font-mono" data-i18n-html
+            data-en='<span class="wm-capt">CAPTAIN</span> <span class="wm-adel">ADEL</span>'><span class="wm-capt">كابتن</span> <span class="wm-adel">عادل</span></span>
+          <span class="lockup-sub font-mono" data-en="captadel.com">captadel.com</span>
+        </div>
       </a>
       <div class="nav-actions">
-        <button type="button" class="lang-toggle" lang="en">EN</button>
-        <a class="btn btn-ghost" href="account.html" data-en="Account">حسابي</a>
+        <div class="nav-telemetry font-mono">
+          <span id="zulu-clock">00:00:00Z</span>
+          <span class="nav-tele-sep">|</span>
+          <span class="nav-tele-nominal">
+            <span class="tele-dot"></span>
+            <span data-en="SYSTEMS NOMINAL">الأنظمة تعمل</span>
+          </span>
+        </div>
+        <button type="button" class="lang-toggle font-mono" lang="en">EN</button>
+        <a class="btn btn-ghost font-mono" href="account.html" data-en="Account">حسابي</a>
       </div>
     </div>
   </header>

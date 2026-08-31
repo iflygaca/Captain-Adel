@@ -35,4 +35,17 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && nav.classList.contains('nav-open')) { setOpen(false); burger.focus(); }
   });
+
+  // Live Zulu UTC Clock ticker across all pages
+  function updateZuluClock() {
+    const el = document.getElementById('zulu-clock');
+    if (!el) return;
+    const now = new Date();
+    const h = String(now.getUTCHours()).padStart(2, '0');
+    const m = String(now.getUTCMinutes()).padStart(2, '0');
+    const s = String(now.getUTCSeconds()).padStart(2, '0');
+    el.textContent = `${h}:${m}:${s}Z`;
+  }
+  setInterval(updateZuluClock, 1000);
+  updateZuluClock();
 })();
