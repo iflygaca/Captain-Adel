@@ -28,7 +28,7 @@ module.exports = {
 
   // Model routing. 'gemini' | 'allam' | 'auto'. See src/brain/route.js.
   provider: process.env.MODEL_PROVIDER || 'gemini',
-  geminiApiKey: process.env.GEMINI_API_KEY || '',
+  geminiApiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY || '',
   geminiModel: process.env.CAPTAIN_ADEL_MODEL || 'gemini-2.5-flash',
   allamBaseUrl: process.env.ALLAM_BASE_URL || '',
   allamModel: process.env.ALLAM_MODEL || 'humain-ai/ALLaM-7B-Instruct-preview',

@@ -172,7 +172,7 @@ function buildContents(message, history) {
  * built in one place. opts._ai is a test-only injection seam; production
  * always builds the client. */
 function initAgentic(message, history, opts) {
-  const apiKey = opts.apiKey || process.env.GEMINI_API_KEY;
+  const apiKey = opts.apiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
   return {
     model: opts.model || DEFAULT_MODEL,
@@ -195,7 +195,7 @@ function initAgentic(message, history, opts) {
 /* Shared setup for the tool-less read-mode completions (complete() and
  * completeStream()). */
 function initComplete({ systemInstruction, contents, opts }) {
-  const apiKey = opts.apiKey || process.env.GEMINI_API_KEY;
+  const apiKey = opts.apiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
   return {
     model: opts.model || DEFAULT_MODEL,
@@ -353,7 +353,7 @@ module.exports = {
   answerAgenticStream,
   complete,
   completeStream,
-  configured: () => !!(process.env.GEMINI_API_KEY),
+  configured: () => !!(process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY),
   TOOL_DECLARATIONS,
   DEFAULT_MODEL,
   buildContents,

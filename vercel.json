@@ -1,6 +1,13 @@
 {
   "version": 2,
   "cleanUrls": true,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "src/brain/_chunks.json.gz",
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
   "rewrites": [
     { "source": "/v1/(.*)", "destination": "/api/index.js" },
     { "source": "/health", "destination": "/api/index.js" }
