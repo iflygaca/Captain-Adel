@@ -323,4 +323,6 @@ Flight crews must always verify critical decisions against **official publicatio
 
 [Live on captadel.com](https://captadel.com) · [Try on HuggingFace](https://huggingface.co/spaces/flygaca/captain-adel) · [Report Issues](https://github.com/ay2m/Captain-Adel/issues) · [Star ⭐](https://github.com/ay2m/Captain-Adel)
 
+🇸🇦 صنع في السعودية · Made in Saudi Arabia
+
 </div>
