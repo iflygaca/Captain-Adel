@@ -17,6 +17,10 @@ evals/gen-cases/drafts/*
 __pycache__/
 *.pyc
 
+# Dense embeddings index artifacts (built on demand or served from storage)
+src/brain/_embeddings.bin
+src/brain/_embeddings.json.gz
+
 # macOS & iOS
 .DS_Store
 .vercel
