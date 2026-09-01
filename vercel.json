@@ -4,13 +4,16 @@
   "functions": {
     "api/index.js": {
       "includeFiles": "src/brain/_chunks.json.gz",
-      "maxDuration": 60,
-      "memory": 1024
+      "maxDuration": 60
+    },
+    "src/server.js": {
+      "includeFiles": "src/brain/_chunks.json.gz",
+      "maxDuration": 60
     }
   },
   "rewrites": [
-    { "source": "/v1/(.*)", "destination": "/api/index.js" },
-    { "source": "/health", "destination": "/api/index.js" }
+    { "source": "/v1/(.*)", "destination": "/api" },
+    { "source": "/health", "destination": "/api" }
   ],
   "headers": [
     {
