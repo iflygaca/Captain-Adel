@@ -26,7 +26,7 @@ const { retrieveSmart } = require('../retrieve');
 const embeddings = require('../embeddings');
 const { MAX_MESSAGE_CHARS } = require('../guards');
 
-const DEFAULT_MODEL = process.env.CAPTAIN_ADEL_MODEL || 'gemini-2.5-flash';
+const DEFAULT_MODEL = process.env.CAPTAIN_ADEL_MODEL || 'gemini-3.6-flash';
 const MAX_TOOL_ROUNDS = 5;
 
 const EMPTY_ANSWER = 'Say again — I did not catch a question there, Captain.';

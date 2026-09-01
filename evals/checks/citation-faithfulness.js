@@ -43,7 +43,7 @@ function loadGenAI() {
   return require('@google/genai');
 }
 
-const JUDGE_MODEL = process.env.EVAL_JUDGE_MODEL || 'gemini-2.5-flash';
+const JUDGE_MODEL = process.env.EVAL_JUDGE_MODEL || 'gemini-3.6-flash';
 const VERDICT_SCORE = { yes: 1, partial: 0.5, no: 0 };
 const MAX_PASSAGE_CHARS = 8000;   // bound the judge prompt
 const CACHE_DIR  = path.join(__dirname, '..', '.cache');

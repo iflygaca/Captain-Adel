@@ -218,7 +218,7 @@ async function llmRewrite(message, history) {
       'thread, keep Part/section numbers, output ONLY the query.\n\n' +
       thread + '\nQ: ' + String(message || '');
     const call = ai.models.generateContent({
-      model: process.env.ADEL_REWRITE_MODEL || 'gemini-2.5-flash',
+      model: process.env.ADEL_REWRITE_MODEL || 'gemini-3.6-flash',
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       config: { temperature: 0, maxOutputTokens: 80 },
     });
