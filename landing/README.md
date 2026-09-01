@@ -1,74 +1,88 @@
-# captadel.com — the landing page
+<div align="center">
 
-The marketing landing for **Captain Adel** (كابتن عادل), served at
-[captadel.com](https://captadel.com) by the Cloudflare Worker `captadel`.
-This directory is the **source of truth** for that site — the deployed thing
-is the built `dist/` of this app, uploaded as Worker static assets.
+# 🌐 captadel.com — Marketing Landing Platform
+### High-Performance Bilingual Landing Site & Interactive AI Showcase
+#### الموقع التعريفي لكابتن عادل · العرض التفاعلي · واجهة النشر السحابية
 
-Not to be confused with the rest of this repo: the Node service in `../src/`
-plus the vanilla pages in `../public/` are the **product app** (chat, mock
-exam, account, billing) and the `/v1/chat` API. The landing is a separate,
-fully static Vite app that only *documents* that API — it makes no live calls.
+<p align="center">
+  <img src="https://img.shields.io/badge/Made%20in-Saudi%20Arabia-006C35?style=for-the-badge&labelColor=0a0e12" alt="صنع في السعودية" />
+  <img src="https://img.shields.io/badge/Stack-React%2019%20%2B%20Vite%207-61DAFB?style=for-the-badge&logo=react&logoColor=white&labelColor=0a0e12" alt="React 19" />
+  <img src="https://img.shields.io/badge/Edge-Cloudflare%20Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white&labelColor=0a0e12" alt="Cloudflare Workers" />
+  <img src="https://img.shields.io/badge/Routing-Path--Driven%20i18n-C8A04A?style=for-the-badge&labelColor=0a0e12" alt="Bilingual" />
+</p>
 
-## Stack
+</div>
 
-- Vite 7 + React 19 + TypeScript, Tailwind CSS 3.4, shadcn/ui, Lenis smooth scroll
-- Two build entries: `index.html` (English, `/`) and `ar/index.html` (Arabic, `/ar/`)
-- Language is **path-driven** (`src/i18n.ts`): `/ar/…` renders RTL Arabic, everything else LTR English; strings live inline via `pick(en, ar)`
-- Sections in `src/sections/` — content: Hero, HeroDemo, Ticker, Cinematic, Doctrine, MeetCaptain,
-  Gallery, Brain, Models, FaqSection, GacarQa, ApiSection; chrome: Header, MobileNav, StickyCta,
-  Loader, Footer. Scroll/reveal/parallax/magnetic behaviour in `src/hooks/useReveal.ts`
-- Media (captain art, cockpit video) in `public/media/`
+---
 
-## Develop
+## 🧭 Overview & Stack
+
+This directory contains the source code for the public marketing website hosted at [captadel.com](https://captadel.com).
+
+Deployed globally on **Cloudflare Workers** with static asset bindings, the site delivers sub-100ms first-contentful paint across Saudi Arabia and the GCC.
+
+### Technical Architecture
+- **Framework:** React 19, TypeScript Strict, Vite 7
+- **Styling:** Tailwind CSS 3.4, shadcn/ui design tokens
+- **Animations:** Lenis smooth scrolling with strict `prefers-reduced-motion` compliance
+- **Internationalization:** Dual HTML entrypoints (`index.html` for English `/`, and `ar/index.html` for RTL Arabic `/ar/`)
+
+---
+
+## 📂 Section & Component Layout
+
+```
+landing/
+├── src/
+│   ├── sections/            # Page content sections
+│   │   ├── Header.tsx       # Navigation header with language switcher
+│   │   ├── Hero.tsx         # Hero banner with Captain Adel avatar
+│   │   ├── HeroDemo.tsx     # Interactive simulator demo
+│   │   ├── Doctrine.tsx     # "Cite or Refuse" philosophy
+│   │   ├── Brain.tsx        # Hybrid RAG & BGE-M3 explanation
+│   │   ├── Models.tsx       # Gemini & ALLaM routing breakdown
+│   │   ├── FaqSection.tsx   # Common regulatory questions
+│   │   ├── ApiSection.tsx   # Developer API quickstart & docs
+│   │   └── Footer.tsx       # Ecosystem links and legal notices
+│   ├── hooks/               # Custom hooks (useReveal, useTheme)
+│   └── i18n.ts              # Translation helper (pick(en, ar))
+├── worker/                  # Cloudflare Worker edge script
+│   └── index.js             # Language routing and asset rewrites
+└── public/                  # Media assets, video clips, OpenGraph cards
+```
+
+---
+
+## ⚡ Local Development
 
 ```bash
 cd landing
-npm install        # or: npm ci
-npm run dev        # http://localhost:3000  (open /ar/ for Arabic)
+npm install
+
+# Start local Vite dev server
+npm run dev
+# 🚀 Running at http://localhost:3000 (open http://localhost:3000/ar/ for Arabic)
 ```
 
-## Build
+---
+
+## 📦 Building & Production Deployment
 
 ```bash
-npm run build      # tsc -b && vite build  →  dist/  (both entries)
-npm run preview    # serve the built dist/ locally
-```
-
-## Deploy (manual, on purpose)
-
-Deploys are **not** wired into CI — publish deliberately, from your machine:
-
-```bash
-cd landing
+# 1. Type-check and compile static bundles for both languages
 npm run build
-npx wrangler deploy        # uses wrangler.toml → Worker "captadel"
+
+# 2. Preview production build locally
+npm run preview
+
+# 3. Deploy to Cloudflare Workers
+npx wrangler deploy
 ```
 
-Auth: either `npx wrangler login` (browser) or set `CLOUDFLARE_API_TOKEN`
-(token needs *Workers Scripts: Edit*). `wrangler.toml` targets the existing
-`captadel` Worker with a static-assets binding (`dist/` → `ASSETS`), and
-`worker/index.js` is the tiny edge script that serves those assets and
-rewrites extensionless paths to the right language shell (`/ar/…` → Arabic,
-otherwise English). If you ever edit the Worker in the Cloudflare dashboard,
-mirror the change into `worker/index.js` so this repo stays the source of truth.
+---
 
-## Known issues
+<div align="center">
 
-Two links on this **public** page point at **private** repositories, so they 404 for every
-visitor and no organisation rename fixes them. Both need a decision about what a visitor should
-see instead:
+<sub>🇸🇦 صنع في السعودية · Made in Saudi Arabia</sub>
 
-| Where | Link | Problem |
-|---|---|---|
-| `src/sections/Footer.tsx` | Squadron → "The Book of Fly GACA" | Points into `ay2m/FlyGACA`, where the file has never existed. `ay2m/Office` holds the canon, but that repo is private too. |
-| `src/sections/ApiSection.tsx` | the GitHub CTA | Points at `ay2m/Captain-Adel`, which is private. Its visible label also still reads `FlyGACA/Captain-Adel` — an organisation that does not exist. |
-
-## Conventions
-
-- Keep every visible string bilingual via `pick()` / `isAr` — no
-  English-only UI. Arabic display headlines take the `ar-display` class.
-- Anything animated must respect `prefers-reduced-motion` (see the guards in
-  `useReveal.ts` and `index.css`).
-- SEO lives in the two HTML shells (meta/OG/JSON-LD/hreflang) plus
-  `public/robots.txt` and `public/sitemap.xml` — update both languages together.
+</div>

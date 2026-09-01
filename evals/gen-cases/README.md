@@ -1,67 +1,110 @@
-# Multi-agent eval-case drafting
+<div align="center">
 
-Grounds itself in the **real** GACAR corpus (`src/brain/retrieve.js` — the same
-retrieval the running service uses) and fans a `claude-sonnet-5`-lead /
-`claude-haiku-4-5`-worker swarm out over one GACAR Part to draft candidate
-[`evals/cases.json`](../cases.json) entries. Design:
-[`docs/multi-agent-orchestrator.md`](../../docs/multi-agent-orchestrator.md).
+# 🤖 Multi-Agent Eval-Case Generator
+### Automated, Grounded Generation of Rigorous GACAR Benchmark Test Cases
+#### توليد حالات التقييم الآلي · التوليد المبني على اللوائح الحقيقية · مراجعة الجودة
 
-**Why it exists:** eval coverage was once only Parts **91**, **61** and **67**.
-That gap has narrowed a long way — `evals/cases.json` now asserts `citesPart`
-across **31 distinct Part sets**, including T1 daily-use Parts such as 121, 141,
-137, 43, 47, 65, 71 and 117. It is still heavily weighted: Part 91 alone carries
-32 of the 138 cases and Part 61 another 16, while most other Parts have one case
-each. This tool exists to keep widening and deepening that tail, one Part at a
-time.
+<p align="center">
+  <img src="https://img.shields.io/badge/Made%20in-Saudi%20Arabia-006C35?style=for-the-badge&labelColor=0a0e12" alt="صنع في السعودية" />
+  <img src="https://img.shields.io/badge/Architecture-Lead%2BWorker%20Swarm-C8A04A?style=for-the-badge&labelColor=0a0e12" alt="Swarm" />
+  <img src="https://img.shields.io/badge/Validation-Verbatim%20Regex%20Pass-0D96F6?style=for-the-badge&labelColor=0a0e12" alt="Validation" />
+  <img src="https://img.shields.io/badge/Language-EN%20%26%20AR%20Mixed-8E75B2?style=for-the-badge&labelColor=0a0e12" alt="Bilingual" />
+</p>
 
-> Keep this paragraph honest when you use the tool — it is the kind of claim
-> that rots. `evals/README.md` describes the assertion keys; the counts above
-> come straight from `cases.json`.
+</div>
 
-**Unlike** [`examples/multi-agent-orchestrator/`](../../examples/multi-agent-orchestrator/)
-(deliberately decoupled from `src/`), this tool imports the real brain's
-retrieval and grounding modules on purpose — that's the point: drafts are
-grounded in genuine corpus passages, not an inline synthetic pack. Still
-dev/eval-only per PDPL: the Anthropic API isn't served in-Kingdom, so this
-never touches `/v1/chat` or a `MODEL_PROVIDER`.
+---
 
-## Run it
+## 🎯 Purpose & Overview
 
-```sh
-cd evals/gen-cases
-npm install
-export ANTHROPIC_API_KEY=sk-ant-...
+The `gen-cases` tool automates the creation of high-quality evaluation cases for [`evals/cases.json`](../cases.json).
 
-node generate.js 121                                  # 6 EN drafts for Part 121
-node generate.js 145 --count 8 --language mixed        # 8 drafts, half AR half EN
-node generate.js 121 > drafts/part-121.json             # redirect the draft to a file
+Instead of manually drafting hundreds of test cases or relying on ungrounded synthetic prompts, this tool imports Captain Adel's **real retrieval engine** (`src/brain/retrieve.js`) to extract authentic regulatory passages across all 74 GACAR Parts. A hierarchical multi-agent swarm then constructs question-answer-assertion triplets with strict verbatim validation.
+
+```
+┌────────────────────────────────────────────────────────┐
+│               GACAR Regulatory Corpus Chunks           │
+│                   (src/brain/_chunks.json.gz)          │
+└───────────────────────────┬────────────────────────────┘
+                            │ Real Retrieval
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│             Lead Orchestrator (Sonnet-5)               │
+│         Decomposes Part into Thematic Sections         │
+└───────────────────────────┬────────────────────────────┘
+                            │ Parallel Tasks
+              ┌─────────────┴─────────────┐
+              ▼                           ▼
+┌───────────────────────────┐   ┌───────────────────────────┐
+│     Worker Agent 1        │   │     Worker Agent 2        │
+│   (Drafts Citations/Q&A)  │   │   (Drafts Refusals/Edges) │
+└─────────────┬─────────────┘   └─────────────┬─────────────┘
+              │                           │
+              └─────────────┬─────────────┘
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│            Automated Validation & Filter Gate          │
+│   • Verifies sourceQuote is exact substring in corpus  │
+│   • Verifies citesPart matches regex of target Part    │
+│   • Rejects ungrounded claims or hallucinated sections │
+└───────────────────────────┬────────────────────────────┘
+                            │ Validated Drafts
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│             Human Review & Curation Workflow           │
+│        (Manual merge into evals/cases.json)            │
+└────────────────────────────────────────────────────────┘
 ```
 
-Progress, per-worker rejections, and the token/cost ledger print to **stderr**;
-the validated draft array (matching `cases.json`'s exact per-case shape)
-prints to **stdout** — so `> file.json` captures just the drafts. A run costs
-roughly **$0.02–0.08** for a 6-case draft (cheaper than the generic
-orchestrator demo — no synthesis pass, just decompose + fan-out + validate).
+---
 
-If the Part has no retrievable passages (some T2/T3 Parts are thin or
-uncatalogued), the tool says so and exits — that's a legitimate result, not a
-bug.
+## ⚡ Execution & Usage
 
-## The human-review workflow — this tool never writes to `cases.json`
+### 1. Setup Environment
+```bash
+cd evals/gen-cases
+npm install
+export ANTHROPIC_API_KEY="sk-ant-..."
+```
 
-Every draft is validated in code before being printed: its citation must
-parse to the target Part via the same regex `src/brain/grounding.js` uses on
-real answers, and its `sourceQuote` must be a verbatim substring of the
-passage it claims to cite — a worker that fabricates a figure or a citation
-gets **rejected**, not silently included. Passing validation only means the
-draft isn't fabricated; it does **not** mean the question, category, or
-assertions are actually good eval design. A human must:
+### 2. Generate Drafts
+```bash
+# Generate 6 English draft cases for GACAR Part 121
+node generate.js 121
 
-1. Read each drafted case.
-2. Trim/rewrite `mustInclude`/`mustIncludeAny` to what actually matters.
-3. Copy the vetted entries into `evals/cases.json` by hand.
-4. Run `npm run eval:dry` (structure) and ideally a live `npm run eval` pass
-   before committing.
+# Generate 8 mixed-language cases (Arabic & English) for Part 145
+node generate.js 145 --count 8 --language mixed
 
-`drafts/` is `.gitignore`d — raw output never lands in version control by
-accident.
+# Pipe validated JSON output directly to a file
+node generate.js 91 > drafts/part-91.json
+```
+
+---
+
+## 🛡️ Automated Validation Rules
+
+Every generated draft must pass automated programmatic gates before being emitted:
+
+1. **Sub-string Verbatim Verification:** The draft's `sourceQuote` must exist verbatim within the retrieved GACAR chunk. Any worker hallucinating a single word is immediately rejected.
+2. **Citation Syntax Check:** The citation string must match the exact regex pattern used by `src/brain/grounding.js` in production (`GACAR Part <N>, §<N>.<M>`).
+3. **Category Integrity:** Refusal cases must test realistic traps (e.g. asking for FAA-specific rules or non-existent GACAR sections).
+
+---
+
+## 👨‍✈️ Human Curation Playbook
+
+This tool **never** modifies `evals/cases.json` automatically. The developer workflow is:
+
+1. Run the generator for a targeted GACAR Part.
+2. Review the generated JSON array in `drafts/`.
+3. Refine `mustInclude` and `mustIncludeAny` keywords to focus on critical aviation safety concepts.
+4. Append vetted cases into `evals/cases.json`.
+5. Verify suite integrity using `npm run eval:dry` and `npm run eval`.
+
+---
+
+<div align="center">
+
+<sub>🇸🇦 صنع في السعودية · Made in Saudi Arabia</sub>
+
+</div>

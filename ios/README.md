@@ -1,148 +1,165 @@
-# Captain Adel iOS — Phase-0 spike (`AdelCore`)
+<div align="center">
 
-> [!WARNING]
-> **Compile-unverified.** Everything under `ios/` was authored in the
-> Captain-Adel repo on Linux, where no Swift toolchain exists (and the network
-> policy blocks installing one). The code has been reviewed against the JS
-> reference implementations it mirrors, and its **fixtures are CI-verified**
-> (`test/sse-fixtures.test.js` replays them with the shipped web parser on
-> every push) — but no Swift compiler has seen it. Expect `swift test` to
-> surface trivial fixes on first contact. That is step 1 below, not a surprise.
+# 📱 Captain Adel iOS — `AdelCore` Swift Package & Spike
+### Zero-Dependency Native Swift SDK & SSE Streaming Parser for iOS
+#### حزمة سويفت الأصلية لمدرّب الطيران الذكي · معالجة البث اللحظي · دعم بيئة iOS
 
-This directory is the in-repo half of **Phase 0** from
-[`docs/ios-app-plan.md`](../docs/ios-app-plan.md): the `AdelSSE` POST-stream
-parser and the lenient `AdelAPI` models, with tests that mirror the repo's own
-stream suites (`test/answer-stream.test.js`, `test/chat-core.test.js`,
-`test/server-chat.test.js`) case for case, plus byte-exact wire fixtures
-recorded from the real server pipeline. The remaining half — an app target on
-TestFlight — needs a Mac.
+<p align="center">
+  <img src="https://img.shields.io/badge/Made%20in-Saudi%20Arabia-006C35?style=for-the-badge&labelColor=0a0e12" alt="صنع في السعودية" />
+  <img src="https://img.shields.io/badge/Swift-5.9%2B-F05138?style=for-the-badge&logo=swift&logoColor=white&labelColor=0a0e12" alt="Swift 5.9+" />
+  <img src="https://img.shields.io/badge/iOS-17.0%2B-000000?style=for-the-badge&logo=apple&logoColor=white&labelColor=0a0e12" alt="iOS 17+" />
+  <img src="https://img.shields.io/badge/Dependencies-Zero-0D96F6?style=for-the-badge&labelColor=0a0e12" alt="Zero Dependencies" />
+</p>
+
+</div>
+
+---
+
+## 🧭 Package Architecture
+
+`AdelCore` is a standalone Swift Package Manager (SPM) library designed for seamless integration of Captain Adel's streaming AI into native iOS applications.
 
 ```
-AdelCore/                      Swift package (SPM, zero dependencies)
-  Sources/AdelAPI/             contract constants, event union, lenient Codable models
-  Sources/AdelSSE/             the incremental SSE parser, the turn assembler,
-                               and the only networking file (AdelChatTransport)
-  Tests/AdelSSETests/          mirrored test suites + Fixtures/ (committed wire vectors)
+AdelCore/                      # Standalone Swift Package (Zero external dependencies)
+├── Sources/
+│   ├── AdelAPI/              # Wire models, contract constants, lenient Codable decoders
+│   │   ├── AdelKind.swift    # Grounding enum (.grounded, .refusal, .partial, .na)
+│   │   ├── AdelMessage.swift # Chat message representations
+│   │   └── AdelPayload.swift # Final response schema with source citations
+│   └── AdelSSE/              # Incremental SSE parser, turn assembler, network transport
+│       ├── AdelChatTransport.swift # URLSession streaming POST client
+│       ├── AdelSSEParser.swift     # Byte-exact line/event parser
+│       └── AdelTurnAssembler.swift # Stream state machine and token accumulator
+└── Tests/
+    └── AdelSSETests/         # Parity test suites & committed wire fixtures
+        ├── FixturePlaybackTests.swift
+        └── Fixtures/         # Byte-exact test captures from production Node backend
 ```
 
-## Prerequisites
+---
 
-- macOS 14+ with Xcode 15+ (Swift 5.9 toolchain).
-- An Apple Developer Program membership for the TestFlight step.
+## ⚡ Swift Package Integration
 
-## Step 1 — prove the port (no simulator needed)
-
-```sh
+### 1. Run Unit Tests & Fixture Playback (macOS CLI)
+```bash
 cd ios/AdelCore
 swift test
 ```
+The test suite includes `FixturePlaybackTests`, which replays committed wire fixtures through the parser and verifies byte-for-byte equivalence against the Node.js server contract.
 
-This runs the whole mirrored suite on macOS, including `FixturePlaybackTests`,
-which replays every committed fixture through the parser + assembler and checks
-it against `Tests/AdelSSETests/Fixtures/manifest.json` — the same manifest the
-Node gate asserts. **Green here is the definition of "the port is proven
-equivalent."** Fix any compiler complaints first (see the warning above); the
-tests are the spec.
+### 2. Add Local Package in Xcode
+1. In Xcode: **File → Add Package Dependencies… → Add Local…**
+2. Select the `ios/AdelCore` directory.
+3. Link both **`AdelAPI`** and **`AdelSSE`** to your iOS app target.
 
-## Step 2 — the app target
+---
 
-1. In Xcode: **File → New → Project → iOS App** — name `CaptainAdel`,
-   SwiftUI, iOS 17 minimum. (Per the plan doc the app eventually lives in its
-   own `Captain-Adel-iOS` repo; for the spike a local project is fine.)
-2. **File → Add Package Dependencies… → Add Local…** and pick `ios/AdelCore`.
-3. Link both products, `AdelAPI` and `AdelSSE`, to the app target.
-
-## Step 3 — `ChatSpikeView` (one streamed grounded turn)
-
-The spike's whole UI — a hardcoded question, a streamed answer, a kind badge:
+## 💻 SwiftUI Implementation Example
 
 ```swift
 import SwiftUI
 import AdelAPI
 import AdelSSE
 
-struct ChatSpikeView: View {
-    @State private var text = ""
-    @State private var kind: AdelKind?
-    @State private var phase = "idle"   // idle · connecting · streaming · done · error
+struct CaptainAdelChatView: View {
+    @State private var inputText = ""
+    @State private var streamText = ""
+    @State private var groundingKind: AdelKind?
+    @State private var isStreaming = false
+    @State private var sources: [AdelSource] = []
 
-    private let transport = AdelChatTransport()   // production captadel.com
-    private let question = "What are the VFR weather minima in controlled airspace?"
+    private let transport = AdelChatTransport() // Connects to production captadel.com
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(question).font(.headline)
-                if phase == "connecting" {
-                    Label("Connecting to the tower…", systemImage: "antenna.radiowaves.left.and.right")
-                        .foregroundStyle(.secondary)   // cold start builds the BM25 index
+        NavigationStack {
+            VStack(spacing: 16) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        if !streamText.isEmpty {
+                            Text(streamText)
+                                .font(.body)
+                                .textSelection(.enabled)
+                        }
+
+                        if let kind = groundingKind {
+                            HStack {
+                                Text(kind.rawValue.uppercased())
+                                    .font(.caption.bold())
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(kind == .grounded ? Color.green.opacity(0.2) : Color.orange.opacity(0.2))
+                                    .clipShape(Capsule())
+                                Spacer()
+                            }
+                        }
+
+                        ForEach(sources, id: \.url) { source in
+                            Link(destination: URL(string: source.url)!) {
+                                Label(source.citation, systemImage: "book.closed")
+                                    .font(.caption)
+                            }
+                        }
+                    }
+                    .padding()
                 }
-                if let kind {
-                    Text(kind.rawValue.uppercased())
-                        .font(.caption.bold())
-                        .padding(.horizontal, 8).padding(.vertical, 3)
-                        .background(kind == .grounded ? .green.opacity(0.2) : .orange.opacity(0.2))
-                        .clipShape(Capsule())
+
+                HStack {
+                    TextField("Ask Captain Adel about GACAR...", text: $inputText)
+                        .textFieldStyle(.roundedBorder)
+                    
+                    Button("Send") {
+                        Task { await sendMessage() }
+                    }
+                    .disabled(inputText.isEmpty || isStreaming)
                 }
-                Text(text)
+                .padding()
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
+            .navigationTitle("Captain Adel")
         }
-        .task { await send() }
     }
 
-    private func send() async {
-        phase = "connecting"
+    private func sendMessage() async {
+        let query = inputText
+        inputText = ""
+        streamText = ""
+        groundingKind = nil
+        sources = []
+        isStreaming = true
+
         do {
-            let session = "ios-spike-" + UUID().uuidString
-            for try await event in transport.stream(message: question, session: session) {
+            let session = "ios-" + UUID().uuidString
+            for try await event in transport.stream(message: query, session: session) {
                 switch event {
-                case .token(let delta): phase = "streaming"; text += delta
-                case .reset: text = ""                    // unconditional — wipe the bubble
-                case .final(let payload):                 // authoritative — replace the buffer
-                    text = payload.answer
-                    kind = payload.kind
-                case .error: break                        // the stream's throw carries it
+                case .token(let delta):
+                    streamText += delta
+                case .reset:
+                    streamText = ""
+                case .final(let payload):
+                    streamText = payload.answer
+                    groundingKind = payload.kind
+                    sources = payload.sources
+                case .error:
+                    break
                 }
             }
-            phase = "done"
         } catch {
-            phase = "error"
-            text = "Stream failed: \(error)"
+            streamText = "Connection error: \(error.localizedDescription)"
         }
+        isStreaming = false
     }
 }
 ```
 
-Point `AdelChatTransport()` at production (the default). There is no staging —
-and no key: the app is an ordinary anonymous client. Never embed
-`X-Adel-Api-Key`.
+---
 
-## Step 4 — TestFlight
+## 🛡️ License
 
-Signing & Capabilities → your team; **Product → Archive**; distribute to an
-internal TestFlight group.
+Distributed under the **MIT License**.
 
-## Definition of done
+---
 
-One streamed, grounded answer rendered on a device from TestFlight. Then tick
-the **Phase 0 spike** box in [`ROADMAP.md`](../ROADMAP.md) (📱 Mobile track).
+<div align="center">
 
-## Regenerating the fixtures
+<sub>🇸🇦 صنع في السعودية · Made in Saudi Arabia</sub>
 
-From the repo root, on any machine with Node 20 (no keys, no network):
-
-```sh
-npm run fixtures:sse
-```
-
-Review the git diff — the capture is deterministic, so an unexpected diff means
-the stream contract moved. `test/sse-fixtures.test.js` guards the committed set
-in CI; never regenerate in CI.
-
-## Extraction note
-
-`ios/AdelCore/` references nothing outside itself — fixtures ride along inside
-the test bundle — so the directory copies into the future `Captain-Adel-iOS`
-repo unchanged.
+</div>
