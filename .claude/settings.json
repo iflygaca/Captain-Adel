@@ -1,5 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "enabledPlugins": {
+    "captain-adel-service@flygaca-family": true,
+    "family-orchestrators@flygaca-family": true
+  },
   "extraKnownMarketplaces": {
     "diagram-design": {
       "source": {
