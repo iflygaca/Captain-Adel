@@ -94,27 +94,27 @@ const QAS = isAr ? QA_AR : QA_EN
 export default function GacarQa() {
   const [open, setOpen] = useState(0)
   return (
-    <section id="qa" className="relative py-16 md:py-28 px-5 overflow-hidden border-t border-[#1a2540]">
+    <section id="qa" className="relative py-16 md:py-28 px-5 overflow-hidden border-t border-[var(--color-void-900)]">
       <span className="ghost-word" aria-hidden>GACAR</span>
       <div className="relative z-10 mx-auto max-w-4xl">
-        <div className="reveal flex items-center gap-3 font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#22d3ee] mb-6">
-          <span className="px-2 py-1 border border-[#2d8ea8]">{isAr ? '٠٦' : '06'}</span>
+        <div className="reveal flex items-center gap-3 font-mono2 text-[10px] tracking-[0.3em] uppercase text-[var(--color-neon-cyan)] mb-6">
+          <span className="px-2 py-1 border border-[var(--color-brand-teal)]">{isAr ? '٠٦' : '06'}</span>
           <span>{isAr ? 'من نصوص الأنظمة — مصدر واحد: GACA' : 'Straight from the regulations — one source: GACA'}</span>
-          <span className="flex-1 h-px bg-[#1a2540]" />
+          <span className="flex-1 h-px bg-[var(--color-void-900)]" />
         </div>
-        <h2 className={`reveal text-[clamp(1.9rem,4vw,3rem)] font-extrabold leading-[1.05] tracking-tight text-[#e6edf6] mb-4 ${isAr ? 'ar-display' : ''}`}>
+        <h2 className={`reveal text-[clamp(1.9rem,4vw,3rem)] font-extrabold leading-[1.05] tracking-tight text-[var(--color-text-primary)] mb-4 ${isAr ? 'ar-display' : ''}`}>
           {isAr ? (
-            <>أسئلة الطيارين، بإجابات <span className="text-[#22d3ee]">من النظام نفسه</span>.</>
+            <>أسئلة الطيارين، بإجابات <span className="text-[var(--color-neon-cyan)]">من النظام نفسه</span>.</>
           ) : (
-            <>Pilots&rsquo; questions, answered <span className="text-[#22d3ee">from the regulation itself</span>.</>
+            <>Pilots&rsquo; questions, answered <span className="text-[var(--color-neon-cyan)]">from the regulation itself</span>.</>
           )}
         </h2>
-        <p className="reveal text-[14px] leading-relaxed text-[#8b98ad] max-w-2xl mb-12">
+        <p className="reveal text-[14px] leading-relaxed text-[var(--color-text-secondary)] max-w-2xl mb-12">
           {isAr
             ? 'كل إجابة أدناه مستمدة حصرًا من نصوص اللوائح التنفيذية للطيران المدني (GACAR) الصادرة عن الهيئة العامة للطيران المدني — مع ذكر المادة بدقة. المصدر الرسمي الوحيد: gaca.gov.sa.'
             : 'Every answer below is drawn exclusively from the General Authority of Civil Aviation Regulations (GACAR), with the exact section cited. The only authoritative source: gaca.gov.sa.'}
         </p>
-        <div className="divide-y divide-[#1a2540] border-y border-[#1a2540]">
+        <div className="divide-y divide-[var(--color-void-900)] border-y border-[var(--color-void-900)]">
           {QAS.map((f, i) => (
             <div key={i} className={`reveal reveal-d${Math.min((i % 4) + 1, 4)}`}>
               <button
@@ -123,14 +123,14 @@ export default function GacarQa() {
                 className="w-full flex items-center justify-between gap-6 py-5 text-start group"
               >
                 <span className="flex items-baseline gap-4">
-                  <span className="font-mono2 text-[10px] tracking-[0.2em] text-[#2d8ea8] shrink-0">
+                  <span className="font-mono2 text-[10px] tracking-[0.2em] text-[var(--color-brand-teal)] shrink-0">
                     {String(i + 1).padStart(2, '0')}
                   </span>
-                  <span className={`text-[15px] md:text-[17px] font-semibold transition-colors duration-150 ${open === i ? 'text-[#22d3ee]' : 'text-[#e6edf6] group-hover:text-[#22d3ee]'}`}>
+                  <span className={`text-[15px] md:text-[17px] font-semibold transition-colors duration-150 ${open === i ? 'text-[var(--color-neon-cyan)]' : 'text-[var(--color-text-primary)] group-hover:text-[var(--color-neon-cyan)]'}`}>
                     {f.q}
                   </span>
                 </span>
-                <span className={`font-mono2 text-lg shrink-0 transition-transform duration-300 ${open === i ? 'rotate-45 text-[#22d3ee]' : 'text-[#8b98ad]'}`}>
+                <span className={`font-mono2 text-lg shrink-0 transition-transform duration-300 ${open === i ? 'rotate-45 text-[var(--color-neon-cyan)]' : 'text-[var(--color-text-secondary)]'}`}>
                   +
                 </span>
               </button>
@@ -140,12 +140,12 @@ export default function GacarQa() {
               >
                 <div className="overflow-hidden">
                   <div className="pb-6 max-w-2xl ms-8">
-                    <p className="text-[14px] leading-relaxed text-[#8b98ad] mb-3">{f.a}</p>
+                    <p className="text-[14px] leading-relaxed text-[var(--color-text-secondary)] mb-3">{f.a}</p>
                     <div className="flex flex-wrap gap-2">
                       {f.cites.map((c) => (
                         <span
                           key={c}
-                          className="latin font-mono2 text-[10px] tracking-[0.14em] px-2 py-1 border border-[#2d8ea8]/60 text-[#22d3ee] bg-[#22d3ee]/5"
+                          className="latin font-mono2 text-[10px] tracking-[0.14em] px-2 py-1 border border-[var(--color-brand-teal)]/60 text-[var(--color-neon-cyan)] bg-[var(--color-neon-cyan)]/5"
                         >
                           {c}
                         </span>
@@ -157,13 +157,13 @@ export default function GacarQa() {
             </div>
           ))}
         </div>
-        <p className="reveal mt-8 font-mono2 text-[10px] tracking-[0.2em] uppercase text-[#8b98ad]">
+        <p className="reveal mt-8 font-mono2 text-[10px] tracking-[0.2em] uppercase text-[var(--color-text-secondary)]">
           {isAr ? 'تعليمي · غير رسمي · النص النافذ لدى ' : 'Educational · unofficial · the binding text lives at '}
           <a
             href="https://gaca.gov.sa"
             target="_blank"
             rel="noopener"
-            className="latin text-[#22d3ee] hover:underline"
+            className="latin text-[var(--color-neon-cyan)] hover:underline"
           >
             gaca.gov.sa
           </a>

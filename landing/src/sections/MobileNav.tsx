@@ -94,11 +94,11 @@ export default function MobileNav({ open, onClose }: { open: boolean; onClose: (
         </div>
 
         <div className="mnav-meta font-mono2" style={{ '--i': NAV.length + 1 } as CSSProperties}>
-          <span className="flex items-center gap-1.5 text-[#34d399]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] anim-pulse-dot" />
+          <span className="flex items-center gap-1.5" style={{ color: 'var(--color-success)' }}>
+            <span className="w-1.5 h-1.5 rounded-full anim-pulse-dot" style={{ backgroundColor: 'var(--color-success)' }} />
             {isAr ? 'الأنظمة تعمل' : 'SYSTEMS NOMINAL'}
           </span>
-          <span className="text-[#8b98ad]">captadel.com</span>
+          <span style={{ color: 'var(--color-text-secondary)' }}>captadel.com</span>
         </div>
       </div>
     </div>,
