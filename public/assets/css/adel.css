@@ -368,6 +368,9 @@ html[dir="rtl"] .font-mono, html[dir="rtl"] .font-mono2 {
   box-shadow: 0 0 20px var(--cyan-op-35); border-color: var(--cyan);
 }
 .btn-primary:hover { text-decoration: none; background: var(--mint); border-color: var(--mint); color: var(--text-on-primary); transform: translateY(-1px); box-shadow: 0 0 26px var(--mint-op-45); }
+  box-shadow: 0 0 20px rgba(34, 211, 238, .35); border-color: var(--cyan);
+}
+.btn-primary:hover { text-decoration: none; background: var(--mint); border-color: var(--mint); color: var(--text-on-primary); transform: translateY(-1px); box-shadow: 0 0 26px rgba(52, 211, 153, .45); }
 .btn-ghost {
   background: var(--cyan-op-04); border-color: var(--line-3); color: var(--cyan);
 }
@@ -963,6 +966,7 @@ html[dir="rtl"] .cite, html[dir="rtl"] .src-cite { direction: ltr; unicode-bidi:
 
 /* ---- start screen: avatar, mode switch, topic/size pickers, resume -------- */
 .exam-start-avatar { border-radius: 50%; border: 3px solid var(--cyan); box-shadow: 0 0 30px var(--cyan-op-40); margin-bottom: var(--s-4); width: 96px; height: 96px; object-fit: cover; }
+.exam-start-avatar { border-radius: 50%; border: 3px solid var(--cyan); box-shadow: 0 0 30px rgba(34, 211, 238, .4); margin-bottom: var(--s-4); width: 96px; height: 96px; object-fit: cover; }
 .exam-start-btn { font-size: 15px; padding: 14px 36px; cursor: pointer; background: var(--cyan); color: var(--text-on-primary); font-weight: 800; font-family: var(--mono); text-transform: uppercase; border: none; border-radius: var(--r-pill); box-shadow: 0 0 25px rgba(34, 211, 238, .35); transition: all var(--dur-1) var(--ease); }
 .exam-start-btn:hover { background: var(--mint); transform: translateY(-1px); box-shadow: 0 0 30px rgba(52, 211, 153, .45); }
 .exam-kbd-hint { font-size: 12px; color: var(--ink-faint); font-family: var(--mono); margin-top: var(--s-4); }
@@ -971,6 +975,7 @@ html[dir="rtl"] .cite, html[dir="rtl"] .src-cite { direction: ltr; unicode-bidi:
 .exam-mode-btn { font-size: 13px; font-weight: 700; padding: 8px 20px; border-radius: var(--r-pill); border: 0; background: transparent; color: var(--ink-dim); cursor: pointer; font-family: var(--mono); transition: all var(--dur-2) var(--ease); }
 .exam-mode-btn:hover { color: var(--ink); }
 .exam-mode-btn.on { background: var(--cyan); color: var(--text-on-primary); font-weight: 800; box-shadow: 0 0 15px var(--cyan-op-30); }
+.exam-mode-btn.on { background: var(--cyan); color: var(--text-on-primary); font-weight: 800; box-shadow: 0 0 15px rgba(34, 211, 238, .3); }
 
 .exam-topic-picker { margin: 0 auto var(--s-4); max-width: 620px; }
 .exam-picker-label { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--ink-faint); margin: var(--s-4) 0 var(--s-2); text-align: start; }
@@ -1150,6 +1155,8 @@ html[dir="rtl"] .acct-plan-badge { text-transform: none; letter-spacing: normal;
 
 .radar-visual { height: 200px; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, var(--line-3-op-08) 0%, transparent 70%); border: 1px solid var(--line-2); border-radius: var(--r-md); position: relative; }
 .compass-dial { width: 160px; height: 160px; border: 2px dashed var(--teal-op-40); border-radius: 50%; position: relative; }
+.radar-visual { height: 200px; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(45, 142, 168, .08) 0%, transparent 70%); border: 1px solid var(--line-2); border-radius: var(--r-md); position: relative; }
+.compass-dial { width: 160px; height: 160px; border: 2px dashed rgba(87, 174, 201, .4); border-radius: 50%; position: relative; }
 .runway-mark { position: absolute; top: 50%; left: 50%; width: 14px; height: 120px; background: var(--runway-light); border: 2px solid var(--runway-dark); border-radius: 3px; transform: translate(-50%, -50%); transition: transform 0.2s ease; }
 .wind-arrow { position: absolute; top: 50%; left: 50%; width: 4px; height: 90px; background: linear-gradient(to top, transparent, var(--neon-cyan)); transform: translate(-50%, -50%); transition: transform 0.2s ease; }
 .wind-arrow::after { content: "▲"; position: absolute; top: -6px; left: -5px; font-size: 12px; color: var(--neon-cyan); }
