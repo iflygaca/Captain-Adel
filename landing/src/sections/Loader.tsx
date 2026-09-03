@@ -33,18 +33,18 @@ export default function Loader() {
 
   if (gone) return null
   return (
-    <div className={`loader-veil ${done ? 'loader-done' : ''} fixed inset-0 z-[100] bg-[#050810] flex flex-col items-center justify-center`}>
+    <div className={`loader-veil ${done ? 'loader-done' : ''} fixed inset-0 z-[100] flex flex-col items-center justify-center`} style={{ backgroundColor: 'var(--color-void)' }}>
       <RadarMark size={72} />
-      <div className="mt-8 font-mono2 text-[11px] leading-6 tracking-[0.14em] text-[#34d399] w-[320px]">
+      <div className="mt-8 font-mono2 text-[11px] leading-6 tracking-[0.14em] w-[320px]" style={{ color: 'var(--color-success)' }}>
         {LINES.slice(0, shown).map((l, i) => (
           <div key={l} className="loader-line" style={{ animationDelay: `${i * 0.02}s` }}>
-            <span className="text-[#8b98ad] mr-2">{String(i).padStart(2, '0')}</span>
-            {i === LINES.length - 1 ? <span className="text-[#22d3ee]">{l}</span> : l}
+            <span className="mr-2" style={{ color: 'var(--color-text-secondary)' }}>{String(i).padStart(2, '0')}</span>
+            {i === LINES.length - 1 ? <span style={{ color: 'var(--color-neon-cyan)' }}>{l}</span> : l}
           </div>
         ))}
       </div>
-      <div className="mt-8 w-[320px] h-px bg-[#1a2540] overflow-hidden">
-        <div className="loader-bar h-full bg-[#22d3ee]" />
+      <div className="mt-8 w-[320px] h-px overflow-hidden" style={{ backgroundColor: 'var(--color-void-900)' }}>
+        <div className="loader-bar h-full" style={{ backgroundColor: 'var(--color-neon-cyan)' }} />
       </div>
     </div>
   )
