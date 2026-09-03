@@ -464,7 +464,7 @@ html[dir="rtl"] .mnav-rule { --rule-origin: right; }
 /* touch affordances: `useMagnetic` is mouse-only, so give fingers a press state */
 @media (hover: none) {
   .btn-swap:active, .mnav-cta:active, .sticky-cta-btn:active { transform: scale(.985); }
-  .bento-tile:active { border-color: #2d8ea8; }
+  .bento-tile:active { border-color: var(--color-brand-teal); }
 }
 
 @media (prefers-reduced-motion: reduce) {
