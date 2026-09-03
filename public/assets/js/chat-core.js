@@ -61,58 +61,13 @@
     return '#';
   }
   /* Wrap every "§91.155(a)(2)" token as a focusable cite that stays LTR in RTL
-     and drives the source lockstep. */
+     and drives the source lockstep. Runs on already-escaped text. */
   function citeTokens(html) {
     return html.replace(/§\s?(\d+\.\d+(?:\.\d+)?(?:\([^)]*\))?)/g, (m, sec) =>
       `<span class="cite" tabindex="0" role="button"`
       + ` aria-label="${t('View source', 'عرض المصدر')} ${esc(sec)}" data-section="${esc(sec)}">`
       + `<bdi dir="ltr" lang="en">${m}</bdi></span>`);
   }
-  /* Build markdown HTML without pre-escaping text — lets DOMPurify see actual dangerous tags. */
-  function inlineUnsafe(text) {
-    return text
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g,
-        (_m, label, url) => `<a href="${safeUrl(url)}" rel="noopener nofollow ugc">${label}</a>`);
-  }
-  function mdRaw(text) {
-    let html = '', list = false;
-    for (const raw of String(text).split('\n')) {
-      const line = raw.trim();
-      if (/^[-*]\s+/.test(line)) {
-        if (!list) { html += '<ul>'; list = true; }
-        html += '<li>' + inlineUnsafe(line.replace(/^[-*]\s+/, '')) + '</li>';
-      } else {
-        if (list) { html += '</ul>'; list = false; }
-        if (line) html += '<p>' + inlineUnsafe(line) + '</p>';
-      }
-    }
-    if (list) html += '</ul>';
-    return html;
-  }
-  /* Sanitize HTML with DOMPurify, allowing GACAR citation tokens and safe markdown elements.
-     In browser: window.DOMPurify is expected to be loaded globally.
-     In Node.js tests: DOMPurify is require'd into module scope. */
-  function sanitizeMarkdown(html) {
-    const purifier = (typeof window !== 'undefined' && window.DOMPurify)
-      || (typeof DOMPurify !== 'undefined' && DOMPurify)
-      || (typeof global !== 'undefined' && global.DOMPurify)
-      || null;
-    if (!purifier) return html;
-    const config = {
-      ALLOWED_TAGS: ['p', 'ul', 'li', 'strong', 'em', 'a', 'span', 'bdi', 'br'],
-      ALLOWED_ATTR: ['class', 'tabindex', 'role', 'aria-label', 'data-section', 'dir', 'lang', 'href', 'rel', 'target'],
-      KEEP_CONTENT: true,
-    };
-    return purifier.sanitize(html, config);
-  }
-  /* Secure markdown: generate raw HTML → sanitize XSS → add citations. */
-  function mdSafe(text) {
-    const raw = mdRaw(text);
-    const sanitized = sanitizeMarkdown(raw);
-    return citeTokens(sanitized);
-  }
-  /* Legacy inline/md for backward compatibility. */
   function inline(text) {
     return citeTokens(esc(text)
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -204,7 +159,7 @@
   const AdelChatCore = {
     apiBase, sessionId, newTurnId,
     errorText, rateLimitedText,
-    esc, safeUrl, citeTokens, inline, md, mdSafe, mdRaw, sanitizeMarkdown,
+    esc, safeUrl, citeTokens, inline, md,
     GBADGE, badgeHtml, verifyActions,
     postChat, sseEvents,
   };
