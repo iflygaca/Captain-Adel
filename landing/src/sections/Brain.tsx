@@ -21,37 +21,37 @@ const STAGES = isAr ? STAGES_AR : STAGES_EN
 
 function Pipeline() {
   return (
-    <div className="reveal reveal-d2 border border-[#1a2540] bg-[#0c1220] p-6 md:p-8">
+    <div className="reveal reveal-d2 p-6 md:p-8" style={{ borderColor: 'var(--color-void-raised)', backgroundColor: 'var(--color-surface-elevated)', border: `1px solid var(--color-void-raised)` }}>
       <div className="flex items-center justify-between mb-6">
-        <span className="font-mono2 text-[10px] tracking-[0.22em] uppercase text-[#8b98ad]">
+        <span className="font-mono2 text-[10px] tracking-[0.22em] uppercase" style={{ color: 'var(--color-text-secondary)' }}>
           {isAr ? 'src/brain — المصدر الوحيد للحقيقة' : 'src/brain — the single source of truth'}
         </span>
-        <span className="font-mono2 text-[10px] text-[#34d399] flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] anim-pulse-dot" /> {isAr ? 'نشط' : 'ACTIVE'}
+        <span className="font-mono2 text-[10px] flex items-center gap-1.5" style={{ color: 'var(--color-success)' }}>
+          <span className="w-1.5 h-1.5 rounded-full anim-pulse-dot" style={{ backgroundColor: 'var(--color-success)' }} /> {isAr ? 'نشط' : 'ACTIVE'}
         </span>
       </div>
 
       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0">
         {STAGES.map((s, i) => (
           <div key={s.id} className="flex md:flex-1 items-center">
-            <div className="flex-1 group border border-[#1a2540] bg-[#111a2b] px-4 py-4 hover:border-[#2d8ea8] transition-colors duration-150">
-              <div className="font-mono2 text-[10px] tracking-[0.2em] text-[#22d3ee]">
-                <span className="text-[#8b98ad] mr-2">{String(i + 1).padStart(2, '0')}</span>
+            <div className="flex-1 group px-4 py-4 transition-colors duration-150" style={{ borderColor: 'var(--color-void-raised)', backgroundColor: 'var(--color-surface-elevated)', border: `1px solid var(--color-void-raised)` }} onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-brand-teal)'} onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--color-void-raised)'}>
+              <div className="font-mono2 text-[10px] tracking-[0.2em]" style={{ color: 'var(--color-neon-cyan)' }}>
+                <span className="mr-2" style={{ color: 'var(--color-text-secondary)' }}>{String(i + 1).padStart(2, '0')}</span>
                 {s.id}
               </div>
-              <p className="mt-2 text-[12px] leading-snug text-[#8b98ad]">{s.desc}</p>
-              <div className="mt-3 font-mono2 text-[10px] text-[#34d399]">→ {s.out}</div>
+              <p className="mt-2 text-[12px] leading-snug" style={{ color: 'var(--color-text-secondary)' }}>{s.desc}</p>
+              <div className="mt-3 font-mono2 text-[10px]" style={{ color: 'var(--color-success)' }}>→ {s.out}</div>
             </div>
             {i < STAGES.length - 1 && (
               <svg className="hidden md:block w-8 shrink-0" viewBox="0 0 32 12" aria-hidden>
-                <line x1="0" y1="6" x2="26" y2="6" stroke="#2d8ea8" strokeWidth="1" className="anim-dash" />
-                <path d="M24 2 L30 6 L24 10" fill="none" stroke="#22d3ee" strokeWidth="1.4" />
+                <line x1="0" y1="6" x2="26" y2="6" strokeWidth="1" className="anim-dash" style={{ stroke: 'var(--color-brand-teal)' }} />
+                <path d="M24 2 L30 6 L24 10" fill="none" strokeWidth="1.4" style={{ stroke: 'var(--color-neon-cyan)' }} />
               </svg>
             )}
             {i < STAGES.length - 1 && (
               <svg className="md:hidden mx-auto h-7" viewBox="0 0 12 28" aria-hidden>
-                <line x1="6" y1="0" x2="6" y2="22" stroke="#2d8ea8" strokeWidth="1" className="anim-dash" />
-                <path d="M2 20 L6 26 L10 20" fill="none" stroke="#22d3ee" strokeWidth="1.4" />
+                <line x1="6" y1="0" x2="6" y2="22" strokeWidth="1" className="anim-dash" style={{ stroke: 'var(--color-brand-teal)' }} />
+                <path d="M2 20 L6 26 L10 20" fill="none" strokeWidth="1.4" style={{ stroke: 'var(--color-neon-cyan)' }} />
               </svg>
             )}
           </div>
