@@ -66,6 +66,7 @@ export default function Footer() {
           <div className="font-mono2 text-[11px] leading-7 tracking-[0.08em] text-[#8b98ad]">
             <div className="text-[#22d3ee] tracking-[0.24em] uppercase text-[10px] mb-3">{isAr ? 'الجهة الرسمية' : 'Authority'}</div>
             <a className="block hover:text-[#22d3ee] transition-colors" href="https://gaca.gov.sa" target="_blank" rel="noreferrer">{isAr ? 'gaca.gov.sa — المصدر الرسمي' : 'gaca.gov.sa — the authoritative source'}</a>
+            <a className="block hover:text-[#22d3ee] transition-colors" href="/accessibility">{isAr ? 'إمكانية الوصول ↗' : 'Accessibility ↗'}</a>
             <span className="block">{isAr ? 'PDPL — معالجة داخل المملكة' : 'PDPL — processed in-Kingdom'}</span>
             <span className="block latin">Node 20 · proprietary license</span>
           </div>
