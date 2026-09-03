@@ -26,6 +26,28 @@
     --color-warning: #fbbf24;
     --color-danger: #f87171;
 
+    /* Grid and structural colors (SVG, borders, dividers) */
+    --color-grid-dark: #1a2540;
+    --color-border-light: #d8d3c6;
+
+    /* User message bubble colors */
+    --color-user-bubble-gradient-start: #1e2a37;
+    --color-user-bubble-gradient-end: #1a2532;
+    --color-user-bubble-border: #2a3a49;
+
+    /* Additional text hierarchy */
+    --color-text-tertiary: #5b6472;
+
+    /* Day theme palette (for Models.tsx and light-mode support) */
+    --color-surface-light: #faf8f2;
+    --color-text-dark: #10151f;
+    --color-border-muted: #e6e1d4;
+    --color-border-lighter: #e6e1d4;
+    --color-brand-teal-dark: #0e7490;
+    --color-success-dark: #059669;
+    --color-amber-dark: #b45309;
+    --color-hover-light: #efeadf;
+
     /* Glass and border tokens */
     --color-glass-border: rgba(255,255,255,0.08);
     --color-glass-fill: rgba(255,255,255,0.04);

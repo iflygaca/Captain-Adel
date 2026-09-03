@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { CSSProperties } from 'react'
 import { isAr } from '../i18n'
 
 type Faq = { q: string; a: string }
@@ -53,34 +54,54 @@ const FAQS = isAr ? FAQS_AR : FAQS_EN
 
 export default function FaqSection() {
   const [open, setOpen] = useState(0)
+  const [hoverQuestionIdx, setHoverQuestionIdx] = useState(-1)
+
   return (
     <section id="faq" className="relative py-16 md:py-28 px-5 overflow-hidden">
       <span className="ghost-word" aria-hidden>{isAr ? 'أسئلة' : 'ASK'}</span>
       <div className="relative z-10 mx-auto max-w-4xl">
-        <div className="reveal flex items-center gap-3 font-mono2 text-[10px] tracking-[0.3em] uppercase text-[#22d3ee] mb-6">
-          <span className="px-2 py-1 border border-[#2d8ea8]">{isAr ? '٠٥' : '05'}</span>
+        <div
+          className="reveal flex items-center gap-3 font-mono2 text-[10px] tracking-[0.3em] uppercase mb-6"
+          style={{ color: 'var(--color-brand-teal)' }}
+        >
+          <span className="px-2 py-1" style={{ border: '1px solid var(--color-brand-teal-dark)' }}>
+            {isAr ? '٠٥' : '05'}
+          </span>
           <span>{isAr ? 'الأسئلة المتكررة — اسأل الكابتن' : 'Frequently asked — interrogating the Captain'}</span>
-          <span className="flex-1 h-px bg-[#1a2540]" />
+          <span className="flex-1 h-px" style={{ backgroundColor: 'var(--color-void-900)' }} />
         </div>
-        <h2 className={`reveal text-[clamp(1.9rem,4vw,3rem)] font-extrabold leading-[1.05] tracking-tight text-[#e6edf6] mb-12 ${isAr ? 'ar-display' : ''}`}>
+        <h2 className={`reveal text-[clamp(1.9rem,4vw,3rem)] font-extrabold leading-[1.05] tracking-tight mb-12 ${isAr ? 'ar-display' : ''}`} style={{ color: 'var(--color-text-primary)' }}>
           {isAr ? (
-            <>كل ما أردت سؤال <span className="text-[#22d3ee]">كابتن عادل</span> عنه.</>
+            <>كل ما أردت سؤال <span style={{ color: 'var(--color-brand-teal)' }}>كابتن عادل</span> عنه.</>
           ) : (
-            <>Everything you wanted to ask <span className="text-[#22d3ee]">Captain Adel</span>.</>
+            <>Everything you wanted to ask <span style={{ color: 'var(--color-brand-teal)' }}>Captain Adel</span>.</>
           )}
         </h2>
-        <div className="divide-y divide-[#1a2540] border-y border-[#1a2540]">
+        <div className="border-y" style={{ borderColor: 'var(--color-void-900)', divideBorderColor: 'var(--color-void-900)' }}>
           {FAQS.map((f, i) => (
-            <div key={i} className={`reveal reveal-d${Math.min(i + 1, 4)}`}>
+            <div key={i} className={`reveal reveal-d${Math.min(i + 1, 4)} border-b`} style={{ borderBottomColor: 'var(--color-void-900)' }}>
               <button
                 onClick={() => setOpen(open === i ? -1 : i)}
+                onMouseEnter={() => setHoverQuestionIdx(i)}
+                onMouseLeave={() => setHoverQuestionIdx(-1)}
                 aria-expanded={open === i}
-                className="w-full flex items-center justify-between gap-6 py-5 text-start group"
+                className="w-full flex items-center justify-between gap-6 py-5 text-start group transition-colors duration-150"
               >
-                <span className={`text-[15px] md:text-[17px] font-semibold transition-colors duration-150 ${open === i ? 'text-[#22d3ee]' : 'text-[#e6edf6] group-hover:text-[#22d3ee]'}`}>
+                <span
+                  className="text-[15px] md:text-[17px] font-semibold transition-colors duration-150"
+                  style={{
+                    color: open === i || hoverQuestionIdx === i ? 'var(--color-brand-teal)' : 'var(--color-text-primary)',
+                  }}
+                >
                   {f.q}
                 </span>
-                <span className={`font-mono2 text-lg shrink-0 transition-transform duration-300 ${open === i ? 'rotate-45 text-[#22d3ee]' : 'text-[#8b98ad]'}`}>
+                <span
+                  className="font-mono2 text-lg shrink-0 transition-transform duration-300"
+                  style={{
+                    transform: open === i ? 'rotate(45deg)' : 'rotate(0deg)',
+                    color: open === i ? 'var(--color-brand-teal)' : 'var(--color-text-secondary)',
+                  }}
+                >
                   +
                 </span>
               </button>
@@ -89,7 +110,7 @@ export default function FaqSection() {
                 style={{ gridTemplateRows: open === i ? '1fr' : '0fr' }}
               >
                 <div className="overflow-hidden">
-                  <p className="pb-6 max-w-2xl text-[14px] leading-relaxed text-[#8b98ad]">
+                  <p className="pb-6 max-w-2xl text-[14px] leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
                     {f.a}
                   </p>
                 </div>

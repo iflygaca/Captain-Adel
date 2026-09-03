@@ -89,7 +89,7 @@ export default function ConsoleDemo() {
   const cur = QAS[qa]
   return (
     <div
-      className="p-4 font-mono2 text-[11px] leading-5 text-[#34d399] min-h-[190px]"
+      className="p-4 font-mono2 text-[11px] leading-5 text-[var(--color-success)] min-h-[190px]"
       onPointerEnter={() => { paused.current = true }}
       onPointerLeave={() => { paused.current = false }}
     >
@@ -98,24 +98,24 @@ export default function ConsoleDemo() {
       ))}
       {booted >= BOOT.length ? (
         <>
-          <div className="text-[#22d3ee]">{ONLINE}</div>
-          <div className="mt-2 text-[#e6edf6]">
-            <span className="text-[#8b98ad]">{PROMPT}&gt; </span>
+          <div className="text-[var(--color-neon-cyan)]">{ONLINE}</div>
+          <div className="mt-2 text-[var(--color-text-primary)]">
+            <span className="text-[var(--color-text-secondary)]">{PROMPT}&gt; </span>
             {cur.q.slice(0, typed)}
-            {!answered && <span className="anim-caret text-[#22d3ee]">▌</span>}
+            {!answered && <span className="anim-caret text-[var(--color-neon-cyan)]">▌</span>}
           </div>
           {answered && (
-            <div className="mt-1 text-[#c6d2e2]">
-              <span className="text-[#8b98ad]">→ </span>
+            <div className="mt-1 text-[var(--color-text-secondary)]">
+              <span className="text-[var(--color-text-secondary)]">→ </span>
               {cur.a}{' '}
-              <span className="px-1.5 py-0.5 bg-[#22d3ee]/10 border border-[#2d8ea8]/50 text-[#22d3ee]">⧉ GACAR {cur.cite}</span>
-              <span className="anim-caret text-[#22d3ee]">▌</span>
+              <span className="px-1.5 py-0.5 bg-[var(--color-neon-cyan)]/10 border border-[var(--color-brand-teal)]/50 text-[var(--color-neon-cyan)]">⧉ GACAR {cur.cite}</span>
+              <span className="anim-caret text-[var(--color-neon-cyan)]">▌</span>
             </div>
           )}
-          <div className="mt-2 font-mono2 text-[8px] tracking-[0.24em] uppercase text-[#8b98ad]/70">{NOTE}</div>
+          <div className="mt-2 font-mono2 text-[8px] tracking-[0.24em] uppercase text-[var(--color-text-secondary)]/70">{NOTE}</div>
         </>
       ) : (
-        <span className="anim-caret text-[#22d3ee]">▌</span>
+        <span className="anim-caret text-[var(--color-neon-cyan)]">▌</span>
       )}
     </div>
   )
