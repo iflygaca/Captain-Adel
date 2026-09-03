@@ -42,6 +42,8 @@ try {
   const { JSDOM } = require('jsdom');
   const window = new JSDOM('').window;
   DOMPurify = createDOMPurify(window);
+  // Attach to global so chat-core.js can find it in its module scope
+  global.DOMPurify = DOMPurify;
 } catch (e) {
   console.error('Failed to load DOMPurify or jsdom:', e.message);
   console.error('Install with: npm install dompurify jsdom --save-dev');
@@ -98,15 +100,13 @@ test('XSS: javascript: protocol in href is blocked', () => {
 
 test('XSS: data: URI in href is blocked', () => {
   const attack = '[Click](data:text/html,<script>alert("xss")</script>)';
-  const html = AdelChatCore.md(attack);
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe(attack);
   assert.strictEqual(safe.includes('data:'), false, 'data: URI should be blocked');
 });
 
 test('XSS: script tags are removed entirely', () => {
   const attack = '<script>alert("xss")</script>Hello';
-  const html = AdelChatCore.md(attack);
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe(attack);
   assert.strictEqual(safe.includes('<script>'), false, 'script tag should be removed');
   assert.strictEqual(safe.includes('alert'), false, 'script content should be removed');
   assert.ok(safe.includes('Hello'), 'surrounding text should survive');
@@ -114,16 +114,14 @@ test('XSS: script tags are removed entirely', () => {
 
 test('XSS: style attribute injection is blocked', () => {
   const attack = '<p style="background:url(\'javascript:alert(1)\')">Text</p>';
-  const html = AdelChatCore.md(attack);
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe(attack);
   assert.strictEqual(safe.includes('style='), false, 'style attribute should be stripped');
   assert.strictEqual(safe.includes('javascript:'), false, 'javascript payload should be gone');
 });
 
 test('XSS: SVG/embed with onload are blocked', () => {
   const attack = '<svg onload="alert(\'xss\')"><circle r="10"/></svg>';
-  const html = AdelChatCore.md(attack);
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe(attack);
   assert.strictEqual(safe.includes('onload'), false, 'onload should be stripped');
   // SVG is not in the whitelist, so the entire element should be removed
   assert.strictEqual(safe.includes('<svg'), false, 'svg should be removed (not in whitelist)');
@@ -131,16 +129,14 @@ test('XSS: SVG/embed with onload are blocked', () => {
 
 test('XSS: iframe injection is blocked', () => {
   const attack = '<iframe src="https://evil.com/steal-creds.html"></iframe>';
-  const html = AdelChatCore.md(attack);
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe(attack);
   assert.strictEqual(safe.includes('<iframe'), false, 'iframe tag should be removed');
   assert.strictEqual(safe.includes('evil.com'), false, 'malicious URL should be gone');
 });
 
 test('XSS: input field injection is blocked', () => {
   const attack = '<input onfocus="alert(\'xss\')" autofocus>';
-  const html = AdelChatCore.md(attack);
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe(attack);
   assert.strictEqual(safe.includes('<input'), false, 'input tag should be removed');
   assert.strictEqual(safe.includes('onfocus'), false, 'event handler should be stripped');
 });
@@ -150,38 +146,33 @@ test('XSS: input field injection is blocked', () => {
 // ============================================================================
 
 test('markdown: bold text survives sanitization', () => {
-  const html = AdelChatCore.md('This is **bold** text');
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe('This is **bold** text');
   assert.ok(safe.includes('<strong>bold</strong>'), 'bold formatting should be preserved');
   assert.ok(safe.includes('This is'), 'surrounding text should survive');
 });
 
 test('markdown: links survive sanitization with safe URLs', () => {
-  const html = AdelChatCore.md('[Learn more](https://flygaca.com)');
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe('[Learn more](https://flygaca.com)');
   assert.ok(safe.includes('<a'), 'link tag should be preserved');
   assert.ok(safe.includes('Learn more'), 'link text should survive');
   assert.ok(safe.includes('flygaca.com'), 'safe URL should be preserved');
 });
 
 test('markdown: GACAR citations are preserved', () => {
-  const html = AdelChatCore.md('See §91.155(a)(2) for details');
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe('See §91.155(a)(2) for details');
   assert.ok(safe.includes('<span class="cite"'), 'cite span should be preserved');
   assert.ok(safe.includes('§91.155'), 'GACAR section should appear');
   assert.ok(safe.includes('data-section='), 'data-section attribute should survive');
 });
 
 test('markdown: BDI tags in citations are preserved', () => {
-  const html = AdelChatCore.md('Reference §91.155 here');
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe('Reference §91.155 here');
   assert.ok(safe.includes('<bdi'), 'BDI tag for RTL should be preserved');
   assert.ok(safe.includes('dir="ltr"'), 'LTR direction should survive');
 });
 
 test('markdown: lists survive sanitization', () => {
-  const html = AdelChatCore.md('- Item 1\n- Item 2\n- Item 3');
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe('- Item 1\n- Item 2\n- Item 3');
   assert.ok(safe.includes('<ul>'), 'ul tag should be preserved');
   assert.ok(safe.includes('<li>'), 'li tags should be preserved');
   assert.ok(safe.includes('Item 1'), 'list items should survive');
@@ -189,23 +180,20 @@ test('markdown: lists survive sanitization', () => {
 });
 
 test('markdown: paragraphs survive sanitization', () => {
-  const html = AdelChatCore.md('First paragraph\n\nSecond paragraph');
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe('First paragraph\n\nSecond paragraph');
   assert.ok(safe.includes('<p>'), 'p tags should be preserved');
   assert.ok(safe.includes('First paragraph'), 'paragraph text should survive');
   assert.ok(safe.includes('Second paragraph'), 'multiple paragraphs should work');
 });
 
 test('markdown: Arabic text and RTL rendering', () => {
-  const html = AdelChatCore.md('النص العربي هنا');
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe('النص العربي هنا');
   assert.ok(safe.includes('النص العربي'), 'Arabic text should survive');
   assert.ok(safe.includes('<p>'), 'paragraph wrapping should be applied');
 });
 
 test('markdown: cite role attribute survives (for a11y)', () => {
-  const html = AdelChatCore.md('Check §91.155');
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe('Check §91.155');
   assert.ok(safe.includes('role="button"'), 'role attribute should be preserved');
   assert.ok(safe.includes('aria-label='), 'aria-label should survive');
   assert.ok(safe.includes('tabindex="0"'), 'tabindex should be preserved');
@@ -240,12 +228,10 @@ test('sanitization: dangerous tags are not allowed', () => {
 });
 
 test('sanitization: safe attributes are allowed', () => {
-  const html = AdelChatCore.md('[Link](https://flygaca.com)');
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe('[Link](https://flygaca.com)');
   assert.ok(safe.includes('href='), 'href attribute should be preserved');
 
-  const htmlWithCite = AdelChatCore.md('See §91.155');
-  const safeCite = AdelChatCore.sanitizeMarkdown(htmlWithCite);
+  const safeCite = AdelChatCore.mdSafe('See §91.155');
   assert.ok(safeCite.includes('class='), 'class attribute should be preserved');
   assert.ok(safeCite.includes('data-section='), 'data-section should be preserved');
   assert.ok(safeCite.includes('aria-label='), 'aria-label should be preserved');
@@ -274,8 +260,7 @@ test('integration: full chat flow with mixed content', () => {
   - Safe list item
   - Another item`;
 
-  const html = AdelChatCore.md(userInput);
-  const safe = AdelChatCore.sanitizeMarkdown(html);
+  const safe = AdelChatCore.mdSafe(userInput);
 
   // Safe content should survive
   assert.ok(safe.includes('gaca.gov.sa'), 'safe URL should survive');
@@ -290,8 +275,7 @@ test('integration: full chat flow with mixed content', () => {
 });
 
 test('integration: sanitizeMarkdown is idempotent', () => {
-  const html = AdelChatCore.md('**Bold** [link](https://flygaca.com)');
-  const safe1 = AdelChatCore.sanitizeMarkdown(html);
+  const safe1 = AdelChatCore.mdSafe('**Bold** [link](https://flygaca.com)');
   const safe2 = AdelChatCore.sanitizeMarkdown(safe1);
   // Running sanitization twice should produce the same result
   assert.strictEqual(safe1, safe2, 'sanitization should be idempotent');

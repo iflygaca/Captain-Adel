@@ -96,6 +96,7 @@
   function sanitizeMarkdown(html) {
     const purifier = (typeof window !== 'undefined' && window.DOMPurify)
       || (typeof DOMPurify !== 'undefined' && DOMPurify)
+      || (typeof global !== 'undefined' && global.DOMPurify)
       || null;
     if (!purifier) return html;
     const config = {
