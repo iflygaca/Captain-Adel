@@ -1,0 +1,123 @@
+{
+  "timestamp": "2026-09-04T15:41:20.738Z",
+  "version": "2.0",
+  "pages": {},
+  "contrast": {
+    "violations": [
+      {
+        "pair": "Warning (Day) - #D97706 on #F5F2ED",
+        "ratio": 2.85,
+        "required": 3,
+        "shortfall": "0.15",
+        "severity": "serious"
+      }
+    ],
+    "passing": 17,
+    "total": 18
+  },
+  "semantics": {},
+  "keyboard": {
+    "checklist": [
+      {
+        "id": "tab-order",
+        "check": "Tab order is logical and sequential",
+        "status": "MANUAL"
+      },
+      {
+        "id": "focus-visible",
+        "check": "Focus ring visible (--focus-ring token, 2px cyan halo)",
+        "status": "MANUAL"
+      },
+      {
+        "id": "focus-trap",
+        "check": "No keyboard focus trap (escape key exits modals)",
+        "status": "MANUAL"
+      },
+      {
+        "id": "enter-submit",
+        "check": "Chat input: Enter submits, Shift+Enter adds line break",
+        "status": "MANUAL"
+      },
+      {
+        "id": "escape",
+        "check": "Escape closes overlays/menus",
+        "status": "MANUAL"
+      },
+      {
+        "id": "arrow-nav",
+        "check": "Message list supports arrow key navigation if needed",
+        "status": "MANUAL"
+      },
+      {
+        "id": "cite-focusable",
+        "check": "GACAR citations (§91.155) are focusable (tabindex=\"0\")",
+        "status": "AUTOMATED"
+      },
+      {
+        "id": "button-accessible",
+        "check": "Buttons have descriptive labels (not \"Click\" alone)",
+        "status": "AUTOMATED"
+      }
+    ],
+    "automatedPass": false
+  },
+  "rtl": {
+    "issues": [],
+    "warnings": []
+  },
+  "summary": {
+    "critical": 0,
+    "serious": 1,
+    "moderate": 1,
+    "warnings": 0
+  },
+  "screenReader": {
+    "checklist": [
+      {
+        "page": "chat.html",
+        "check": "Chat log has role=\"log\" with aria-live=\"polite\"",
+        "critical": true
+      },
+      {
+        "page": "chat.html",
+        "check": "Messages announce with speaker context (user/assistant)",
+        "critical": true
+      },
+      {
+        "page": "chat.html",
+        "check": "Grounding badge has role=\"status\" (live region)",
+        "critical": true
+      },
+      {
+        "page": "chat.html",
+        "check": "Avatar alt text is descriptive (\"Captain Adel\"), not generic",
+        "critical": true
+      },
+      {
+        "page": "all",
+        "check": "Headings are hierarchical (h1 → h2 → h3)",
+        "critical": true
+      },
+      {
+        "page": "all",
+        "check": "Form labels associated via for/id",
+        "critical": false
+      },
+      {
+        "page": "all",
+        "check": "Links have descriptive anchor text (not \"click here\")",
+        "critical": false
+      },
+      {
+        "page": "all",
+        "check": "Icon buttons have aria-label",
+        "critical": true
+      },
+      {
+        "page": "all",
+        "check": "Navigation landmarks identified (nav, main, aside)",
+        "critical": false
+      }
+    ]
+  }
+}
