@@ -1,132 +1,88 @@
-/* MarkdownView.module.css - Token-based styling for rendered Markdown */
-
-.root {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.paragraph {
-  margin: 0;
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 1rem;
-  line-height: 1.5;
+.region {
   word-wrap: break-word;
   overflow-wrap: break-word;
-  hyphens: auto;
 }
 
-.paragraph:first-child {
-  margin-top: 0;
+.region p {
+  margin-block: 0.75rem;
+  line-height: 1.6;
 }
 
-.paragraph:last-child {
-  margin-bottom: 0;
+.region p:first-child {
+  margin-block-start: 0;
 }
 
-/* Bold text styling */
-.bold {
+.region p:last-child {
+  margin-block-end: 0;
+}
+
+.region strong {
   font-weight: 600;
-  color: inherit;
+  color: var(--color-hud-emerald);
 }
 
-/* Link styling */
-.link {
-  color: var(--color-gacar-part, #06B6D4);
+.region em {
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+.region u {
   text-decoration: underline;
-  cursor: pointer;
-  transition: opacity 0.2s ease-out;
+  text-decoration-color: var(--color-gacar-part);
+  text-underline-offset: 0.25em;
 }
 
-.link:hover {
+.region a {
+  color: var(--color-hud-emerald);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+  transition: color 150ms ease-out;
+}
+
+.region a:hover {
+  color: var(--color-hud-emerald);
   opacity: 0.8;
 }
 
-.link:focus {
-  outline: 2px solid var(--color-gacar-part, #06B6D4);
+.region a:focus {
+  outline: 2px solid var(--color-hud-emerald);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 0.25rem;
 }
 
-/* GACAR citation styling (§NNN.NNN format) */
+.region ul,
+.region ol {
+  margin-block: 0.75rem;
+  padding-inline-start: 1.5rem;
+}
+
+.region li {
+  margin-block-end: 0.5rem;
+  line-height: 1.6;
+}
+
+.region li:last-child {
+  margin-block-end: 0;
+}
+
 .citation {
-  color: var(--color-gacar-part, #06B6D4);
-  font-weight: 500;
-  cursor: pointer;
+  display: inline;
   padding: 0.125rem 0.25rem;
-  border-radius: 3px;
-  transition: background-color 0.2s ease-out;
+  border-radius: 0.25rem;
+  background-color: rgba(6, 182, 212, 0.1);
+  border-bottom: 2px dotted var(--color-gacar-part);
+  font-weight: 500;
+  cursor: help;
+  transition: background-color 150ms ease-out;
 }
 
 .citation:hover {
-  background-color: rgba(6, 182, 212, 0.1);
+  background-color: rgba(6, 182, 212, 0.2);
 }
 
 .citation:focus {
-  outline: 2px solid var(--color-gacar-part, #06B6D4);
-  outline-offset: 1px;
-}
-
-/* Unordered list styling */
-.list {
-  margin: 0.75rem 0;
-  padding-left: 1.5rem;
-  list-style-type: disc;
-}
-
-.list :first-child {
-  margin-top: 0;
-}
-
-.list :last-child {
-  margin-bottom: 0;
-}
-
-.listItem {
-  margin: 0.5rem 0;
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 1rem;
-  line-height: 1.5;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-.listItem::marker {
-  color: var(--color-gacar-part, #06B6D4);
-}
-
-/* RTL support */
-[dir='rtl'] .list {
-  padding-left: 0;
-  padding-right: 1.5rem;
-  direction: rtl;
-  text-align: right;
-}
-
-[dir='rtl'] .listItem {
-  direction: rtl;
-  text-align: right;
-}
-
-/* Reduced motion accessibility */
-@media (prefers-reduced-motion: reduce) {
-  .link,
-  .citation {
-    transition: none;
-  }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: more) {
-  .link {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 3px;
-  }
-
-  .citation {
-    border: 1px solid var(--color-gacar-part, #06B6D4);
-  }
+  outline: 2px solid var(--color-gacar-part);
+  outline-offset: 2px;
 }
