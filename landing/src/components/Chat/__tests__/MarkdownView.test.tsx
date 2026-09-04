@@ -48,7 +48,7 @@ describe('MarkdownView', () => {
   it('parses GACAR citations (§NNN.NNN)', () => {
     render(<MarkdownView content="Per §91.155, pilots must maintain VFR minima." />);
     const citation = screen.getByRole('doc-biblioref');
-    expect(citation).toHaveAttribute('aria-label', expect.stringContaining('§91.155'));
+    expect(citation).toHaveAttribute('aria-label', 'GACAR section §91.155');
   });
 
   it('renders unordered lists', () => {
@@ -113,14 +113,14 @@ Third paragraph.`;
 
   it('handles empty content gracefully', () => {
     const { container } = render(<MarkdownView content="" />);
-    expect(container.querySelector('.root')).toBeInTheDocument();
+    expect(container.firstChild).toBeInTheDocument();
   });
 
   it('applies custom className', () => {
     const { container } = render(
       <MarkdownView content="Test" className="custom-class" />
     );
-    expect(container.querySelector('.root')).toHaveClass('custom-class');
+    expect(container.firstChild).toHaveClass('custom-class');
   });
 
   it('escapes HTML special characters in text nodes', () => {

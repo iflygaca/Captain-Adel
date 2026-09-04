@@ -46,19 +46,19 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   return (
     <div className={containerClass} data-message-id={messageId} data-role={role}>
-      <div className={messageClass}>
+      <div className={messageClass} data-testid="message-bubble">
         {/* Message content */}
         <div className={styles.content}>{content}</div>
 
         {/* Timestamp */}
-        {timestamp && <div className={styles.timestamp}>{formatTime(timestamp)}</div>}
+        {timestamp && <div className={styles.timestamp} data-testid="timestamp">{formatTime(timestamp)}</div>}
 
         {/* Streaming indicator for assistant messages */}
         {isStreaming && role === 'assistant' && (
           <div className={styles.streamingIndicator}>
-            <span className={styles.typingDot}></span>
-            <span className={styles.typingDot}></span>
-            <span className={styles.typingDot}></span>
+            <span className={styles.typingDot} data-testid="typing-dot"></span>
+            <span className={styles.typingDot} data-testid="typing-dot"></span>
+            <span className={styles.typingDot} data-testid="typing-dot"></span>
           </div>
         )}
       </div>

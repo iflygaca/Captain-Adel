@@ -126,15 +126,16 @@ export const MarkdownView: React.FC<MarkdownViewProps> = ({ content, className =
           result.push(linkText);
         }
       } else if (match.type === 'citation') {
+        const citationText = text.substring(match.start, match.end);
         result.push(
           <span
             key={`cite-${idx}`}
             className={styles.citation}
             role="doc-biblioref"
-            aria-label={`GACAR section ${match.groups[0] || 'reference'}`}
+            aria-label={`GACAR section ${citationText}`}
             tabIndex={0}
           >
-            <bdi>{text.substring(match.start, match.end)}</bdi>
+            <bdi>{citationText}</bdi>
           </span>
         );
       }

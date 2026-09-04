@@ -86,14 +86,14 @@ describe('GrundingBadge', () => {
   });
 
   it('applies correct styling class based on state', () => {
-    const { rerender, container } = render(<GrundingBadge state="grounded" />);
-    expect(container.querySelector('.badge')).toHaveClass('grounded');
+    const { rerender } = render(<GrundingBadge state="grounded" />);
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Grounded in GACAR');
 
     rerender(<GrundingBadge state="partial" />);
-    expect(container.querySelector('.badge')).toHaveClass('partial');
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Partially grounded');
 
     rerender(<GrundingBadge state="refusal" />);
-    expect(container.querySelector('.badge')).toHaveClass('refusal');
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Cannot ground in GACAR');
   });
 
   it('renders without sources by default', () => {
@@ -124,14 +124,16 @@ describe('GrundingBadge', () => {
 
   it('handles long source lists with scrolling', () => {
     const sources = Array.from({ length: 20 }, (_, i) => `§${90 + i}.${100 + i}`);
-    const { container } = render(
+    render(
       <GrundingBadge state="grounded" sources={sources} />
     );
 
     fireEvent.click(screen.getByRole('button'));
 
-    const list = container.querySelector('.sourcesList');
-    expect(list).toHaveClass('sourcesList');
-    // CSS max-height and overflow-y will handle scrolling
+    const region = screen.getByRole('region', { name: /Citation sources/ });
+    expect(region).toBeInTheDocument();
+    // Verify all 20 sources are rendered
+    const links = region.querySelectorAll('a');
+    expect(links.length).toBe(20);
   });
 });
