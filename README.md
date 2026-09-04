@@ -12,6 +12,40 @@
 
 </div>
 
+## 🏗 Fly GACA Family
+
+[📚 FlyGACA Web & API](https://github.com/ay2m/FlyGACA) • 
+[🤖 Captain Adel AI](https://github.com/ay2m/Captain-Adel) • 
+[📱 FlyGACA iOS](https://github.com/ay2m/FlyGACA-ios) • 
+[🏢 Office & Governance](https://github.com/ay2m/Office)
+
+<!-- 
+  README ENHANCEMENT AUDIT — ay2m/Captain-Adel
+  Last audit: 2026-09-04 by claude-readme-supervisor
+  Status: READY for phase 1 (family links + audit blocks added)
+  
+  DRIFT RISKS IDENTIFIED:
+  - Line 89: Eval count (501+) hardcoded — drifts with each evals/ commit
+  - Line 91: Chunk count (80K) hardcoded — drifts with corpus refreshes
+  - Lines 156–158: Roadmap ETAs (Q2/Q3 2027) — no versioning, will rot
+  - No latency/SLA metrics in README — Cloud Logging has p95 inference data
+  - No deployment runbook link — docs/runbooks/ exist but not visible
+  - No cross-repo Captain-Adel integration links (brain-retrieval relies on FlyGACA corpus)
+  
+  PHASE 2 TASKS:
+  - Extract eval count from `evals/cases.json` record count
+  - Extract chunk count from `src/brain/_chunks.json.gz` byte size ÷ 1024
+  - Fetch p95 latency from Cloud Logging API (me-central2)
+  - Link to ROADMAP.md instead of hardcoding dates
+  - Add "Deployment" section with runbook links
+  
+  PHASE 3 TASKS:
+  - Create `.github/workflows/readme-supervisor.yml` with Cloud Logging API credential
+  - Implement stat replacement for evals, chunks, latency
+  
+  CROSS-REPO SYNC CHECK: Family contract parity ✓ (ay2m/Office, ay2m/FlyGACA aligned)
+-->
+
 ---
 
 ## 🎯 What's this?
