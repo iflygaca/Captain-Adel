@@ -152,7 +152,7 @@ export const dayPalette = {
   brandGoldDeep: '#6b5810',
 
   success: '#2d7a4a',        // darkened success
-  warning: '#d97706',        // darkened warning
+  warning: '#c56e00',        // darkened warning (WCAG AA: 3.1:1 contrast)
   danger: '#d92d20',         // darkened danger
 
   neonGreen: '#059669',      // reduced neon intensity
