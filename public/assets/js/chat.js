@@ -30,7 +30,8 @@
 
   const API     = core.apiBase();
   const ENDPOINT = API + '/v1/chat';
-  const AVATAR  = 'assets/img/captain/avatar.png';
+  // Use absolute path for avatar to ensure consistency across all hosting contexts
+  const AVATAR  = '/avatar.png';
   const history = [];
   let examMode = false;     // GACA oral-exam mode (Adel plays the examiner)
   const isAr = () => document.documentElement.lang === 'ar';
