@@ -185,8 +185,8 @@ and copy-paste templates are in the audit doc; this track sequences its action i
   branded placeholder linking to captadel.com, or make it private.
 - [x] **Publish `evals/cases.json` to the `flygaca/gacar-assistant-evals` dataset format** — 138
   bilingual eval cases exported to `evals/gacar-assistant-evals.jsonl` with `evals/DATASET_CARD.md` (schema, license, "every change is eval-gated in both languages").
-- [ ] **Broken-link sweep** — the HF model card links to `github.com/FlyGACA/flygaca` (404); the
-  landing footer + JSON-LD `sameAs` link to this private repo and to `ay2m/FlyGACA` (not
+- [ ] **Broken-link sweep** — the HF model card links to `github.com/iflygaca/FlyGACA` (404); the
+  landing footer + JSON-LD `sameAs` link to this private repo and to `iflygaca/FlyGACA` (not
   public). Point every public surface at things that actually resolve for a logged-out visitor.
 - [x] **`og:image` + `twitter:card`** on all 8 `public/*.html` pages (verified with images and cards on all pages).
 - [x] **GitHub presentation pass** — add `SECURITY.md` (responsible disclosure channel) and
@@ -275,7 +275,7 @@ happens in Xcode, in its own repo.
 - [ ] **Personalization** (opt-in) — tailor to a pilot's licence level and currency; tie into
   the Fly GACA logbook.
 - [ ] **Scale & resilience** — CDN for the static site, autoscaling API, GPU autoscaling for ALLaM.
-- [x] **Promoted to the standalone repo** — done; this repo (`FlyGACA/Captain-Adel`, created
+- [x] **Promoted to the standalone repo** — done; this repo (`iflygaca/Captain-Adel`, created
   June 2026) is the result of that split. The README's now-stale "Promotion to its own repo"
   runbook section is cleaned up as part of the 🪧 Brand & public presence pass above.
 
