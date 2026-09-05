@@ -1,6 +1,6 @@
 # Captain Adel — brand & presentation audit (August 2026)
 
-A multi-angle audit of how the project presents across **GitHub** (`FlyGACA/Captain-Adel` + the org),
+A multi-angle audit of how the project presents across **GitHub** (`ay2m/Captain-Adel` + the org),
 **the web** (captadel.com, audited from `landing/` + `public/` source and search-engine footprint —
 the live site is not reachable from the audit sandbox), and **Hugging Face** (`flygaca`).
 Audience assumed: pilots, aviation enthusiasts, and developers evaluating the maker's work.
@@ -41,7 +41,7 @@ report-only coverage/audit, gated deploy with health check).
 **Gaps:**
 
 - **The repo is private** while three public surfaces link to it: the landing footer
-  ("Squadron" → `github.com/FlyGACA/Captain-Adel`), the landing JSON-LD `sameAs`, and the README
+  ("Squadron" → `github.com/ay2m/Captain-Adel`), the landing JSON-LD `sameAs`, and the README
   of the HF model (indirectly). Every one of those is a 404 for your audience. This is the single
   highest-leverage fact in the audit — see Strategic #1.
 - **Badges are broken for everyone**: shields.io cannot read private repos, so the README's CI
@@ -52,8 +52,8 @@ report-only coverage/audit, gated deploy with health check).
 - **Stale README section**: "Promotion to its own repo" still describes splitting a
   `captadel/` subtree out of `flygaca/flygaca` — the split already happened (this repo exists,
   created June 2026). Delete the section; it reads as if the repo is a mirror of somewhere else.
-- **Family-table link rot**: of the repos listed, only `FlyGACA/FlyGACA-app` and
-  `FlyGACA/FlyGACA-ios` are publicly visible today. `ay2m/FlyGACA` (The Book), `Office`, and the
+- **Family-table link rot**: of the repos listed, only `ay2m/FlyGACA` and
+  `ay2m/FlyGACA-ios` are publicly visible today. `ay2m/Office` and the
   per-app metadata repos 404 for outsiders. Either annotate them (`*private*`) or link only what
   resolves.
 - **Missing community files**: no `CONTRIBUTING.md`, no `SECURITY.md`, no issue/PR templates.
@@ -113,7 +113,7 @@ All three repos were created 29 May 2026 and are **empty scaffolds**:
   well-written (intended use, out-of-scope, limitations, eval-table skeleton) but says
   "weights not published yet" and is full of TBDs; `pipeline_tag: sentence-similarity` +
   `library_name: sentence-transformers` on a weightless repo means the code snippet and any
-  inference widget fail. Its **Links section points to `github.com/FlyGACA/flygaca` — a 404** —
+  inference widget fail. Its **Links section points to `github.com/ay2m/FlyGACA` — a 404** —
   and never mentions captadel.com.
 - **Dataset `flygaca/gacar-assistant-evals`** — no README, no data, no tags beyond `region:us`.
   (The "41 downloads" are crawlers hitting an empty repo.) Meanwhile the *actual* eval set —
@@ -140,8 +140,8 @@ they read as "abandoned." Two of the three are fixable in under an hour (below);
    eval cases gate every prompt/model change"), it's self-authored, and the empty repo shows you
    already intended it. Suggested license: `cc-by-4.0`.
 3. **Broken-link + metadata sweep (~30 min).**
-   - HF model card: Links → `https://captadel.com`, `https://github.com/FlyGACA` (org, public),
-     `https://hf.co/datasets/flygaca/gacar-assistant-evals`; drop the dead `FlyGACA/flygaca` URL.
+   - HF model card: Links → `https://captadel.com`, `https://github.com/ay2m` (org, public),
+     `https://hf.co/datasets/flygaca/gacar-assistant-evals`; drop the dead `ay2m/FlyGACA` URL.
    - Landing `Footer.tsx`: while the repo is private, point "Squadron" at the public org page
      and flygaca.com; drop or annotate the Book link.
    - Landing JSON-LD `sameAs`: add HF profile, org page, LinkedIn, Instagram (snippet C).
@@ -246,7 +246,7 @@ match-or-beat the bar in EN **and** AR; parity gate for new providers) · Proven
 
 ```json
 "sameAs": [
-  "https://github.com/FlyGACA",
+  "https://github.com/ay2m",
   "https://huggingface.co/flygaca",
   "https://flygaca.com",
   "https://www.linkedin.com/in/captadel/",
