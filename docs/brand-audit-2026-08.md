@@ -1,6 +1,6 @@
 # Captain Adel — brand & presentation audit (August 2026)
 
-A multi-angle audit of how the project presents across **GitHub** (`ay2m/Captain-Adel` + the org),
+A multi-angle audit of how the project presents across **GitHub** (`iflygaca/Captain-Adel` + the org),
 **the web** (captadel.com, audited from `landing/` + `public/` source and search-engine footprint —
 the live site is not reachable from the audit sandbox), and **Hugging Face** (`flygaca`).
 Audience assumed: pilots, aviation enthusiasts, and developers evaluating the maker's work.
@@ -41,7 +41,7 @@ report-only coverage/audit, gated deploy with health check).
 **Gaps:**
 
 - **The repo is private** while three public surfaces link to it: the landing footer
-  ("Squadron" → `github.com/ay2m/Captain-Adel`), the landing JSON-LD `sameAs`, and the README
+  ("Squadron" → `github.com/iflygaca/Captain-Adel`), the landing JSON-LD `sameAs`, and the README
   of the HF model (indirectly). Every one of those is a 404 for your audience. This is the single
   highest-leverage fact in the audit — see Strategic #1.
 - **Badges are broken for everyone**: shields.io cannot read private repos, so the README's CI

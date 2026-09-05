@@ -275,7 +275,7 @@ happens in Xcode, in its own repo.
 - [ ] **Personalization** (opt-in) — tailor to a pilot's licence level and currency; tie into
   the Fly GACA logbook.
 - [ ] **Scale & resilience** — CDN for the static site, autoscaling API, GPU autoscaling for ALLaM.
-- [x] **Promoted to the standalone repo** — done; this repo (`ay2m/Captain-Adel`, created
+- [x] **Promoted to the standalone repo** — done; this repo (`iflygaca/Captain-Adel`, created
   June 2026) is the result of that split. The README's now-stale "Promotion to its own repo"
   runbook section is cleaned up as part of the 🪧 Brand & public presence pass above.
 
