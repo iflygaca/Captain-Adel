@@ -1,63 +1,78 @@
 /** @type {import('tailwindcss').Config} */
+const { themeToTailwindConfig, themes } = require('../src/design/tokens.ts');
+
+const tokenConfig = themeToTailwindConfig(themes.falcon);
+
 module.exports = {
   darkMode: ["class"],
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        // Unified token system colors from tokens.ts
+        ...tokenConfig.colors,
+
+        // Legacy Radix UI fallbacks (mapped to token equivalents)
+        border: "var(--color-border-default)",
+        input: "var(--color-void-raised)",
+        ring: "var(--color-neon-cyan)",
+        background: "var(--color-void)",
+        foreground: "var(--color-text-primary)",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "var(--color-brand-teal)",
+          foreground: "var(--color-text-on-primary)",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "var(--color-brand-sage)",
+          foreground: "var(--color-text-on-success)",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
-          foreground: "hsl(var(--destructive-foreground) / <alpha-value>)",
+          DEFAULT: "var(--color-danger)",
+          foreground: "var(--color-text-on-warning)",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "var(--color-void-raised)",
+          foreground: "var(--color-text-secondary)",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "var(--color-brand-gold)",
+          foreground: "var(--color-text-on-accent)",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "var(--color-surface-elevated)",
+          foreground: "var(--color-text-primary)",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "var(--color-surface-raised)",
+          foreground: "var(--color-text-primary)",
         },
         sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+          DEFAULT: "var(--color-surface-base)",
+          foreground: "var(--color-text-primary)",
+          primary: "var(--color-brand-teal)",
+          "primary-foreground": "var(--color-text-on-primary)",
+          accent: "var(--color-brand-gold)",
+          "accent-foreground": "var(--color-text-on-accent)",
+          border: "var(--color-border-default)",
+          ring: "var(--color-neon-cyan)",
         },
       },
       borderRadius: {
-        xl: "calc(var(--radius) + 4px)",
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        xs: "calc(var(--radius) - 6px)",
+        ...tokenConfig.borderRadius,
+        xl: "var(--radius-xl)",
+        lg: "var(--radius-lg)",
+        md: "var(--radius-md)",
+        sm: "var(--radius-sm)",
+        xs: "calc(var(--radius-sm) - 2px)",
       },
       boxShadow: {
+        ...tokenConfig.boxShadow,
         xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+      },
+      fontFamily: tokenConfig.fontFamily,
+      fontSize: tokenConfig.fontSize,
+      spacing: {
+        ...tokenConfig.spacing,
       },
       keyframes: {
         "accordion-down": {

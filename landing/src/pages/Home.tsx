@@ -24,7 +24,7 @@ export default function Home() {
   useScrollFx()
   useScrollSkew()
   return (
-    <div className="grain min-h-screen bg-[#050810] text-[#e6edf6]">
+    <div className="grain min-h-screen" style={{ backgroundColor: 'var(--color-void)', color: 'var(--color-text-primary)' }}>
       <Loader />
       <Header />
       <main className="skewy">

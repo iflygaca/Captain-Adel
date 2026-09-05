@@ -29,3 +29,6 @@ src/brain/_embeddings.json.gz
 ios/.build/
 *.xcodeproj
 !ios/project.yml
+
+# Metrics collection (git-ignored)
+.stats.json

@@ -10,12 +10,18 @@ const PARTS = [
 export default function Ticker() {
   const items = [...PARTS, ...PARTS]
   return (
-    <div className="relative border-y border-[#1a2540] bg-[#0c1220] overflow-hidden">
+    <div
+      className="relative border-y overflow-hidden"
+      style={{
+        borderColor: 'var(--color-void-900)',
+        backgroundColor: 'var(--color-void)',
+      }}
+    >
       <div className="flex whitespace-nowrap anim-ticker py-3">
         {items.map((p, i) => (
-          <span key={i} className="flex items-center font-mono2 text-[10px] tracking-[0.22em] uppercase text-[#8b98ad]">
+          <span key={i} className="flex items-center font-mono2 text-[10px] tracking-[0.22em] uppercase" style={{ color: 'var(--color-text-secondary)' }}>
             <span className="px-6">{p}</span>
-            <span className="text-[#22d3ee]">✦</span>
+            <span style={{ color: 'var(--color-brand-teal)' }}>✦</span>
           </span>
         ))}
       </div>

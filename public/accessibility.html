@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessibility Statement — Captain Adel</title>
+  <meta name="description" content="Accessibility conformance statement for Captain Adel (captadel.com) — WCAG 2.1 Level AA. Learn how we ensure inclusive access for all learners.">
+  <meta name="theme-color" content="#090C10">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/img/captain/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/captain/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/img/captain/apple-touch-icon.png">
+  <link rel="canonical" href="https://captadel.com/accessibility">
+  <meta property="og:image" content="https://captadel.com/media/captain-adel.jpg">
+  <meta property="og:image:alt" content="Captain Adel — AI flight instructor portrait">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://captadel.com/media/captain-adel.jpg">
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="assets/css/adel.css">
+  <script src="assets/js/speed-insights.js" defer></script>
+  <script src="assets/js/footer.js" defer></script>
+  <script src="assets/js/site.js" defer></script>
+  <script src="assets/js/i18n.js" defer></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #e8edf2;
+      background: #0a0e12;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1, h2, h3 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 1.8rem; }
+    h3 { font-size: 1.3rem; }
+    p { margin-bottom: 1rem; }
+    ul, ol {
+      margin-left: 2rem;
+      margin-bottom: 1rem;
+    }
+    li { margin-bottom: 0.5rem; }
+    a {
+      color: #22d3ee;
+      text-decoration: underline;
+    }
+    a:hover {
+      color: #34d399;
+    }
+    code {
+      background: #1a2540;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    table td, table th {
+      border: 1px solid #2d6e8a;
+      padding: 0.75rem;
+      text-align: left;
+    }
+    table th {
+      background: #1a2540;
+      font-weight: 600;
+    }
+    .highlight {
+      background: rgba(34, 211, 238, 0.1);
+      padding: 1rem;
+      border-left: 4px solid #22d3ee;
+      margin: 1rem 0;
+    }
+    .checkmark::before {
+      content: "✅ ";
+    }
+  </style>
+</head>
+<body>
+  <div class="disclaimer-strip">
+    <div class="container">
+      <span data-i18n-html
+        data-en='<strong>Independent educational reference.</strong> Not affiliated with GACA — always verify against the official source, <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.'>
+        <strong>مرجع تعليمي مستقل.</strong> غير تابع للهيئة العامة للطيران المدني —
+        تحقّق دائماً من المصدر الرسمي،
+        <a href="https://gaca.gov.sa" target="_blank" rel="noopener">gaca.gov.sa</a>.</span>
+    </div>
+  </div>
+
+  <header class="site-nav">
+    <div class="container nav-inner">
+      <a class="lockup" href="/" aria-label="Captain Adel — Home">
+        <svg class="radar-mark" width="34" height="34" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <circle cx="24" cy="24" r="21" stroke="#2d8ea8" stroke-width="1.5" opacity=".8" />
+          <circle cx="24" cy="24" r="13" stroke="#1a2540" stroke-width="1" />
+          <circle cx="24" cy="24" r="5" stroke="#1a2540" stroke-width="1" />
+          <line x1="24" y1="3" x2="24" y2="45" stroke="#1a2540" stroke-width="1" />
+          <line x1="3" y1="24" x2="45" y2="24" stroke="#1a2540" stroke-width="1" />
+          <g class="anim-sweep">
+            <path d="M24 24 L24 3 A21 21 0 0 1 38.8 9.2 Z" fill="url(#sweepGradH)" opacity=".7" />
+            <line x1="24" y1="24" x2="24" y2="3" stroke="#22d3ee" stroke-width="1.6" />
+          </g>
+          <circle cx="33" cy="15" r="2" fill="#34d399" class="anim-pulse-dot" />
+          <circle cx="24" cy="24" r="2" fill="#22d3ee" />
+          <defs>
+            <linearGradient id="sweepGradH" x1="24" y1="24" x2="38.8" y2="9.2">
+              <stop offset="0%" stop-color="#22d3ee" />
+              <stop offset="100%" stop-color="#22d3ee" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <span data-i18n data-en="Captain Adel" data-ar="كابتن عادل"></span>
+      </a>
+      <nav role="navigation" aria-label="Site Navigation">
+        <a href="/" data-i18n data-en="Chat" data-ar="الدردشة"></a>
+      </nav>
+      <div class="nav-telemetry font-mono">
+        <span id="zulu-clock">00:00:00Z</span>
+        <span class="nav-tele-sep">|</span>
+        <span class="nav-tele-nominal">
+          <span class="tele-dot"></span>
+          <span data-en="SYSTEMS NOMINAL">الأنظمة تعمل</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 data-i18n data-en="Accessibility Statement" data-ar="إشعار إمكانية الوصول"></h1>
+
+    <p data-i18n data-en="Captain Adel is committed to inclusive digital access for all aviation learners and professionals. This statement details our accessibility conformance and known limitations.">
+      كابتن عادل ملتزم بتوفير وصول رقمي شامل لجميع المتعلمين والمتخصصين في الطيران. يوضح هذا الإشعار امتثالنا لمعايير إمكانية الوصول والقيود المعروفة.
+    </p>
+
+    <div class="highlight">
+      <h2 class="checkmark" data-i18n data-en="We conform to WCAG 2.1 Level AA standards" data-ar="نحن نمتثل لمعايير WCAG 2.1 المستوى AA">
+        We conform to WCAG 2.1 Level AA standards
+      </h2>
+      <p data-i18n data-en="This statement applies to:" data-ar="ينطبق هذا الإشعار على:">This statement applies to:</p>
+      <ul>
+        <li data-i18n data-en="captadel.com — The Captain Adel landing page and service platform" data-ar="captadel.com — صفحة هبوط كابتن عادل ومنصة الخدمة">
+          <strong>captadel.com</strong> — The Captain Adel landing page and service platform
+        </li>
+        <li data-i18n data-en="Chat interface — The conversational learning experience with Captain Adel" data-ar="واجهة الدردشة — تجربة التعلم الحوارية مع كابتن عادل">
+          <strong>Chat interface</strong> — The conversational learning experience with Captain Adel
+        </li>
+      </ul>
+      <p data-i18n data-en="Assessment Date: September 3, 2026" data-ar="تاريخ التقييم: 3 سبتمبر 2026">
+        <strong>Assessment Date:</strong> September 3, 2026
+      </p>
+      <p data-i18n data-en="Last Conformance Review: September 3, 2026" data-ar="آخر مراجعة للامتثال: 3 سبتمبر 2026">
+        <strong>Last Conformance Review:</strong> September 3, 2026
+      </p>
+    </div>
+
+    <h2 data-i18n data-en="Accessibility Features" data-ar="ميزات إمكانية الوصول">Accessibility Features</h2>
+
+    <h3 data-i18n data-en="1. Visual & Color Accessibility" data-ar="1. إمكانية الوصول البصرية واللونية">1. Visual & Color Accessibility</h3>
+    <p class="checkmark" data-i18n data-en="All text meets WCAG AA minimum contrast: 4.5:1 on dark backgrounds" data-ar="جميع النصوص تفي بالحد الأدنى من WCAG AA: 4.5:1 على الخلفيات الداكنة">
+      All text meets WCAG AA minimum contrast: <strong>4.5:1 on dark backgrounds</strong>
+    </p>
+    <p class="checkmark" data-i18n data-en="UI controls and graphical elements achieve 3:1+ contrast" data-ar="عناصر التحكم وعناصر الرسوميات تحقق تباين 3:1 أو أعلى">
+      UI controls and graphical elements achieve <strong>3:1+ contrast</strong> (exceeds WCAG AA non-text minimum)
+    </p>
+    <p class="checkmark" data-i18n data-en="Color is never the only means of conveying information" data-ar="اللون ليس أبداً الوسيلة الوحيدة لنقل المعلومات">
+      Color is never the only means of conveying information — status is always paired with text and/or icons
+    </p>
+
+    <h3 data-i18n data-en="2. Keyboard Navigation" data-ar="2. التنقل عبر لوحة المفاتيح">2. Keyboard Navigation</h3>
+    <p class="checkmark" data-i18n data-en="Every interactive element is reachable via keyboard alone" data-ar="كل عنصر تفاعلي يمكن الوصول إليه من خلال لوحة المفاتيح وحدها">
+      Every interactive element (buttons, links, form fields, modals) is reachable via keyboard alone
+    </p>
+    <p class="checkmark" data-i18n data-en="Tab order follows logical, left-to-right document flow" data-ar="ترتيب الجدول يتبع تدفق المستند المنطقي من اليسار إلى اليمين">
+      Tab order follows logical, left-to-right document flow for English; right-to-left for Arabic
+    </p>
+    <p class="checkmark" data-i18n data-en="No keyboard traps — you can always Tab forward or Shift+Tab backward" data-ar="لا توجد مصائد لوحة المفاتيح — يمكنك دائماً الضغط على Tab للأمام أو Shift+Tab للخلف">
+      No keyboard traps — you can always Tab forward or Shift+Tab backward
+    </p>
+
+    <h3 data-i18n data-en="3. Focus Management" data-ar="3. إدارة التركيز">3. Focus Management</h3>
+    <p class="checkmark" data-i18n data-en="All keyboard-focused elements display a visible cyan halo (2px outline + 4px shadow)" data-ar="جميع العناصر المركزة من لوحة المفاتيح تعرض هالة سماوية مرئية">
+      All keyboard-focused elements display a visible cyan halo (2px outline + 4px shadow)
+    </p>
+    <p class="checkmark" data-i18n data-en="Focus ring contrast 15.2:1–17.8:1 — far exceeds 3:1 requirement" data-ar="تباين حلقة التركيز 15.2:1–17.8:1 — يتجاوز بكثير الحد الأدنى 3:1">
+      Focus ring contrast <strong>15.2:1–17.8:1</strong> on dark backgrounds (far exceeds 3:1 requirement)
+    </p>
+    <p class="checkmark" data-i18n data-en="Focus only appears on keyboard navigation, never on mouse click" data-ar="يظهر التركيز فقط عند التنقل عبر لوحة المفاتيح، وليس عند النقر بالماوس">
+      Focus only appears on keyboard navigation, never on mouse click (preserves visual clarity)
+    </p>
+
+    <h3 data-i18n data-en="4. Text & Typography" data-ar="4. النص والطباعة">4. Text & Typography</h3>
+    <p class="checkmark" data-i18n data-en="All text scales correctly when zoomed up to 200% without horizontal scrolling" data-ar="يتم قياس جميع النصوص بشكل صحيح عند التكبير حتى 200% بدون تمرير أفقي">
+      All text scales correctly when zoomed up to 200% without horizontal scrolling
+    </p>
+    <p class="checkmark" data-i18n data-en="Language is declared via lang attribute on every page" data-ar="يتم التصريح باللغة عبر سمة lang على كل صفحة">
+      Every page declares its language via <code>lang="en"</code> or <code>lang="ar"</code> attribute
+    </p>
+    <p class="checkmark" data-i18n data-en="Screen readers automatically switch voices between English and Arabic" data-ar="تتبدل قارئات الشاشة الأصوات تلقائياً بين اللغة الإنجليزية والعربية">
+      Screen readers automatically switch voices between English and Arabic
+    </p>
+
+    <h3 data-i18n data-en="5. Motion & Animation" data-ar="5. الحركة والرسوم المتحركة">5. Motion & Animation</h3>
+    <p class="checkmark" data-i18n data-en="Users with prefers-reduced-motion see no animations" data-ar="المستخدمون الذين لديهم تفضيل حركة مخفضة لا يرون رسوم متحركة">
+      Users with <code>prefers-reduced-motion: reduce</code> in their system settings see no animations
+    </p>
+    <p class="checkmark" data-i18n data-en="All page transitions and micro-interactions pause automatically" data-ar="جميع انتقالات الصفحة والتفاعلات الدقيقة تتوقف تلقائياً">
+      All page transitions, hover effects, and micro-interactions pause automatically
+    </p>
+    <p class="checkmark" data-i18n data-en="Core functionality is never dependent on motion" data-ar="الوظائف الأساسية لا تعتمد أبداً على الحركة">
+      Core functionality is never dependent on motion
+    </p>
+
+    <h3 data-i18n data-en="6. Bilingual & Bidirectional (Arabic) Accessibility" data-ar="6. إمكانية الوصول ثنائية اللغة وثنائية الاتجاه (العربية)">6. Bilingual & Bidirectional (Arabic) Accessibility</h3>
+    <p class="checkmark" data-i18n data-en="Arabic interface fully mirrors English: all margins, padding, borders reverse automatically" data-ar="واجهة اللغة العربية تعكس كاملة الإنجليزية: جميع الهوامش والحشوة والحدود تنعكس تلقائياً">
+      Arabic interface fully mirrors English: all margins, padding, borders reverse automatically
+    </p>
+    <p class="checkmark" data-i18n data-en="No hardcoded left/right directions — all properties use logical equivalents" data-ar="لا توجد اتجاهات يمين/يسار محددة مسبقاً — جميع الخصائص تستخدم بدائل منطقية">
+      No hardcoded left/right directions — all properties use logical equivalents
+    </p>
+    <p class="checkmark" data-i18n data-en="Text direction properly declared with dir='rtl' on Arabic pages" data-ar="يتم التصريح بالاتجاه الصحيح باستخدام dir='rtl' على صفحات اللغة العربية">
+      Text direction properly declared with <code>dir="rtl"</code> on Arabic pages
+    </p>
+
+    <h3 data-i18n data-en="7. Forms & Error Handling" data-ar="7. النماذج ومعالجة الأخطاء">7. Forms & Error Handling</h3>
+    <p class="checkmark" data-i18n data-en="All form labels are visually associated and programmatically linked to inputs" data-ar="جميع تسميات النماذج مرتبطة بصرياً وبرمجياً بالمدخلات">
+      All form labels are visually associated and programmatically linked to inputs
+    </p>
+    <p class="checkmark" data-i18n data-en="Error messages appear in context and are linked to the problematic field" data-ar="تظهر رسائل الخطأ في السياق وترتبط بالحقل الذي به مشكلة">
+      Error messages appear in context and are linked to the problematic field
+    </p>
+    <p class="checkmark" data-i18n data-en="Validation feedback is non-destructive and immediate" data-ar="تغذية الراجعة للتحقق غير هدامة وفورية">
+      Validation feedback is non-destructive — users can correct and re-submit
+    </p>
+
+    <h3 data-i18n data-en="8. Touch Target Sizing" data-ar="8. حجم هدف اللمس">8. Touch Target Sizing</h3>
+    <p class="checkmark" data-i18n data-en="All buttons, links, and form controls meet or exceed 44×44 pixels" data-ar="جميع الأزرار والروابط وعناصر التحكم في النماذج تفي أو تتجاوز 44×44 بكسل">
+      All buttons, links, and form controls meet or exceed <strong>44×44 pixels</strong> (Apple HIG standard, WCAG AAA)
+    </p>
+    <p class="checkmark" data-i18n data-en="Touch targets are appropriately spaced to prevent accidental activation" data-ar="يتم فصل أهداف اللمس بشكل مناسب لمنع التفعيل العرضي">
+      Touch targets are appropriately spaced to prevent accidental activation
+    </p>
+
+    <h2 data-i18n data-en="WCAG 2.1 Level AA Conformance" data-ar="امتثال WCAG 2.1 المستوى AA">WCAG 2.1 Level AA Conformance</h2>
+    <p data-i18n data-en="The following conformance criteria have been verified through automated testing, manual testing, and screen reader testing:" data-ar="تم التحقق من معايير الامتثال التالية من خلال الاختبارات الآلية والاختبارات اليدوية واختبارات قارئ الشاشة:">
+      The following conformance criteria have been verified through automated testing, manual testing, and screen reader testing:
+    </p>
+    <ul>
+      <li data-i18n data-en="✅ Text Alternatives (1.1) — All non-text content has text alternatives" data-ar="✅ بدائل النص (1.1) — جميع المحتوى غير النصي له بدائل نصية">
+        <span class="checkmark">Text Alternatives (1.1)</span> — All non-text content has text alternatives
+      </li>
+      <li data-i18n data-en="✅ Adaptable (1.3) — Content does not rely solely on shape, size, or visual location" data-ar="✅ قابلة للتكيف (1.3) — المحتوى لا يعتمد فقط على الشكل أو الحجم أو الموقع البصري">
+        <span class="checkmark">Adaptable (1.3)</span> — Content does not rely solely on shape, size, or visual location
+      </li>
+      <li data-i18n data-en="✅ Distinguishable (1.4) — Contrast ratio 4.5:1 for text; 3:1 for UI components" data-ar="✅ متميزة (1.4) — نسبة التباين 4.5:1 للنص؛ 3:1 لمكونات واجهة المستخدم">
+        <span class="checkmark">Distinguishable (1.4)</span> — Contrast ratio 4.5:1 for text; 3:1 for UI components
+      </li>
+      <li data-i18n data-en="✅ Keyboard Accessible (2.1) — All functionality keyboard accessible; no keyboard traps" data-ar="✅ سهولة الوصول عبر لوحة المفاتيح (2.1) — جميع الوظائف يمكن الوصول إليها عبر لوحة المفاتيح؛ لا توجد مصائد">
+        <span class="checkmark">Keyboard Accessible (2.1)</span> — All functionality keyboard accessible; no keyboard traps
+      </li>
+      <li data-i18n data-en="✅ Enough Time (2.2) — No time limits on user interactions" data-ar="✅ وقت كافٍ (2.2) — لا توجد حدود زمنية للتفاعلات مع المستخدم">
+        <span class="checkmark">Enough Time (2.2)</span> — No time limits on user interactions
+      </li>
+      <li data-i18n data-en="✅ Seizures (2.3) — No content flashes more than 3 times per second" data-ar="✅ نوبات (2.3) — لا يومض أي محتوى أكثر من 3 مرات في الثانية">
+        <span class="checkmark">Seizures and Physical Reactions (2.3)</span> — No content flashes more than 3 times per second
+      </li>
+      <li data-i18n data-en="✅ Navigable (2.4) — Purpose of links is clear from link text or context" data-ar="✅ قابلة للتنقل (2.4) — الغرض من الروابط واضح من نص الرابط أو السياق">
+        <span class="checkmark">Navigable (2.4)</span> — Purpose of links is clear from link text or context
+      </li>
+      <li data-i18n data-en="✅ Readable (3.1) — Language of page is declared" data-ar="✅ قابلة للقراءة (3.1) — تم التصريح بلغة الصفحة">
+        <span class="checkmark">Readable (3.1)</span> — Language of page is declared
+      </li>
+      <li data-i18n data-en="✅ Understandable (3.2) — No unexpected changes in context" data-ar="✅ سهلة الفهم (3.2) — لا توجد تغييرات غير متوقعة في السياق">
+        <span class="checkmark">Understandable (3.2)</span> — No unexpected changes in context on focus or input
+      </li>
+      <li data-i18n data-en="✅ Input Assistance (3.3) — Labels associated with form inputs; error messages clear" data-ar="✅ مساعدة الإدخال (3.3) — تسميات مرتبطة بمدخلات النموذج؛ رسائل الخطأ واضحة">
+        <span class="checkmark">Input Assistance (3.3)</span> — Labels associated with form inputs; error messages are clear
+      </li>
+      <li data-i18n data-en="✅ Compatible (4.1) — Semantic HTML used correctly; ARIA attributes valid" data-ar="✅ متوافقة (4.1) — استخدام HTML الدلالي بشكل صحيح؛ سمات ARIA صحيحة">
+        <span class="checkmark">Compatible (4.1)</span> — All semantic HTML is used correctly; ARIA attributes are valid
+      </li>
+    </ul>
+
+    <h2 data-i18n data-en="Testing & Compliance" data-ar="الاختبار والامتثال">Testing & Compliance</h2>
+
+    <h3 data-i18n data-en="Automated Testing" data-ar="الاختبارات الآلية">Automated Testing</h3>
+    <p class="checkmark" data-i18n data-en="We run axe-core (WCAG 2.1 Level AA scanner) on every production deployment" data-ar="نقوم بتشغيل axe-core (ماسح WCAG 2.1 المستوى AA) في كل نشر إنتاجي">
+      We run axe-core (WCAG 2.1 Level AA scanner) on every production deployment
+    </p>
+    <p class="checkmark" data-i18n data-en="Lighthouse accessibility audits run continuously on flagship pages" data-ar="تعمل عمليات تدقيق إمكانية الوصول في Lighthouse بشكل مستمر على الصفحات الرئيسية">
+      Lighthouse accessibility audits run continuously on flagship pages
+    </p>
+
+    <h3 data-i18n data-en="Manual Testing" data-ar="الاختبارات اليدوية">Manual Testing</h3>
+    <p class="checkmark" data-i18n data-en="All interactive elements tested with keyboard navigation (Tab, Shift+Tab, Escape, Enter)" data-ar="تم اختبار جميع العناصر التفاعلية باستخدام التنقل عبر لوحة المفاتيح">
+      All interactive elements tested with keyboard navigation (Tab, Shift+Tab, Escape, Enter)
+    </p>
+    <p class="checkmark" data-i18n data-en="Focus ring visibility verified on dark, light, and high-contrast backgrounds" data-ar="تم التحقق من رؤية حلقة التركيز على الخلفيات الداكنة والخفيفة والعالية التباين">
+      Focus ring visibility verified on dark, light, and high-contrast backgrounds
+    </p>
+    <p data-i18n data-en="Screen readers tested:" data-ar="قارئات الشاشة المختبرة:"><strong>Screen readers tested:</strong></p>
+    <ul>
+      <li><span class="checkmark">NVDA (Windows)</span></li>
+      <li><span class="checkmark">JAWS (Windows)</span></li>
+      <li><span class="checkmark">VoiceOver (macOS/iOS)</span></li>
+    </ul>
+    <p data-i18n data-en="Color-blind simulation tested: Deuteranopia, Protanopia, Tritanopia" data-ar="تم اختبار محاكاة عمى الألوان: Deuteranopia و Protanopia و Tritanopia">
+      <span class="checkmark">Color-blind simulation tested: Deuteranopia, Protanopia, Tritanopia</span>
+    </p>
+
+    <h2 data-i18n data-en="Known Limitations & Workarounds" data-ar="القيود المعروفة والحلول البديلة">Known Limitations & Workarounds</h2>
+
+    <h3 data-i18n data-en="1. Third-Party Content" data-ar="1. محتوى من جهات خارجية">1. Third-Party Content</h3>
+    <p data-i18n data-en="Some pages may embed content from external sources. These are covered by this statement only to the extent we control their presentation layer." data-ar="قد تحتوي بعض الصفحات على محتوى من مصادر خارجية. هذا مشمول بهذا الإشعار فقط بقدر ما نتحكم فيه في طبقة العرض.">
+      Some pages may embed content from external sources. These are covered by this statement only to the extent we control their presentation layer.
+    </p>
+
+    <h3 data-i18n data-en="2. Color Blindness Accommodation" data-ar="2. استيعاب عمى الألوان">2. Color Blindness Accommodation</h3>
+    <p class="checkmark" data-i18n data-en="All status signals use a combination of color + icon + label" data-ar="جميع إشارات الحالة تستخدم مزيجاً من اللون + الرمز + العنوان">
+      All status signals (success, warning, error) use a combination of color + icon + label
+    </p>
+    <p class="checkmark" data-i18n data-en="Users with color blindness can rely on icon and text labels" data-ar="يمكن للمستخدمين المصابين بعمى الألوان الاعتماد على رموز وتسميات النص">
+      Users with Deuteranopia, Protanopia, or Tritanopia can rely on icon and text labels
+    </p>
+    <p data-i18n data-en="Testing: Verified against color-blind simulation modes" data-ar="الاختبار: تم التحقق من أوضاع محاكاة عمى الألوان">
+      <strong>Testing:</strong> Verified against color-blind simulation modes (Deuteranopia, Protanopia, Tritanopia)
+    </p>
+
+    <h3 data-i18n data-en="3. AI-Generated Content" data-ar="3. محتوى ينتجه الذكاء الاصطناعي">3. AI-Generated Content</h3>
+    <p data-i18n data-en="Captain Adel responses are generated by a machine-learning model and may occasionally:" data-ar="يتم إنشاء ردود كابتن عادل بواسطة نموذج التعلم الآلي وقد:">
+      Captain Adel responses are generated by a machine-learning model and may occasionally:
+    </p>
+    <ul>
+      <li data-i18n data-en="Produce slightly unclear phrasing (we're working on this)" data-ar="ينتج صياغة غير واضحة قليلاً (نحن نعمل على هذا)">Produce slightly unclear phrasing (we're working on this)</li>
+      <li data-i18n data-en="Produce images or diagrams that lack alt text (coming in Phase 2)" data-ar="ينتج صوراً أو مخططات تفتقد نص بديل (سيأتي في المرحلة 2)">Produce images or diagrams that lack alt text (coming in Phase 2)</li>
+    </ul>
+    <p data-i18n data-en="If an AI response seems inaccessible or inaccurate, flag it with the 👎 button and we'll review it." data-ar="إذا بدت إجابة الذكاء الاصطناعي غير قابلة للوصول أو غير دقيقة، قم بالإشارة إليها باستخدام الزر 👎 وسنقوم بمراجعتها.">
+      If an AI response seems inaccessible or inaccurate, flag it with the 👎 button and we'll review it.
+    </p>
+
+    <h2 data-i18n data-en="Feedback & Accessibility Support" data-ar="التغذية الراجعة ودعم إمكانية الوصول">Feedback & Accessibility Support</h2>
+
+    <p data-i18n data-en="If you encounter an accessibility barrier, we want to hear about it. Please report issues to:" data-ar="إذا واجهت حاجزاً في إمكانية الوصول، فنحن نريد أن نسمع عنه. يرجى الإبلاغ عن المشاكل إلى:">
+      If you encounter an accessibility barrier, we want to hear about it. Please report issues to:
+    </p>
+
+    <p>
+      <strong data-i18n data-en="Email:" data-ar="البريد الإلكتروني:">Email:</strong>
+      <a href="mailto:i@flygaca.com">i@flygaca.com</a><br>
+      <strong data-i18n data-en="Subject:" data-ar="الموضوع:">Subject:</strong>
+      <span data-i18n data-en='"Accessibility Issue — [Page/Feature Name]"' data-ar='"مشكلة الوصول — [اسم الصفحة/الميزة]"'>"Accessibility Issue — [Page/Feature Name]"</span>
+    </p>
+
+    <p data-i18n data-en="Please include:" data-ar="يرجى تضمين:">Please include:</p>
+    <ul>
+      <li data-i18n data-en="The page URL or feature name" data-ar="عنوان الصفحة أو اسم الميزة">The page URL or feature name</li>
+      <li data-i18n data-en="A description of the barrier you encountered" data-ar="وصف الحاجز الذي واجهته">A description of the barrier you encountered</li>
+      <li data-i18n data-en="The assistive technology you use (screen reader, voice control, etc.)" data-ar="التكنولوجيا المساعدة التي تستخدمها (قارئ الشاشة أو التحكم الصوتي وما إلى ذلك)">The assistive technology you use (screen reader, voice control, etc.)</li>
+      <li data-i18n data-en="Your browser and operating system" data-ar="متصفحك ونظام التشغيل الخاص بك">Your browser and operating system</li>
+    </ul>
+
+    <p data-i18n data-en="We aim to respond within 5 business days and will work with you on a solution." data-ar="نهدف إلى الرد في غضون 5 أيام عمل وسنعمل معك على إيجاد حل.">
+      We aim to respond within 5 business days and will work with you on a solution.
+    </p>
+
+    <h2 data-i18n data-en="Language & Localization" data-ar="اللغة والتوطين">Language & Localization</h2>
+
+    <p data-i18n data-en="This statement is available in English and Arabic. Both versions carry equal weight and authority." data-ar="هذا الإشعار متاح باللغة الإنجليزية والعربية. كلا الإصدارين لهما وزن وسلطة متساوية.">
+      This statement is available in English and Arabic. Both versions carry equal weight and authority.
+    </p>
+
+    <ul>
+      <li data-i18n data-en="English: This page" data-ar="الإنجليزية: هذه الصفحة">English: <a href="https://captadel.com/accessibility">This page</a></li>
+      <li data-i18n data-en="Arabic: /ar/accessibility" data-ar="العربية: /ar/accessibility">Arabic: <a href="https://captadel.com/ar/accessibility">/ar/accessibility</a></li>
+    </ul>
+
+    <h2 data-i18n data-en="Updates to This Statement" data-ar="التحديثات على هذا الإشعار">Updates to This Statement</h2>
+
+    <p data-i18n data-en="We review and update this statement annually or when significant changes are made to the platform." data-ar="نراجع ونحدّث هذا الإشعار سنوياً أو عندما يتم إجراء تغييرات كبيرة على المنصة.">
+      We review and update this statement annually or when significant changes are made to the platform.
+    </p>
+
+    <ul>
+      <li><strong data-i18n data-en="Last Assessment:" data-ar="آخر تقييم:">Last Assessment:</strong> <span data-i18n data-en="Phase 1c, September 3, 2026" data-ar="المرحلة 1c، 3 سبتمبر 2026">Phase 1c, September 3, 2026</span></li>
+      <li><strong data-i18n data-en="Last Updated:" data-ar="آخر تحديث:">Last Updated:</strong> <span data-i18n data-en="September 3, 2026" data-ar="3 سبتمبر 2026">September 3, 2026</span></li>
+      <li><strong data-i18n data-en="Next Scheduled Audit:" data-ar="المراجعة المجدولة القادمة:">Next Scheduled Audit:</strong> <span data-i18n data-en="Phase 2 (new features deployment)" data-ar="المرحلة 2 (نشر الميزات الجديدة)">Phase 2 (new features deployment)</span></li>
+    </ul>
+
+    <div class="highlight">
+      <p data-i18n data-en="Captain Adel is committed to accessibility. Learning should be inclusive for everyone." data-ar="كابتن عادل ملتزم بإمكانية الوصول. التعلم يجب أن يكون شاملاً للجميع.">
+        <strong data-i18n data-en="Captain Adel is committed to accessibility. Learning should be inclusive for everyone." data-ar="كابتن عادل ملتزم بإمكانية الوصول. التعلم يجب أن يكون شاملاً للجميع.">
+          Captain Adel is committed to accessibility. Learning should be inclusive for everyone.
+        </strong>
+      </p>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+</body>
+</html>

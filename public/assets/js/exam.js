@@ -26,7 +26,7 @@
   const QUIZ_URL = 'assets/data/quiz.json';
   const ENDPOINT = '/v1/chat';
   const STORE = 'captadel:exam-progress';
-  const AVATAR = 'assets/img/captain/avatar.png';
+  const AVATAR = '/avatar.png';
   const PRACTICE_COUNTS = [10, 15, 25];
 
   const isAr = () => document.documentElement.lang !== 'en';
